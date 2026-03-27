@@ -3,13 +3,65 @@ package com.resolver
 class MutableICPCScoreboardImpl(
     private val rows: MutableList<MutableICPCRow>
 ) : MutableScoreboard<MutableICPCRow> {
-    private var currentRowIndex = rows.size - 1
-
-    override fun getCurrentRow(): MutableICPCRow {
-        return rows[currentRowIndex]
+    init {
+        rows
+            .sortWith(
+                compareByDescending<MutableICPCRow> { it.solvedCount }
+                    .thenBy { it.totalPenaltyTime }
+            )
+        rows.forEachIndexed { i, row ->
+            row.rank = i + 1
+        }
     }
 
-    override fun sort(): ResolutionStep {
-        TODO("Not yet implemented")
+    private var currentRowIndex = rows.size - 1
+
+    override fun getCurrentRow(): MutableICPCRow? {
+        return if (currentRowIndex >= 0) {
+            rows[currentRowIndex]
+        } else {
+            null
+        }
+    }
+
+    override fun sort(problemId: String): ResolutionStep {
+        if (!(rows[currentRowIndex].problemIdToSubmissionsResult[problemId]
+                ?: throw UnexpectedStateException(
+                    "problemId=$problemId is expected to be the key of map, but it is not"
+                )).isSolved
+        ) {
+            return ResolutionStep.RejectResolutionStep(
+                rows[currentRowIndex].teamId,
+                problemId
+            )
+        }
+        var aboveIndex = currentRowIndex - 1
+        val oldIndex = currentRowIndex
+        var newIndex = currentRowIndex
+        while (aboveIndex >= 0 &&
+            (rows[newIndex].solvedCount > rows[aboveIndex].solvedCount ||
+                    (rows[newIndex].solvedCount == rows[newIndex].solvedCount) &&
+                    (rows[newIndex].totalPenaltyTime < rows[newIndex].totalPenaltyTime))
+        ) {
+            rows[newIndex] = rows[aboveIndex].also { rows[aboveIndex] = rows[newIndex] }
+            rows[newIndex].rank = newIndex + 1
+            rows[aboveIndex].rank = aboveIndex + 1
+            aboveIndex--
+            newIndex--
+        }
+        return ResolutionStep.ICPCAcceptResolutionStep(
+            teamId = rows[newIndex].teamId,
+            problemId = problemId,
+            oldRank = rows[oldIndex].rank,
+            newRank = rows[newIndex].rank,
+            oldTotalPenaltyTime = rows[oldIndex].totalPenaltyTime,
+            newTotalPenaltyTime = rows[newIndex].totalPenaltyTime,
+            isSolved = true,
+            isFirstToSolve = false // TODO
+        )
+    }
+
+    override fun up() {
+        currentRowIndex--
     }
 }

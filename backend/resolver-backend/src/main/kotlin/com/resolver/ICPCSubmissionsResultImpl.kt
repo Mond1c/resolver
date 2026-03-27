@@ -5,7 +5,6 @@ import kotlin.time.Duration
 data class ICPCSubmissionsResultImpl(
     override val penaltyTime: Duration,
     override val isSolved: Boolean,
-    override val isPending: Boolean
-) : ICPCSubmissionsResult {
-    override var isOpened: Boolean = false
-}
+    override val isPending: Boolean,
+    override var isOpened: Boolean
+) : ICPCSubmissionsResult

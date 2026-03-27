@@ -1,5 +1,7 @@
 package com.resolver
 
+import kotlin.time.Duration
+
 sealed interface ResolutionStep {
     class RejectResolutionStep(
         val teamId: String,
@@ -11,8 +13,8 @@ sealed interface ResolutionStep {
         val problemId: String,
         val oldRank: Int,
         val newRank: Int,
-        val oldTotalTime: Int,
-        val newTotalTime: Int,
+        val oldTotalPenaltyTime: Duration,
+        val newTotalPenaltyTime: Duration,
         val isSolved: Boolean,
         val isFirstToSolve: Boolean
     ) : ResolutionStep

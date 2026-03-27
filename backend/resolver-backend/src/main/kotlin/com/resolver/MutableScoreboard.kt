@@ -1,7 +1,9 @@
 package com.resolver
 
 interface MutableScoreboard<T : MutableRow> {
-    fun getCurrentRow(): T
+    fun getCurrentRow(): T?
 
-    fun sort(): ResolutionStep
+    fun sort(problemId: String): ResolutionStep
+
+    fun up()
 }
