@@ -32,12 +32,12 @@ internal object MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<Muta
                                 val judgementContestEndTime =
                                     judgement.endContestTime
                                         ?: TODO("Interesting case: judgement does not have end contest time. \n $judgement")
-                                if (judgement.id in eventFeedAnalyzer.penaltyJudgementTypeIds) {
+                                if (judgement.judgementTypeId in eventFeedAnalyzer.penaltyJudgementTypeIds) {
                                     if (judgementContestEndTime >= freezeContestStartTime) {
                                         isPending = true
                                     }
                                     penalty += penaltyTime
-                                } else if (judgement.id in eventFeedAnalyzer.solvedJudgementTypeIds) {
+                                } else if (judgement.judgementTypeId in eventFeedAnalyzer.solvedJudgementTypeIds) {
                                     penalty += submission.contestTime
                                     isSolved = true
                                     if (judgementContestEndTime >= freezeContestStartTime) {

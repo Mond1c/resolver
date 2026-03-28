@@ -4,7 +4,7 @@ import com.resolver.resolution_logic_api.ICPCSubmissionsResult
 import com.resolver.resolution_logic_api.MutableICPCRow
 import kotlin.time.Duration
 
-internal class MutableICPCRowImpl(
+internal data class MutableICPCRowImpl(
     override var teamId: String,
     override var rank: Int,
     override var totalPenaltyTime: Duration,

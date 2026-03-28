@@ -4,7 +4,7 @@ import com.resolver.resolution_logic_api.MutableICPCRow
 import com.resolver.resolution_logic_api.MutableScoreboard
 import com.resolver.resolution_logic_api.ResolutionStep
 
-internal class MutableICPCScoreboardImpl(
+internal data class MutableICPCScoreboardImpl(
     private val rows: MutableList<MutableICPCRow>
 ) : MutableScoreboard<MutableICPCRow> {
     init {

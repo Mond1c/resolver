@@ -5,7 +5,7 @@ internal object EventFeedElementTypes {
     const val TEAMS = "teams"
     const val ORGANIZATIONS = "organizations"
     const val JUDGEMENTS = "judgements"
-    const val JUDGEMENT_TYPES = "judgement_types"
+    const val JUDGEMENT_TYPES = "judgement-types"
     const val SUBMISSIONS = "submissions"
     const val AWARDS = "awards"
 }

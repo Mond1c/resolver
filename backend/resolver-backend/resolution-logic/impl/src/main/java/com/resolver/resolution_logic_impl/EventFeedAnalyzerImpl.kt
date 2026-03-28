@@ -153,8 +153,12 @@ internal class EventFeedAnalyzerImpl(
         return _judgements
             .groupBy { it.submissionId }
             .mapValues { judgement ->
-                judgement.value
-                    .filter { it.current ?: true }
+                listOf(
+                    judgement.value
+                        .filter { it.current ?: true }
+                        .sortedBy { it.endTime }
+                        .last()
+                )
             }
     }
 }
