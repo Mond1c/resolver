@@ -63,7 +63,11 @@ internal class EventFeedAnalyzerImpl(
 
     private fun read(eventFeedPath: Path) {
         Files.newBufferedReader(eventFeedPath).use { reader ->
-            reader.forEachLine { line ->
+            while (true) {
+                val line = reader.readLine() ?: break
+                if (line.isBlank()) {
+                    continue
+                }
                 val jsonElement = json.parseToJsonElement(line)
                 jsonElement.jsonObject[Constants.DATA]?.let { jsonDataElement ->
                     when (jsonElement.jsonObject[Constants.TYPE]?.jsonPrimitive?.content) {
