@@ -1,4 +1,4 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.constants
 
 internal object EventFeedElementTypes {
     const val CONTEST = "contest"

@@ -1,4 +1,4 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.extensions
 
 import org.icpclive.clics.objects.Contest
 import kotlin.time.Duration

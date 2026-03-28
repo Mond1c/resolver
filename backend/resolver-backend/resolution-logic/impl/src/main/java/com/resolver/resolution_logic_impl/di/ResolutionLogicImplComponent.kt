@@ -1,8 +1,11 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.di
 
 import com.resolver.resolution_logic_api.EventFeedResolutionPreparator
 import com.resolver.resolution_logic_api.MutableICPCRow
 import com.resolver.resolution_logic_api.MutableScoreboardBuilder
+import com.resolver.resolution_logic_impl.event_feed_analyzer.EventFeedAnalyzerImpl
+import com.resolver.resolution_logic_impl.icpc.MutableICPCScoreboardBuilderImpl
+import com.resolver.resolution_logic_impl.icpc.SimpleICPCEventFeedResolutionPreparatorImpl
 import kotlinx.serialization.json.Json
 import org.icpclive.clics.FeedVersion
 import org.icpclive.clics.clicsEventsSerializersModule

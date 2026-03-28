@@ -1,6 +1,9 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.event_feed_analyzer
 
 import com.resolver.resolution_logic_api.EventFeedAnalyzer
+import com.resolver.resolution_logic_impl.constants.Constants
+import com.resolver.resolution_logic_impl.constants.EventFeedElementTypes
+import com.resolver.resolution_logic_impl.exceptions.UnexpectedStateException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
@@ -55,6 +58,7 @@ internal class EventFeedAnalyzerImpl(
         _submissions.clear()
         _organizations.clear()
         _teams.clear()
+        _awards.clear()
     }
 
     private fun read(eventFeedPath: Path) {

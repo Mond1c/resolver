@@ -1,4 +1,4 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.icpc
 
 import com.resolver.resolution_logic_api.ICPCSubmissionsResult
 import com.resolver.resolution_logic_api.MutableICPCRow

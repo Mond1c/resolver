@@ -1,8 +1,9 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.icpc
 
 import com.resolver.resolution_logic_api.MutableICPCRow
 import com.resolver.resolution_logic_api.MutableScoreboard
 import com.resolver.resolution_logic_api.ResolutionStep
+import com.resolver.resolution_logic_impl.exceptions.UnexpectedStateException
 
 internal data class MutableICPCScoreboardImpl(
     private val rows: MutableList<MutableICPCRow>

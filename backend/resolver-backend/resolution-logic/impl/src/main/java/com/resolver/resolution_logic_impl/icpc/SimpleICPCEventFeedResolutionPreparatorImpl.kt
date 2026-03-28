@@ -1,7 +1,8 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.icpc
 
 import com.resolver.resolution_logic_api.*
 import java.nio.file.Path
+import kotlin.collections.iterator
 
 internal class SimpleICPCEventFeedResolutionPreparatorImpl(
     private val eventFeedAnalyzer: EventFeedAnalyzer,

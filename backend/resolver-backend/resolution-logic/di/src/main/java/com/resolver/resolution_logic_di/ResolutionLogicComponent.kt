@@ -1,7 +1,7 @@
 package com.resolver.resolution_logic_di
 
 import com.resolver.resolution_logic_api.EventFeedResolutionPreparator
-import com.resolver.resolution_logic_impl.ResolutionLogicImplComponent
+import com.resolver.resolution_logic_impl.di.ResolutionLogicImplComponent
 import java.nio.file.Path
 
 object ResolutionLogicComponent {

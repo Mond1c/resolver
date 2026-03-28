@@ -1,6 +1,8 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.icpc
 
 import com.resolver.resolution_logic_api.*
+import com.resolver.resolution_logic_impl.exceptions.UnexpectedStateException
+import com.resolver.resolution_logic_impl.extensions.calculateFreezeContestStartTime
 import kotlin.time.Duration
 
 internal object MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow> {

@@ -1,4 +1,4 @@
-package com.resolver.resolution_logic_impl
+package com.resolver.resolution_logic_impl.constants
 
 internal object Constants {
     const val TYPE = "type"
