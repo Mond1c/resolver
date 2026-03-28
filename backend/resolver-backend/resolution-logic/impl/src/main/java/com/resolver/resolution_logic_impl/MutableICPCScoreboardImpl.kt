@@ -1,6 +1,10 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
-class MutableICPCScoreboardImpl(
+import com.resolver.resolution_logic_api.MutableICPCRow
+import com.resolver.resolution_logic_api.MutableScoreboard
+import com.resolver.resolution_logic_api.ResolutionStep
+
+internal class MutableICPCScoreboardImpl(
     private val rows: MutableList<MutableICPCRow>
 ) : MutableScoreboard<MutableICPCRow> {
     init {

@@ -1,8 +1,9 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
+import com.resolver.resolution_logic_api.*
 import kotlin.time.Duration
 
-class MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow> {
+internal object MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow> {
     override fun build(eventFeedAnalyzer: EventFeedAnalyzer): MutableScoreboard<MutableICPCRow> {
         val submissionIdToJudgements = eventFeedAnalyzer.getSubmissionIdToJudgements()
         val penaltyTime = eventFeedAnalyzer.contest.penaltyTime
@@ -28,7 +29,9 @@ class MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow
                                 .sortedBy { it.time }) {
                                 val judgement = (submissionIdToJudgements[submission.id]
                                     ?: throw UnexpectedStateException("submissionId=${submission.id} is expected to be the key of map, but it is not"))[0]
-                                val judgementContestEndTime = judgement.endContestTime ?: TODO("Interesting case")
+                                val judgementContestEndTime =
+                                    judgement.endContestTime
+                                        ?: TODO("Interesting case: judgement does not have end contest time. \n $judgement")
                                 if (judgement.id in eventFeedAnalyzer.penaltyJudgementTypeIds) {
                                     if (judgementContestEndTime >= freezeContestStartTime) {
                                         isPending = true

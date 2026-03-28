@@ -1,5 +1,6 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
+import com.resolver.resolution_logic_api.EventFeedAnalyzer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
@@ -8,7 +9,7 @@ import org.icpclive.clics.objects.*
 import java.nio.file.Files
 import java.nio.file.Path
 
-class EventFeedAnalyzerImpl(
+internal class EventFeedAnalyzerImpl(
     private val json: Json
 ) : EventFeedAnalyzer {
     private lateinit var _contest: Contest

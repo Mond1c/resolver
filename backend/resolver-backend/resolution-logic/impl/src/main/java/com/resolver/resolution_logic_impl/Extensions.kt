@@ -1,8 +1,8 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
 import org.icpclive.clics.objects.Contest
 import kotlin.time.Duration
 
-fun Contest.calculateFreezeContestStartTime(): Duration {
+internal fun Contest.calculateFreezeContestStartTime(): Duration {
     return duration - (scoreboardFreezeDuration ?: Duration.ZERO)
 }

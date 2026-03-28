@@ -10,3 +10,7 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
     }
 }
+
+include(":resolution-logic:api")
+include(":resolution-logic:impl")
+include(":resolution-logic:di")

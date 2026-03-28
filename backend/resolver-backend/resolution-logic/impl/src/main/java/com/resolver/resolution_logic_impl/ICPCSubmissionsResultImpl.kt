@@ -1,8 +1,9 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
+import com.resolver.resolution_logic_api.ICPCSubmissionsResult
 import kotlin.time.Duration
 
-data class ICPCSubmissionsResultImpl(
+internal class ICPCSubmissionsResultImpl(
     override val isFirstToSolve: Boolean,
     override val penaltyTime: Duration,
     override val isSolved: Boolean,

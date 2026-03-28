@@ -1,6 +1,6 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
-object EventFeedElementTypes {
+internal object EventFeedElementTypes {
     const val CONTEST = "contest"
     const val TEAMS = "teams"
     const val ORGANIZATIONS = "organizations"

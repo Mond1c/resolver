@@ -1,8 +1,9 @@
-package com.resolver
+package com.resolver.resolution_logic_impl
 
+import com.resolver.resolution_logic_api.*
 import java.nio.file.Path
 
-class SimpleICPCEventFeedResolutionPreparatorImpl(
+internal class SimpleICPCEventFeedResolutionPreparatorImpl(
     private val eventFeedAnalyzer: EventFeedAnalyzer,
     private val mutableICPCScoreboardBuilder: MutableScoreboardBuilder<MutableICPCRow>,
     eventFeedPath: Path
@@ -13,7 +14,7 @@ class SimpleICPCEventFeedResolutionPreparatorImpl(
         eventFeedAnalyzer.filterUnjudgedSubmissions()
     }
 
-    override fun prepareResolution() {
+    override fun prepareResolution(): List<ResolutionStep> {
         val scoreboard = mutableICPCScoreboardBuilder.build(eventFeedAnalyzer)
         while (true) {
             val row = scoreboard.getCurrentRow() ?: break
@@ -36,5 +37,6 @@ class SimpleICPCEventFeedResolutionPreparatorImpl(
                 scoreboard.up()
             }
         }
+        return steps
     }
 }

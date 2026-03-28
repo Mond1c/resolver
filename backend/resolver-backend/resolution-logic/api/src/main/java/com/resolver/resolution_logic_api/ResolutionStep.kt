@@ -1,14 +1,14 @@
-package com.resolver
+package com.resolver.resolution_logic_api
 
 import kotlin.time.Duration
 
 sealed interface ResolutionStep {
-    class RejectResolutionStep(
+    data class RejectResolutionStep(
         val teamId: String,
         val problemId: String
     ) : ResolutionStep
 
-    class ICPCAcceptResolutionStep(
+    data class ICPCAcceptResolutionStep(
         val teamId: String,
         val problemId: String,
         val oldRank: Int,
@@ -19,7 +19,7 @@ sealed interface ResolutionStep {
         val isFirstToSolve: Boolean
     ) : ResolutionStep
 
-    class IOIAcceptResolutionStep(
+    data class IOIAcceptResolutionStep(
         val teamId: String,
         val problemId: String,
         val oldRank: Int,

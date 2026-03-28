@@ -1,7 +1,7 @@
-package com.resolver
+package com.resolver.resolution_logic_api
 
 abstract class EventFeedResolutionPreparator {
     protected val steps = mutableListOf<ResolutionStep>()
 
-    abstract fun prepareResolution()
+    abstract fun prepareResolution(): List<ResolutionStep>
 }

@@ -1,4 +1,4 @@
-package com.resolver
+package com.resolver.resolution_logic_api
 
 import org.icpclive.clics.objects.*
 import java.nio.file.Path
