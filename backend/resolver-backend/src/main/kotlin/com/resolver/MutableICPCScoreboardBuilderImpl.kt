@@ -4,17 +4,11 @@ import kotlin.time.Duration
 
 class MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow> {
     override fun build(eventFeedAnalyzer: EventFeedAnalyzer): MutableScoreboard<MutableICPCRow> {
-        val submissionIdToJudgement = eventFeedAnalyzer
-            .judgements
-            .groupBy { it.submissionId }
-            .mapValues { judgement ->
-                judgement.value
-                    .filter { it.current ?: true }
-            }
+        val submissionIdToJudgements = eventFeedAnalyzer.getSubmissionIdToJudgements()
         val penaltyTime = eventFeedAnalyzer.contest.penaltyTime
             ?: throw UnexpectedStateException("Penalty time is expected to be defined in pass-fail contests")
-        val freezeContestStartTime =
-            eventFeedAnalyzer.contest.duration - (eventFeedAnalyzer.contest.scoreboardFreezeDuration ?: Duration.ZERO)
+        val freezeContestStartTime = eventFeedAnalyzer.contest.calculateFreezeContestStartTime()
+        val problemIdToFirstSolvedTeamId = eventFeedAnalyzer.getProblemIdToFirstSolvedTeamId()
         val rows: MutableList<MutableICPCRow> = eventFeedAnalyzer
             .submissions
             .groupBy { it.teamId }
@@ -32,7 +26,7 @@ class MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow
                             var isPending = false
                             for (submission in submissions2.value
                                 .sortedBy { it.time }) {
-                                val judgement = (submissionIdToJudgement[submission.id]
+                                val judgement = (submissionIdToJudgements[submission.id]
                                     ?: throw UnexpectedStateException("submissionId=${submission.id} is expected to be the key of map, but it is not"))[0]
                                 val judgementContestEndTime = judgement.endContestTime ?: TODO("Interesting case")
                                 if (judgement.id in eventFeedAnalyzer.penaltyJudgementTypeIds) {
@@ -52,7 +46,11 @@ class MutableICPCScoreboardBuilderImpl : MutableScoreboardBuilder<MutableICPCRow
                                     break
                                 }
                             }
+                            val anySubmission = submissions2.value.firstOrNull()
+                                ?: throw UnexpectedStateException("Submissions must have at least one submission")
                             ICPCSubmissionsResultImpl(
+                                isFirstToSolve = problemIdToFirstSolvedTeamId[anySubmission.problemId]
+                                        == anySubmission.teamId,
                                 penaltyTime = penalty,
                                 isSolved = isSolved,
                                 isPending = isPending,

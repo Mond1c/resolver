@@ -9,6 +9,8 @@ class SimpleICPCEventFeedResolutionPreparatorImpl(
 ) : EventFeedResolutionPreparator() {
     init {
         eventFeedAnalyzer.resetAndAnalyze(eventFeedPath)
+        eventFeedAnalyzer.filterHiddenTeams()
+        eventFeedAnalyzer.filterUnjudgedSubmissions()
     }
 
     override fun prepareResolution() {

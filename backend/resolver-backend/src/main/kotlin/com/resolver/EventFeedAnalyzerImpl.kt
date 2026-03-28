@@ -19,13 +19,13 @@ class EventFeedAnalyzerImpl(
     override val judgements: List<Judgement>
         get() = _judgements
 
-    private val _solvedJudgementTypes = hashSetOf<String>()
+    private val _solvedJudgementTypeIds = hashSetOf<String>()
     override val solvedJudgementTypeIds: Set<String>
-        get() = _solvedJudgementTypes
+        get() = _solvedJudgementTypeIds
 
-    private val _penaltyJudgementTypes = hashSetOf<String>()
+    private val _penaltyJudgementTypeIds = hashSetOf<String>()
     override val penaltyJudgementTypeIds: Set<String>
-        get() = _penaltyJudgementTypes
+        get() = _penaltyJudgementTypeIds
 
     private val _submissions = mutableListOf<Submission>()
     override val submissions: List<Submission>
@@ -49,8 +49,8 @@ class EventFeedAnalyzerImpl(
 
     override fun reset() {
         _judgements.clear()
-        _solvedJudgementTypes.clear()
-        _penaltyJudgementTypes.clear()
+        _solvedJudgementTypeIds.clear()
+        _penaltyJudgementTypeIds.clear()
         _submissions.clear()
         _organizations.clear()
         _teams.clear()
@@ -92,15 +92,68 @@ class EventFeedAnalyzerImpl(
                         EventFeedElementTypes.JUDGEMENT_TYPES -> {
                             val judgementType = json.decodeFromJsonElement<JudgementType>(jsonDataElement)
                             if (judgementType.penalty) {
-                                _penaltyJudgementTypes.add(judgementType.id)
+                                _penaltyJudgementTypeIds.add(judgementType.id)
                             }
                             if (judgementType.solved) {
-                                _solvedJudgementTypes.add(judgementType.id)
+                                _solvedJudgementTypeIds.add(judgementType.id)
                             }
                         }
                     }
                 }
             }
         }
+        if (!::_contest.isInitialized) {
+            throw UnexpectedStateException("Contest must be presented in event feed")
+        }
+    }
+
+    override fun filterHiddenTeams() {
+        val hiddenTeamIds = _teams
+            .filter { it.hidden ?: false }
+            .map { it.id }
+            .toHashSet()
+        _awards.forEachIndexed { i, award ->
+            _awards[i] = award.copy(teamIds = award.teamIds.filter { it !in hiddenTeamIds })
+        }
+        _teams.removeIf { it.id in hiddenTeamIds }
+        val submissionIdsOfHiddenTeams = _submissions
+            .filter { it.teamId in hiddenTeamIds }
+            .map { it.id }
+            .toHashSet()
+        _submissions.removeIf { it.id in submissionIdsOfHiddenTeams }
+        _judgements.removeIf { it.submissionId in submissionIdsOfHiddenTeams }
+    }
+
+    override fun filterUnjudgedSubmissions() {
+        val judgedSubmissionsIds = _judgements
+            .map { it.submissionId }
+            .toHashSet()
+        _submissions.removeIf { it.id !in judgedSubmissionsIds }
+        _judgements.removeIf { it.submissionId !in judgedSubmissionsIds }
+    }
+
+    override fun getProblemIdToFirstSolvedTeamId(): Map<String, String> {
+        val submissionById = _submissions.associateBy { it.id }
+        val problemIdToFirstSolvedTeamId = HashMap<String, String>()
+        for (judgement in _judgements
+            .filter { it.judgementTypeId in solvedJudgementTypeIds }
+            .sortedBy { it.endContestTime ?: TODO("Interesting case") }) {
+            val submission = submissionById[judgement.submissionId]
+                ?: throw UnexpectedStateException("Impossible state reached")
+            val firstSolvedTeamId = problemIdToFirstSolvedTeamId[submission.problemId]
+            if (firstSolvedTeamId == null) {
+                problemIdToFirstSolvedTeamId[submission.problemId] = submission.teamId
+            }
+        }
+        return problemIdToFirstSolvedTeamId
+    }
+
+    override fun getSubmissionIdToJudgements(): Map<String, List<Judgement>> {
+        return _judgements
+            .groupBy { it.submissionId }
+            .mapValues { judgement ->
+                judgement.value
+                    .filter { it.current ?: true }
+            }
     }
 }

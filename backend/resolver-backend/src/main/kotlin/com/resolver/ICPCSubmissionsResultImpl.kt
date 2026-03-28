@@ -3,6 +3,7 @@ package com.resolver
 import kotlin.time.Duration
 
 data class ICPCSubmissionsResultImpl(
+    override val isFirstToSolve: Boolean,
     override val penaltyTime: Duration,
     override val isSolved: Boolean,
     override val isPending: Boolean,

@@ -25,11 +25,11 @@ class MutableICPCScoreboardImpl(
     }
 
     override fun sort(problemId: String): ResolutionStep {
-        if (!(rows[currentRowIndex].problemIdToSubmissionsResult[problemId]
-                ?: throw UnexpectedStateException(
-                    "problemId=$problemId is expected to be the key of map, but it is not"
-                )).isSolved
-        ) {
+        val submissionsResult = rows[currentRowIndex].problemIdToSubmissionsResult[problemId]
+            ?: throw UnexpectedStateException(
+                "problemId=$problemId is expected to be the key of map, but it is not"
+            )
+        if (!submissionsResult.isSolved) {
             return ResolutionStep.RejectResolutionStep(
                 rows[currentRowIndex].teamId,
                 problemId
@@ -40,8 +40,8 @@ class MutableICPCScoreboardImpl(
         var newIndex = currentRowIndex
         while (aboveIndex >= 0 &&
             (rows[newIndex].solvedCount > rows[aboveIndex].solvedCount ||
-                    (rows[newIndex].solvedCount == rows[newIndex].solvedCount) &&
-                    (rows[newIndex].totalPenaltyTime < rows[newIndex].totalPenaltyTime))
+                    (rows[newIndex].solvedCount == rows[aboveIndex].solvedCount) &&
+                    (rows[newIndex].totalPenaltyTime < rows[aboveIndex].totalPenaltyTime))
         ) {
             rows[newIndex] = rows[aboveIndex].also { rows[aboveIndex] = rows[newIndex] }
             rows[newIndex].rank = newIndex + 1
@@ -57,7 +57,7 @@ class MutableICPCScoreboardImpl(
             oldTotalPenaltyTime = rows[oldIndex].totalPenaltyTime,
             newTotalPenaltyTime = rows[newIndex].totalPenaltyTime,
             isSolved = true,
-            isFirstToSolve = false // TODO
+            isFirstToSolve = submissionsResult.isFirstToSolve,
         )
     }
 

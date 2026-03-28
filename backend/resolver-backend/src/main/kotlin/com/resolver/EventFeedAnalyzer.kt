@@ -21,4 +21,12 @@ interface EventFeedAnalyzer {
         reset()
         analyze(eventFeedPath)
     }
+
+    fun filterHiddenTeams()
+
+    fun filterUnjudgedSubmissions()
+
+    fun getProblemIdToFirstSolvedTeamId(): Map<String, String>
+
+    fun getSubmissionIdToJudgements(): Map<String, List<Judgement>>
 }
