@@ -65,7 +65,7 @@ internal class EventFeedAnalyzerImpl(
         Files.newBufferedReader(eventFeedPath).use { reader ->
             while (true) {
                 val line = reader.readLine() ?: break
-                if (line.isBlank()) {
+                if (line.isBlank() || line.startsWith(Constants.JSON_COMMENTARY)) {
                     continue
                 }
                 val jsonElement = json.parseToJsonElement(line)
