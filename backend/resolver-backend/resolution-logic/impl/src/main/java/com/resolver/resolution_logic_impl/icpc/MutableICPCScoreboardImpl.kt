@@ -25,8 +25,9 @@ internal data class MutableICPCScoreboardImpl(
         return rows.getOrNull(currentRowIndex)
     }
 
-    override fun sort(problemId: String): ResolutionStep {
-        val submissionsResult = rows[currentRowIndex].problemIdToSubmissionsResult[problemId]
+    override fun sort(problemId: String): ResolutionStep? {
+        val submissionsResult = (rows.getOrNull(currentRowIndex) ?: return null)
+            .problemIdToSubmissionsResult[problemId]
             ?: throw UnexpectedStateException(
                 "problemId=$problemId is expected to be the key of map, but it is not"
             )

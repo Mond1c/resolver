@@ -11,13 +11,14 @@ import org.junit.jupiter.api.assertAll
 import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class EventFeedAnalyzerImplTests {
     @Test
     fun testFirstToSolve1() {
         val ndjsonUrl =
             javaClass.getResource("/fail-pass-test-event-feed-1.ndjson")
-                ?: error("File not found in resources")
+                ?: fail("File not found in resources")
         val path = Paths.get(ndjsonUrl.toURI())
         val eventFeedAnalyzer = ResolutionLogicImplComponent.eventFeedAnalyzer1
         eventFeedAnalyzer.resetAndAnalyze(path)

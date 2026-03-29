@@ -1,6 +1,7 @@
 package com.resolver.resolution_logic_impl.icpc
 
 import com.resolver.resolution_logic_api.*
+import com.resolver.resolution_logic_impl.exceptions.UnexpectedStateException
 import java.nio.file.Path
 
 internal class SimpleICPCEventFeedResolutionPreparatorImpl(
@@ -31,7 +32,10 @@ internal class SimpleICPCEventFeedResolutionPreparatorImpl(
                 }
             }
             if (problemId != null) {
-                steps.add(scoreboard.sort(problemId))
+                val step =
+                    scoreboard.sort(problemId)
+                        ?: throw UnexpectedStateException("Incorrect using of MutableScoreboard")
+                steps.add(step)
             } else {
                 // TODO: awards
                 scoreboard.up()
