@@ -22,11 +22,7 @@ internal data class MutableICPCScoreboardImpl(
     private var currentRowIndex = rows.size - 1
 
     override fun getCurrentRow(): MutableICPCRow? {
-        return if (currentRowIndex >= 0) {
-            rows[currentRowIndex]
-        } else {
-            null
-        }
+        return rows.getOrNull(currentRowIndex)
     }
 
     override fun sort(problemId: String): ResolutionStep {
