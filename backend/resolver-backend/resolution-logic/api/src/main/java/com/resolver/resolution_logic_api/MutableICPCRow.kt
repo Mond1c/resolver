@@ -6,4 +6,6 @@ interface MutableICPCRow : MutableRow {
     var totalPenaltyTime: Duration
     var solvedCount: Int
     val problemIdToSubmissionsResult: HashMap<String, ICPCSubmissionsResult>
+
+    fun isBetterThan(other: MutableICPCRow): Boolean
 }

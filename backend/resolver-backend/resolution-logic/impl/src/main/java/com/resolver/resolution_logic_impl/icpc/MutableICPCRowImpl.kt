@@ -10,4 +10,10 @@ internal data class MutableICPCRowImpl(
     override var totalPenaltyTime: Duration,
     override var solvedCount: Int,
     override val problemIdToSubmissionsResult: HashMap<String, ICPCSubmissionsResult>,
-) : MutableICPCRow
+) : MutableICPCRow {
+    override fun isBetterThan(other: MutableICPCRow): Boolean {
+        return solvedCount > other.solvedCount ||
+                (solvedCount == other.solvedCount) &&
+                (totalPenaltyTime < other.totalPenaltyTime)
+    }
+}
