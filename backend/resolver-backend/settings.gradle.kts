@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 include(":resolution-logic:api")
 include(":resolution-logic:impl")
 include(":resolution-logic:di")
+include(":scoreboard-management:api")
+include(":scoreboard-management:impl")
+include(":scoreboard-management:di")
