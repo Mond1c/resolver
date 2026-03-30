@@ -40,7 +40,7 @@ internal data class MutableICPCScoreboardImpl(
         var aboveIndex = currentRowIndex - 1
         val oldIndex = currentRowIndex
         var newIndex = currentRowIndex
-        while (aboveIndex >= 0 && rows[newIndex].isBetterThan(rows[aboveIndex])) {
+        while (aboveIndex >= 0 && rows[newIndex] isBetterThan rows[aboveIndex]) {
             rows[newIndex] = rows[aboveIndex].also { rows[aboveIndex] = rows[newIndex] }
             rows[newIndex].rank = newIndex + 1
             rows[aboveIndex].rank = aboveIndex + 1
