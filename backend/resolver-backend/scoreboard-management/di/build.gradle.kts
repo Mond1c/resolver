@@ -2,12 +2,12 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver"
+group = "com.resolver_management"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-    implementation(project(":resolution-logic:api"))
-    implementation(project(":resolution-logic:di"))
+    implementation(project(":scoreboard-management:api"))
+    implementation(project(":scoreboard-management:impl"))
 
     implementation(libs.clics.api)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")

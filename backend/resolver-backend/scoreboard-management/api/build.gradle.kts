@@ -2,12 +2,11 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver"
+group = "com.resolver_management"
 version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(project(":resolution-logic:api"))
-    implementation(project(":resolution-logic:di"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation(libs.clics.api)

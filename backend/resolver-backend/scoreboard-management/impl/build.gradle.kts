@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver"
+group = "com.resolver_management"
 version = "1.0-SNAPSHOT"
 
 dependencies {
