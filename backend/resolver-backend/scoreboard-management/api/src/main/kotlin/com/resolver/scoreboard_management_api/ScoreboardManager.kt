@@ -20,4 +20,8 @@ interface ScoreboardManager<T : MutableRow> {
     fun getUiEventsFlow(): Flow<UiEvent>
 
     fun getScoreboard(): MutableScoreboard<T>
+
+    companion object {
+        const val BASE_TIME_BETWEEN_MS = 1000L
+    }
 }

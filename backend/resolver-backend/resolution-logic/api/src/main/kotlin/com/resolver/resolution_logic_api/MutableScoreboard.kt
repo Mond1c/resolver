@@ -6,4 +6,6 @@ interface MutableScoreboard<T : MutableRow> {
     fun sort(problemId: String): ResolutionStep?
 
     fun up()
+
+    fun applyChanges(changes: ScoreboardChanges<T>)
 }
