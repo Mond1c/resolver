@@ -3,6 +3,7 @@ package com.resolver.resolution_logic_impl.icpc
 import com.resolver.resolution_logic_api.MutableICPCRow
 import com.resolver.resolution_logic_api.MutableScoreboard
 import com.resolver.resolution_logic_api.ResolutionStep
+import com.resolver.resolution_logic_api.ScoreboardChanges
 import com.resolver.resolution_logic_impl.exceptions.UnexpectedStateException
 
 internal data class MutableICPCScoreboardImpl(
@@ -61,5 +62,9 @@ internal data class MutableICPCScoreboardImpl(
 
     override fun up() {
         currentRowIndex--
+    }
+
+    override fun applyChanges(changes: ScoreboardChanges<MutableICPCRow>) {
+        TODO("Not yet implemented")
     }
 }
