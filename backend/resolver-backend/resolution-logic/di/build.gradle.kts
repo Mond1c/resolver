@@ -9,7 +9,8 @@ dependencies {
     implementation(project(":resolution-logic:api"))
     implementation(project(":resolution-logic:impl"))
 
-    implementation(libs.clics.api)
+    implementation(libs.full)
+
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     testImplementation(kotlin("test"))

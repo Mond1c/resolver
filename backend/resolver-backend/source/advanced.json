@@ -1,0 +1,12 @@
+[
+  {
+    "type": "overrideContestSettings",
+    "freezeTimeSeconds": 14400
+  },
+  {
+    "type": "addMedals",
+    "gold": 4,
+    "silver": 4,
+    "bronze": 4
+  }
+]

@@ -9,8 +9,9 @@ dependencies {
     implementation(project(":resolution-logic:api"))
     implementation(project(":scoreboard-management:api"))
 
+    implementation(libs.full)
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation(libs.clics.api)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     testImplementation(kotlin("test"))
