@@ -31,8 +31,8 @@ class ScoreboardManagerImpl(
     private val timeBetween = MutableStateFlow(ScoreboardManager.BASE_TIME_BETWEEN_MS)
     private val isUp = MutableStateFlow(true)
     private val isStopped = MutableStateFlow(true)
-    private val nextSignal = MutableSharedFlow<Unit>()
-    private val prevSignal = MutableSharedFlow<Unit>()
+    private val upSignal = MutableSharedFlow<Unit>()
+    private val downSignal = MutableSharedFlow<Unit>()
     private val scoreboardManagerScope = CoroutineScope(SupervisorJob() + scoreboardCoroutineDispatcher)
     private val mtx = Mutex()
     private var currentUnusedUiEventsIndex = 0
@@ -64,13 +64,13 @@ class ScoreboardManagerImpl(
 
     override fun up() {
         scoreboardManagerScope.launch {
-            nextSignal.emit(Unit)
+            upSignal.emit(Unit)
         }
     }
 
     override fun down() {
         scoreboardManagerScope.launch {
-            prevSignal.emit(Unit)
+            downSignal.emit(Unit)
         }
     }
 
@@ -92,7 +92,7 @@ class ScoreboardManagerImpl(
 
     private fun getUpFlow(): Flow<UiEvent> {
         return flow {
-            nextSignal.collect {
+            upSignal.collect {
                 mtx.withLock {
                     if (isStopped.value && currentUnusedUiEventsIndex < uiEvents.size) {
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
@@ -112,7 +112,7 @@ class ScoreboardManagerImpl(
 
     private fun getDownFlow(): Flow<UiEvent> {
         return flow {
-            prevSignal.collect {
+            downSignal.collect {
                 mtx.withLock {
                     if (isStopped.value && currentUnusedUiEventsIndex > 0) {
                         currentUnusedUiEventsIndex--
