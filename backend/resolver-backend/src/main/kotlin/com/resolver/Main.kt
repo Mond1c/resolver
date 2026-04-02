@@ -3,6 +3,7 @@ package com.resolver
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
+import kotlinx.collections.immutable.PersistentMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.icpclive.cds.CommentaryMessagesUpdate
@@ -27,23 +28,21 @@ class App : CliktCommand() {
                     firstToSolves = true
                     submissionResultsAfterFreeze = true
                     autoFinalize = true
-                }
-                    .contestState()
-                    .collect { state ->
-                        when (val lastEvent = state.lastEvent) {
-                            is CommentaryMessagesUpdate -> {}
-                            is InfoUpdate -> {
-                                if (lastEvent.newInfo.status is ContestStatus.FINALIZED) {
-                                    states.add(state)
-                                    resolveICPC(states).steps.joinToString(separator = "\n").also(::println)
-                                }
-                            }
-
-                            is RunUpdate -> {
+                }.contestState().collect { state ->
+                    when (val lastEvent = state.lastEvent) {
+                        is CommentaryMessagesUpdate -> {}
+                        is InfoUpdate -> {
+                            if (lastEvent.newInfo.status is ContestStatus.FINALIZED) {
                                 states.add(state)
+                                resolveICPC(states).steps.joinToString(separator = "\n").also(::println)
                             }
                         }
+
+                        is RunUpdate -> {
+                            states.add(state)
+                        }
                     }
+                }
             }
         }
     }
@@ -52,7 +51,8 @@ class App : CliktCommand() {
 sealed interface ResolutionStep {
     data class RejectResolutionStep(
         val teamId: TeamId,
-        val problem: ProblemId,
+        val problemId: ProblemId,
+        val wrongAttempts: Int
     ) : ResolutionStep
 
     data class ICPCAcceptResolutionStep(
@@ -78,15 +78,17 @@ data class Calculations(
 )
 
 fun calculate(contestState: ContestState): Calculations {
-    val contestInfo = contestState.infoAfterEvent ?: TODO("infoAfterEvent is null")
+    return calculate(contestState.infoAfterEvent, contestState.runsAfterEvent)
+}
+
+fun calculate(contestInfo: ContestInfo?, runs: PersistentMap<RunId, RunInfo>): Calculations {
+    val contestInfo = contestInfo ?: TODO("contestInfo is null")
     val calculator = getScoreboardCalculator(contestInfo, OptimismLevel.NORMAL)
-    val rows = contestState.runsAfterEvent.values
-        .groupBy { runInfo ->
-            runInfo.teamId
-        }
-        .mapValues { runInfoEntries ->
-            calculator.getScoreboardRow(contestInfo, runInfoEntries.value)
-        }
+    val rows = runs.values.groupBy { runInfo ->
+        runInfo.teamId
+    }.mapValues { runInfoEntries ->
+        calculator.getScoreboardRow(contestInfo, runInfoEntries.value)
+    }
     val ranks = calculator.getRanking(contestInfo, rows)
     return Calculations(rows, ranks)
 }
@@ -99,76 +101,89 @@ fun resolveICPC(states: List<ContestState>): ResolutionResult {
             ?: TODO("infoAfterEvent or freezeTime is null"))
     }
     val contestStateRightBeforeFreeze = notFrozenContestStates.last()
-    val teamIdToProblemIdToFrozenContestStates = runs
-        .filter {
+    val teamIdToProblemIdToFrozenContestStates: HashMap<TeamId, HashMap<ProblemId, List<ContestState>>> =
+        HashMap(runs.filter {
             (it.lastEvent as RunUpdate).newInfo.time >= (it.infoAfterEvent?.freezeTime
                 ?: TODO("infoAfterEvent or freezeTime is null"))
-        }
-        .groupBy { state ->
+        }.groupBy { state ->
             (state.lastEvent as RunUpdate).newInfo.teamId
-        }
-        .mapValues { contestStates ->
-            contestStates.value
-                .groupBy { state ->
-                    (state.lastEvent as RunUpdate).newInfo.problemId
-                }
-        }
+        }.mapValues { contestStates ->
+            HashMap(contestStates.value.groupBy { state ->
+                (state.lastEvent as RunUpdate).newInfo.problemId
+            })
+        })
     var currentContestState = contestStateRightBeforeFreeze
     val steps = mutableListOf<ResolutionStep>()
     var currentUnresolvedIndex = teamsCount - 1
     val problemIdToIndex = currentContestState.infoAfterEvent?.scoreboardProblems?.associate { it.id to it.ordinal }
         ?: TODO("infoAfterEvent is null")
     while (currentUnresolvedIndex >= 0) {
-        val (rows, ranks) = calculate(currentContestState)
-        val teamId = ranks.order[currentUnresolvedIndex]
+        val (rows, ranking) = calculate(currentContestState)
+        val teamId = ranking.order[currentUnresolvedIndex]
         val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
         if (problemIdToFrozenContestStates == null) {
             currentUnresolvedIndex--
             continue
         }
-        var runToChoose: ContestState? = null
-        val scoreboardRowBeforeResolution = rows[ranks.order[currentUnresolvedIndex]] ?: TODO("Unexpected null")
+        var contestStatesToChoose: List<ContestState>? = null
+        val scoreboardRowBeforeResolution = rows[ranking.order[currentUnresolvedIndex]] ?: TODO("Unexpected null")
+        val oldIndex = currentUnresolvedIndex
+        val oldRank = ranking.ranks[oldIndex]
+        val oldPenalty = scoreboardRowBeforeResolution.penalty
+        var currentPenaltyDelta = Duration.INFINITE
+        var currentMaxSolved = scoreboardRowBeforeResolution.totalScore
+        var isSolvedFound = false
         for (entry in problemIdToFrozenContestStates) {
-            problemLoop@ for (frozenContestState in entry.value) {
+            var newRuns = currentContestState.runsAfterEvent
+            for (frozenContestState in entry.value) {
                 val runInfo = (frozenContestState.lastEvent as RunUpdate).newInfo
-                val icpcResult = runInfo.result as RunResult.ICPC
-//                if (!icpcResult.verdict.isAccepted) {
-//                    runToChoose = frozenContestState
-//                    break@problemLoop
-//                } else
-                if (icpcResult.verdict.isAccepted &&
-                    !(scoreboardRowBeforeResolution.problemResults[problemIdToIndex[runInfo.problemId]
-                        ?: TODO("Unexpected null")] as ICPCProblemResult).isSolved
-                ) {
-                    runToChoose = frozenContestState
-                    break@problemLoop
-                }
+                newRuns = newRuns.put(runInfo.id, runInfo)
+            }
+            val (rows, ranking) = calculate(currentContestState.infoAfterEvent, newRuns)
+            val newIndex = ranking.order.indexOf(teamId)
+            val scoreboardRowAfterTestResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
+            val testPenalty = scoreboardRowAfterTestResolution.penalty
+            val testSolved = scoreboardRowAfterTestResolution.totalScore
+            if (testSolved > currentMaxSolved) {
+                currentMaxSolved = testSolved
+                isSolvedFound = true
+                contestStatesToChoose = entry.value
+            } else if (isSolvedFound && testPenalty != oldPenalty && testPenalty - oldPenalty < currentPenaltyDelta) {
+                currentPenaltyDelta = testPenalty - oldPenalty
+                contestStatesToChoose = entry.value
+            } else if (!isSolvedFound) {
+                contestStatesToChoose = entry.value
             }
         }
-        val oldIndex = currentUnresolvedIndex
-        val oldRank = ranks.ranks[oldIndex]
-        if (runToChoose == null) {
+        if (contestStatesToChoose != null) {
+            val runInfo =
+                ((contestStatesToChoose.lastOrNull() ?: TODO("Unexpected null")).lastEvent as RunUpdate).newInfo
+            (teamIdToProblemIdToFrozenContestStates[runInfo.teamId]
+                ?: TODO("Unexpected null")).remove(runInfo.problemId)
+        }
+        if (contestStatesToChoose == null) {
             currentUnresolvedIndex--
         } else {
-            println(currentContestState.lastEvent as RunUpdate)
-            currentContestState = currentContestState.applyEvent(runToChoose.lastEvent)
-            val (rows, ranks) = calculate(currentContestState)
-            var newIndex = 0
-            for (i in 0..<teamsCount) {
-                if (ranks.order[i] == teamId) {
-                    newIndex = i
-                    break
-                }
+            contestStatesToChoose.forEach { contestState ->
+                currentContestState = currentContestState.applyEvent(contestState.lastEvent)
             }
-            val newRank = ranks.ranks[newIndex]
-            val scoreboardRowAfterResolution = rows[ranks.order[newIndex]] ?: TODO("Unexpected null")
+            val (rows, ranking) = calculate(currentContestState)
+            val newIndex = ranking.order.indexOf(teamId)
+            val newRank = ranking.ranks[newIndex]
+            val scoreboardRowAfterResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
             val runInfo = (currentContestState.lastEvent as RunUpdate).newInfo
             val icpcResult = runInfo.result as RunResult.ICPC
+            val problemResult = scoreboardRowAfterResolution.problemResults[problemIdToIndex[runInfo.problemId]
+                ?: TODO("Unexpected null")] as ICPCProblemResult
             if (!icpcResult.verdict.isAccepted) {
-                steps.add(ResolutionStep.RejectResolutionStep(runInfo.teamId, runInfo.problemId))
+                steps.add(
+                    ResolutionStep.RejectResolutionStep(
+                        runInfo.teamId,
+                        runInfo.problemId,
+                        problemResult.wrongAttempts
+                    )
+                )
             } else {
-                val problemResult = scoreboardRowAfterResolution.problemResults[problemIdToIndex[runInfo.problemId]
-                    ?: TODO("Unexpected null")] as ICPCProblemResult
                 steps.add(
                     ResolutionStep.ICPCAcceptResolutionStep(
                         teamId = runInfo.teamId,
@@ -177,7 +192,7 @@ fun resolveICPC(states: List<ContestState>): ResolutionResult {
                         newRank = newRank,
                         oldIndex = oldIndex,
                         newIndex = newIndex,
-                        isFirstToSolve = problemResult.isSolved,
+                        isFirstToSolve = problemResult.isFirstToSolve,
                         wrongAttempts = problemResult.wrongAttempts,
                         newTotalPenalty = scoreboardRowAfterResolution.penalty
                     )
