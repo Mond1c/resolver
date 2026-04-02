@@ -51,6 +51,7 @@ class GreedyICPCResolver(
         var currentUnresolvedIndex = teamsCount - 1
         val problemIdToIndex = currentContestState.infoAfterEvent?.scoreboardProblems?.associate { it.id to it.ordinal }
             ?: TODO("infoAfterEvent is null")
+        val snapshots = mutableListOf<ContestState>()
         while (currentUnresolvedIndex >= 0) {
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestState)
                 ?: TODO("Unexpected null")
@@ -89,6 +90,7 @@ class GreedyICPCResolver(
             prepareDecision(
                 currentContestState = currentContestState,
                 contestStatesToApply = contestStatesToApply,
+                scoreboardRowBeforeResolution = scoreboardRowBeforeResolution,
                 problemIdToIndex = problemIdToIndex,
                 teamId = teamId,
                 oldRank = oldRank,
@@ -96,6 +98,7 @@ class GreedyICPCResolver(
                 currentUnresolvedIndex = currentUnresolvedIndex
             ).apply {
                 currentContestState = currentContestStateResult
+                snapshots.add(currentContestState)
                 problemIdToResolve?.let { problemId ->
                     (teamIdToProblemIdToFrozenContestStates[teamId]
                         ?: TODO("Unexpected null")).remove(problemId)
@@ -108,7 +111,8 @@ class GreedyICPCResolver(
         }
         return ResolutionResultImpl(
             steps = steps,
-            contestStateRightBeforeFreeze = contestStateRightBeforeFreeze
+            contestStateRightBeforeFreeze = contestStateRightBeforeFreeze,
+            snapshots = snapshots
         )
     }
 
@@ -161,6 +165,7 @@ class GreedyICPCResolver(
         currentContestState: ContestState,
         contestStatesToApply: List<ContestState>?,
         problemIdToIndex: Map<ProblemId, Int>,
+        scoreboardRowBeforeResolution: ScoreboardRow,
         teamId: TeamId,
         oldRank: Int,
         oldIndex: Int,
@@ -191,6 +196,7 @@ class GreedyICPCResolver(
                 ?: TODO("Unexpected null")] as ICPCProblemResult
             resolutionStep = if (!icpcResult.verdict.isAccepted) {
                 ResolutionStep.RejectResolutionStep(
+                    oldIndex,
                     runInfo.teamId,
                     runInfo.problemId,
                     problemResult.wrongAttempts
@@ -205,6 +211,7 @@ class GreedyICPCResolver(
                     newIndex = newIndex,
                     isFirstToSolve = problemResult.isFirstToSolve,
                     wrongAttempts = problemResult.wrongAttempts,
+                    oldTotalPenalty = scoreboardRowBeforeResolution.penalty,
                     newTotalPenalty = scoreboardRowAfterResolution.penalty
                 )
             }

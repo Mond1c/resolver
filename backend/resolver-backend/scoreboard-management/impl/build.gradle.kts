@@ -8,6 +8,7 @@ version = "1.0-SNAPSHOT"
 dependencies {
     implementation(project(":resolution-logic:api"))
     implementation(project(":scoreboard-management:api"))
+    implementation(project(":util:api"))
 
     implementation(libs.full)
 

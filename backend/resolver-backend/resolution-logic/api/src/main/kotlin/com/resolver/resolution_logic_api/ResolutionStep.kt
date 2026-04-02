@@ -5,14 +5,17 @@ import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
 
 sealed interface ResolutionStep {
+    val teamId: TeamId
+
     data class RejectResolutionStep(
-        val teamId: TeamId,
+        val index: Int,
+        override val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int
     ) : ResolutionStep
 
     data class ICPCAcceptResolutionStep(
-        val teamId: TeamId,
+        override val teamId: TeamId,
         val problemId: ProblemId,
         val oldRank: Int,
         val newRank: Int,
@@ -20,6 +23,7 @@ sealed interface ResolutionStep {
         val newIndex: Int,
         val isFirstToSolve: Boolean,
         val wrongAttempts: Int,
+        val oldTotalPenalty: Duration,
         val newTotalPenalty: Duration
     ) : ResolutionStep
 }

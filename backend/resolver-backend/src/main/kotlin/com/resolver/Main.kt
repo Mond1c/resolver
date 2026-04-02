@@ -3,7 +3,9 @@ package com.resolver
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.resolver.util_di.ResolverUtilComponent
+import com.resolver.resolution_logic_di.ResolutionLogicComponent
+import com.resolver.scoreboard_management_di.ScoreboardManagementComponent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -11,12 +13,9 @@ import org.icpclive.cds.CommentaryMessagesUpdate
 import org.icpclive.cds.InfoUpdate
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.adapters.addComputedData
-import org.icpclive.cds.adapters.applyEvent
 import org.icpclive.cds.adapters.contestState
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ContestStatus
-import org.icpclive.cds.api.currentContestTime
-import org.icpclive.cds.api.toTeamId
 
 class App : CliktCommand() {
     private val resolverOptions by ResolverCommandLineOptions()
@@ -77,22 +76,27 @@ class App : CliktCommand() {
             semaphore.acquire()
             semaphore.acquire()
 
-            val calc = ResolverUtilComponent.scoreboardCalculator1
-            var remLastState = removed.last()
-            val score1 = calc.calculateScoreboard(remLastState.infoAfterEvent, remLastState.runsAfterEvent)
-            score1?.rows["spb512".toTeamId()]?.problemResults?.also(::println)
-            val frozen =
-                notRemoved.filter { it.infoAfterEvent!!.currentContestTime > remLastState.infoAfterEvent!!.freezeTime!! }
-                    .filter { it.lastEvent is RunUpdate }
-                    .filter { (it.lastEvent as RunUpdate).newInfo.teamId == "spb512".toTeamId() }
-            for (run in frozen) {
-                remLastState = remLastState.applyEvent(run.lastEvent)
-            }
-            val score2 = calc.calculateScoreboard(
-                remLastState.infoAfterEvent,
-                remLastState.runsAfterEvent
+            val frozenState = removed.last()
+            val resolver = ResolutionLogicComponent.greedyICPCResolver
+            val result = resolver.resolve(notRemoved)
+            val manager = ScoreboardManagementComponent.provideScoreboardManager1(
+                frozenState = frozenState,
+                snapshots = result.snapshots,
+                steps = result.steps
             )
-            score2?.rows["spb512".toTeamId()]?.problemResults?.also(::println)
+            launch {
+                manager.getUiEventsFlow().collect {
+                    println(it)
+                }
+            }
+            launch {
+                delay(1000)
+                launch {
+                    manager.start()
+                }
+                delay(15000)
+                manager.changeDirection()
+            }
         }
     }
 }

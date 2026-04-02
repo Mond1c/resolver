@@ -6,5 +6,6 @@ import org.icpclive.cds.api.ContestState
 
 internal class ResolutionResultImpl(
     override val steps: List<ResolutionStep>,
-    override val contestStateRightBeforeFreeze: ContestState
+    override val contestStateRightBeforeFreeze: ContestState,
+    override val snapshots: List<ContestState>
 ) : ResolutionResult
