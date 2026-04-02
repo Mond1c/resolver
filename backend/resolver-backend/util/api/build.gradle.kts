@@ -2,13 +2,10 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver"
+group = "com.resolver_util"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-    implementation(project(":util:api"))
-    implementation(project(":resolution-logic:api"))
-
     implementation(libs.full)
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
