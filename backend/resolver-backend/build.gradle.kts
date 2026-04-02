@@ -8,6 +8,8 @@ version = "1.0-SNAPSHOT"
 dependencies {
     implementation(project(":resolution-logic:api"))
     implementation(project(":resolution-logic:di"))
+    implementation(project(":util:api"))
+    implementation(project(":util:di"))
 
     implementation(libs.full)
 
