@@ -1,0 +1,9 @@
+compose.yaml
+*.md
+*.env
+.gradle
+.idea
+.kotlin
+build
+.git
+.gitignore

@@ -14,5 +14,6 @@ abstract class Server(
 
     companion object {
         const val RESOLUTION_WS_ENDPOINT = "/resolution"
+        const val RESOLUTION_CONTROL_WS_ENDPOINT = "/control"
     }
 }

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.resolver"
-version = "1.0-SNAPSHOT"
+version = "1.0-logic-SNAPSHOT"
 
 dependencies {
     implementation(project(":util:api"))
@@ -20,5 +20,5 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(25)
 }

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.resolver_server"
-version = "1.0-SNAPSHOT"
+version = "1.0-resolver-SNAPSHOT"
 
 dependencies {
     implementation(project(":resolver-server:api"))
@@ -19,5 +19,5 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(25)
 }

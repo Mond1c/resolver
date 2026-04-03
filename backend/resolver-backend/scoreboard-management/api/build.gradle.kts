@@ -4,12 +4,14 @@ plugins {
 }
 
 group = "com.resolver_management"
-version = "1.0-SNAPSHOT"
+version = "1.0-management-SNAPSHOT"
 
 dependencies {
     implementation(project(":resolution-logic:api"))
 
     implementation(libs.full)
+
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
@@ -20,5 +22,5 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(25)
 }

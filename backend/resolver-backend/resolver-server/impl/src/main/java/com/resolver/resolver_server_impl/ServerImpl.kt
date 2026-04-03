@@ -10,6 +10,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -74,12 +75,46 @@ class ServerImpl(
         }
 
         routing {
-            webSocket(RESOLUTION_WS_ENDPOINT) {
+            setResolutionWebSocketRoute()
+            setResolutionControlWebSocketRoute()
+        }
+    }
+
+    private fun Routing.setResolutionWebSocketRoute() {
+        webSocket(RESOLUTION_WS_ENDPOINT) {
 //                send(json.encodeToString(scoreboardManager.getScoreboard()))
-                scoreboardManager.getUiEventsFlow()
-                    .collect { event ->
-                        send(json.encodeToString(event))
+            scoreboardManager.getUiEventsFlow()
+                .collect { event ->
+                    send(json.encodeToString(event))
+                }
+        }
+    }
+
+    private fun Routing.setResolutionControlWebSocketRoute() {
+        webSocket(RESOLUTION_CONTROL_WS_ENDPOINT) {
+            runCatching {
+                incoming.consumeEach { frame ->
+                    // 0 - stop, 1 - start, 2 - up, 3 - down, 4 x - apply speed factor x
+                    if (frame is Frame.Text) {
+                        val receivedText = frame.readText()
+                        if (receivedText.contains(' ')) {
+                            val parts = receivedText.split(' ')
+                            if (parts.size == 2) {
+                                if (parts[0] == "4") {
+                                    parts[1].toDoubleOrNull()?.let { factor ->
+                                        scoreboardManager.applySpeedFactor(factor)
+                                    }
+                                }
+                            }
+                        }
+                        when (receivedText) {
+                            "0" -> scoreboardManager.stop()
+                            "1" -> scoreboardManager.start()
+                            "2" -> scoreboardManager.up()
+                            "3" -> scoreboardManager.down()
+                        }
                     }
+                }
             }
         }
     }

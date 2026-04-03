@@ -60,9 +60,8 @@ class App : CliktCommand() {
                 ScoreboardManagementComponent.json
             )
             launch {
-                server.start(8080, "localhost")
+                server.start(8080, "0.0.0.0")
             }
-            manager.start()
         }
     }
 

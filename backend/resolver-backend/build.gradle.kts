@@ -1,16 +1,22 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    application
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 group = "com.resolver"
 version = "1.0-SNAPSHOT"
 
-dependencies {
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.host.common)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.websockets)
+application {
+    mainClass.set("com.resolver.MainKt")
+}
 
+tasks.shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    mergeServiceFiles()
+}
+
+dependencies {
     implementation(project(":resolver-server:api"))
     implementation(project(":resolver-server:di"))
     implementation(project(":resolution-logic:api"))
@@ -29,5 +35,5 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(25)
 }
