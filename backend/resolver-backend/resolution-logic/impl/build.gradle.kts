@@ -11,8 +11,6 @@ dependencies {
 
     implementation(libs.full)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-
     testImplementation(kotlin("test"))
 }
 

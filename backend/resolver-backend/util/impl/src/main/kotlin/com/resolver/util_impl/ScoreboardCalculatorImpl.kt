@@ -21,7 +21,15 @@ object ScoreboardCalculatorImpl : ScoreboardCalculator {
             runInfo.teamId
         }.mapValues { runInfoEntries ->
             calculator.getScoreboardRow(contestInfo, runInfoEntries.value)
-        }
+        }.toMutableMap()
+        rows.putAll(
+            (contestInfo.teams.keys.toHashSet() - rows.keys.toHashSet())
+                .map { teamId ->
+                    Pair(
+                        teamId,
+                        calculator.getScoreboardRow(contestInfo, listOf())
+                    )
+                })
         val ranks = calculator.getRanking(contestInfo, rows)
         return ScoreboardCalculationsImpl(rows, ranks)
     }

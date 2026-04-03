@@ -1,28 +1,40 @@
 package com.resolver.scoreboard_management_api
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
 
 sealed interface UiEvent {
+    @Serializable
+    @SerialName("ChooseRow")
     data class ChooseRow(
         val index: Int
     ) : UiEvent
 
+    @Serializable
+    @SerialName("UnchooseRow")
     data class UnchooseRow(
         val index: Int
     ) : UiEvent
 
+    @Serializable
+    @SerialName("ChooseProblem")
     data class ChooseProblem(
         val index: Int,
         val problemId: ProblemId
     ) : UiEvent
 
+    @Serializable
+    @SerialName("UnchooseProblem")
     data class UnchooseProblem(
         val index: Int,
         val problemId: ProblemId
     ) : UiEvent
 
+    @Serializable
+    @SerialName("AcceptICPC")
     data class AcceptICPC(
         val teamId: TeamId,
         val problemId: ProblemId,
@@ -36,6 +48,8 @@ sealed interface UiEvent {
         val isFirstToSolve: Boolean
     ) : UiEvent
 
+    @Serializable
+    @SerialName("ReverseAcceptICPC")
     data class ReverseAcceptICPC(
         val teamId: TeamId,
         val problemId: ProblemId,
@@ -47,17 +61,23 @@ sealed interface UiEvent {
         val newTotalPenalty: Duration
     ) : UiEvent
 
+    @Serializable
+    @SerialName("Reject")
     data class Reject(
         val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int
     ) : UiEvent
 
+    @Serializable
+    @SerialName("ReverseReject")
     data class ReverseReject(
         val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int
     ) : UiEvent
 
+    @Serializable
+    @SerialName("NoOp")
     object NoOp : UiEvent
 }

@@ -1,9 +1,17 @@
 [versions]
 kotlin = "2.3.0"
 live-v3 = "v3.5.0"
+ktor = "3.4.1"
 
 [libraries]
+ktor-server-netty = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-netty" }
+ktor-server-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-core" }
+ktor-server-routing = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-routing" }
+ktor-server-host-common = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-host-common" }
+ktor-server-websockets = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-websockets" }
+
 full = { version.ref = "live-v3", group = "com.github.icpc.live-v3", name = "org.icpclive.cds.full" }
+
 kotlin-junit = { version.ref = "kotlin", group = "org.jetbrains.kotlin", name = "kotlin-test-junit5" }
 
 [plugins]

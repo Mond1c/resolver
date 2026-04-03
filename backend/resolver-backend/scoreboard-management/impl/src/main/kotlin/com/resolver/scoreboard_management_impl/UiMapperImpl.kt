@@ -21,6 +21,12 @@ object UiMapperImpl : UiMapper {
                             )
                         )
                         add(this@UiMapperImpl mapToUiEvent step)
+                        add(
+                            UiEvent.UnchooseProblem(
+                                index = step.newIndex,
+                                problemId = step.problemId
+                            )
+                        )
                         if (i < steps.size - 1 && steps[i + 1].teamId == step.teamId) {
                             isPrevTheSame = true
                         } else {
@@ -40,6 +46,12 @@ object UiMapperImpl : UiMapper {
                             )
                         )
                         add(this@UiMapperImpl mapToUiEvent step)
+                        add(
+                            UiEvent.UnchooseProblem(
+                                index = step.index,
+                                problemId = step.problemId
+                            )
+                        )
                         if (i < steps.size - 1 && steps[i + 1].teamId == step.teamId) {
                             isPrevTheSame = true
                         } else {
@@ -113,6 +125,11 @@ object UiMapperImpl : UiMapper {
 
             is UiEvent.UnchooseRow -> UiEvent.ChooseRow(
                 index = uiEvent.index
+            )
+
+            is UiEvent.UnchooseProblem -> UiEvent.ChooseProblem(
+                index = uiEvent.index,
+                problemId = uiEvent.problemId
             )
 
             else -> UiEvent.NoOp

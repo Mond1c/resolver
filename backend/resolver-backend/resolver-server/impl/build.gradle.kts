@@ -2,15 +2,17 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver_management"
+group = "com.resolver_server"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-    implementation(project(":resolution-logic:api"))
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.host.common)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+
+    implementation(project(":resolver-server:api"))
     implementation(project(":scoreboard-management:api"))
-    implementation(project(":scoreboard-management:impl"))
-    implementation(project(":util:api"))
-    implementation(project(":util:di"))
 
     implementation(libs.full)
 

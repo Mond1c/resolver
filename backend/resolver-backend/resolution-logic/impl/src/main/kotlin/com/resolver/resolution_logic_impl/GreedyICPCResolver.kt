@@ -34,7 +34,7 @@ class GreedyICPCResolver(
             (it.lastEvent as RunUpdate).newInfo.time < (it.infoAfterEvent?.freezeTime
                 ?: TODO("infoAfterEvent or freezeTime is null"))
         }
-        val contestStateRightBeforeFreeze = notFrozenContestStates.last()
+        val contestStateRightBeforeFreeze = notFrozenContestStates.lastOrNull() ?: TODO()
         val teamIdToProblemIdToFrozenContestStates: HashMap<TeamId, HashMap<ProblemId, List<ContestState>>> =
             HashMap(runs.filter {
                 (it.lastEvent as RunUpdate).newInfo.time >= (it.infoAfterEvent?.freezeTime

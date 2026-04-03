@@ -6,6 +6,13 @@ group = "com.resolver"
 version = "1.0-SNAPSHOT"
 
 dependencies {
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.host.common)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+
+    implementation(project(":resolver-server:api"))
+    implementation(project(":resolver-server:di"))
     implementation(project(":resolution-logic:api"))
     implementation(project(":resolution-logic:di"))
     implementation(project(":scoreboard-management:api"))
@@ -14,8 +21,6 @@ dependencies {
     implementation(project(":util:di"))
 
     implementation(libs.full)
-
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     testImplementation(kotlin("test"))
 }
