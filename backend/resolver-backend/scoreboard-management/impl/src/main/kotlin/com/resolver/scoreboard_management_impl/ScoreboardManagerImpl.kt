@@ -58,7 +58,7 @@ class ScoreboardManagerImpl(
 
     override fun applySpeedFactor(speedFactor: Double) {
         timeBetween.update {
-            (ScoreboardManager.BASE_TIME_BETWEEN_MS * speedFactor).toLong()
+            (ScoreboardManager.BASE_TIME_BETWEEN_MS / speedFactor).toLong()
         }
     }
 

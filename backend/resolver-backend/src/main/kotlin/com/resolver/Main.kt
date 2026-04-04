@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.resolver.resolution_logic_di.ResolutionLogicComponent
 import com.resolver.resolver_server_di.ResolverServerComponent
 import com.resolver.scoreboard_management_di.ScoreboardManagementComponent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -17,7 +18,7 @@ import org.icpclive.cds.adapters.contestState
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ContestStatus
 
-class App : CliktCommand() {
+object App : CliktCommand() {
     private val resolverOptions by ResolverCommandLineOptions()
 
     override fun run() {
@@ -59,8 +60,9 @@ class App : CliktCommand() {
                 manager,
                 ScoreboardManagementComponent.json
             )
-            launch {
-                server.start(8080, "0.0.0.0")
+            server.start(resolverOptions.port, resolverOptions.host)
+            while (true) {
+                delay(10000)
             }
         }
     }
@@ -94,4 +96,4 @@ class App : CliktCommand() {
     }
 }
 
-fun main(args: Array<String>) = App().main(args)
+fun main(args: Array<String>) = App.main(args)

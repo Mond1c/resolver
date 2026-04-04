@@ -125,10 +125,9 @@ class GreedyICPCResolver(
         currentPenaltyDelta: Duration,
         oldPenalty: Duration
     ): CellAnalyzeResult {
-        var newRuns = currentContestState.runsAfterEvent
-        for (frozenContestState in frozenContestStates) {
-            val runInfo = (frozenContestState.lastEvent as RunUpdate).newInfo
-            newRuns = newRuns.put(runInfo.id, runInfo)
+        val newRuns = frozenContestStates.fold(currentContestState.runsAfterEvent) { runs, state ->
+            val runInfo = (state.lastEvent as RunUpdate).newInfo
+            runs.put(runInfo.id, runInfo)
         }
         val (rows, ranking) = scoreboardCalculator.calculateScoreboard(
             currentContestState.infoAfterEvent,

@@ -2,8 +2,11 @@
 kotlin = "2.3.0"
 live-v3 = "v3.5.0"
 ktor = "3.4.1"
+logger = "1.5.32"
 
 [libraries]
+logger = { version.ref = "logger", group = "ch.qos.logback", name = "logback-classic" }
+
 ktor-server-netty = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-netty" }
 ktor-server-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-core" }
 ktor-server-routing = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-routing" }

@@ -17,6 +17,8 @@ tasks.shadowJar {
 }
 
 dependencies {
+    implementation(libs.logger)
+
     implementation(project(":resolver-server:api"))
     implementation(project(":resolver-server:di"))
     implementation(project(":resolution-logic:api"))

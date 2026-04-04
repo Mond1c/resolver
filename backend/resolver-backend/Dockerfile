@@ -6,7 +6,7 @@ copy . .
 
 run chmod +x gradlew
 
-run ./gradlew shadowJar -x test
+run ./gradlew shadowJar -x test --no-daemon
 
 from alpine:3.23
 
@@ -19,6 +19,10 @@ workdir /resolver
 
 copy --from=builder /resolver/build/libs/*-all.jar resolver.jar
 copy --from=builder /resolver/source ./source
-expose 8080
 
-entrypoint ["java", "-jar", "resolver.jar", "-c", "./source"]
+env port=8080
+env host=0.0.0.0
+
+expose ${port}
+
+entrypoint ["sh", "-c", "java -jar resolver.jar -c ./source -h ${host} -p ${port}"]
