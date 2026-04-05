@@ -36,13 +36,11 @@ class ServerImpl(
                 if (isStarted.load()) {
                     return StartResult.AlreadyStarted
                 }
-                if (!isStarted.load()) {
-                    server = embeddedServer(
-                        Netty,
-                        port = port,
-                        host = host
-                    ) { module() }
-                }
+                server = embeddedServer(
+                    Netty,
+                    port = port,
+                    host = host
+                ) { module() }
                 val startJob = serverScope.launch {
                     try {
                         server.startSuspend(wait = true)
