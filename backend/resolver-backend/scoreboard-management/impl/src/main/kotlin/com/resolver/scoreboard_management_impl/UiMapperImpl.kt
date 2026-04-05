@@ -154,13 +154,13 @@ object UiMapperImpl : UiMapper {
                 problemId = step.problemId
             )
         )
-        var newIsPrevThaSame: Boolean
+        var newIsPrevTheSame: Boolean
         if (nextOrNull?.teamId == step.teamId) {
-            newIsPrevThaSame = true
+            newIsPrevTheSame = true
         } else {
-            newIsPrevThaSame = false
+            newIsPrevTheSame = false
             add(UiEvent.UnchooseRow(index = step.index))
         }
-        return newIsPrevThaSame
+        return newIsPrevTheSame
     }
 }
