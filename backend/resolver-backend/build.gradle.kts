@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     application
-    id("com.gradleup.shadow") version "9.4.1"
+    alias(libs.plugins.gradle.shadow)
 }
 
 group = "com.resolver"

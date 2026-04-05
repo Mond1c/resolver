@@ -6,8 +6,6 @@ group = "com.resolver"
 version = "1.0-logic-SNAPSHOT"
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-
     implementation(libs.full)
 
     testImplementation(kotlin("test"))

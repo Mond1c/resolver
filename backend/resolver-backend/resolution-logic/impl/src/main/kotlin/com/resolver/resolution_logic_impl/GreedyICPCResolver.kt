@@ -34,7 +34,6 @@ class GreedyICPCResolver(
             (it.lastEvent as RunUpdate).newInfo.time < (it.infoAfterEvent?.freezeTime
                 ?: TODO("infoAfterEvent or freezeTime is null"))
         }
-        val contestStateRightBeforeFreeze = notFrozenContestStates.lastOrNull() ?: TODO()
         val teamIdToProblemIdToFrozenContestStates: HashMap<TeamId, HashMap<ProblemId, List<ContestState>>> =
             HashMap(runs.filter {
                 (it.lastEvent as RunUpdate).newInfo.time >= (it.infoAfterEvent?.freezeTime
@@ -46,7 +45,7 @@ class GreedyICPCResolver(
                     (state.lastEvent as RunUpdate).newInfo.problemId
                 })
             })
-        var currentContestState = contestStateRightBeforeFreeze
+        var currentContestState = notFrozenContestStates.lastOrNull() ?: TODO()
         val steps = mutableListOf<ResolutionStep>()
         var currentUnresolvedIndex = teamsCount - 1
         val problemIdToIndex = currentContestState.infoAfterEvent?.scoreboardProblems?.associate { it.id to it.ordinal }
@@ -111,7 +110,6 @@ class GreedyICPCResolver(
         }
         return ResolutionResultImpl(
             steps = steps,
-            contestStateRightBeforeFreeze = contestStateRightBeforeFreeze,
             snapshots = snapshots
         )
     }
