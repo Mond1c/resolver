@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    kotlin("plugin.serialization") version "2.3.0"
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "com.resolver_management"
@@ -11,9 +11,9 @@ dependencies {
 
     implementation(libs.full)
 
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    api(libs.serialization)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation(libs.coroutines)
 
     testImplementation(kotlin("test"))
 }

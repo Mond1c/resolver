@@ -10,6 +10,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -21,11 +22,13 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalAtomicApi::class)
 class ServerImpl(
     private val json: Json,
-    scoreboardManager: ScoreboardManager
+    scoreboardManager: ScoreboardManager,
+    serverDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Server(scoreboardManager) {
     private lateinit var server: EmbeddedServer<*, *>
     private var isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
+    private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
 
     override suspend fun start(port: Int, host: String): StartResult {
         return try {
@@ -33,16 +36,23 @@ class ServerImpl(
                 if (isStarted.load()) {
                     return StartResult.AlreadyStarted
                 }
-                if (!::server.isInitialized || !isStarted.load()) {
+                if (!isStarted.load()) {
                     server = embeddedServer(
                         Netty,
                         port = port,
                         host = host
                     ) { module() }
-                    isStarted.store(true)
                 }
-                server.startSuspend(wait = false)
-                StartResult.Success
+                val startJob = serverScope.launch {
+                    try {
+                        server.startSuspend(wait = true)
+                    } catch (e: Exception) {
+                        isStarted.store(false)
+                        throw e
+                    }
+                }
+                isStarted.store(true)
+                StartResult.MaybeSuccess(startJob)
             }
         } catch (_: Exception) {
             StartResult.Failure
@@ -52,7 +62,7 @@ class ServerImpl(
     override suspend fun stop(): StopResult {
         return try {
             mtx.withLock {
-                if (isStarted.load() && ::server.isInitialized) {
+                if (isStarted.load()) {
                     server.stopSuspend()
                     isStarted.store(false)
                     return StopResult.Success

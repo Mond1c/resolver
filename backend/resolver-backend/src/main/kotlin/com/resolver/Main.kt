@@ -4,9 +4,9 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.resolver.resolution_logic_di.ResolutionLogicComponent
+import com.resolver.resolver_server_api.StartResult
 import com.resolver.resolver_server_di.ResolverServerComponent
 import com.resolver.scoreboard_management_di.ScoreboardManagementComponent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -60,9 +60,12 @@ object App : CliktCommand() {
                 manager,
                 ScoreboardManagementComponent.json
             )
-            server.start(resolverOptions.port, resolverOptions.host)
-            while (true) {
-                delay(10000)
+            when (val startResult = server.start(resolverOptions.port, resolverOptions.host)) {
+                StartResult.AlreadyStarted -> {}
+                StartResult.Failure -> {}
+                is StartResult.MaybeSuccess -> {
+                    startResult.startJob.join()
+                }
             }
         }
     }
