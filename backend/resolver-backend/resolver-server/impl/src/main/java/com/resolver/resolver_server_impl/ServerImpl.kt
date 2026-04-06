@@ -97,15 +97,17 @@ class ServerImpl(
 
     private fun Routing.setResolutionControlWebSocketRoute() {
         webSocket(RESOLUTION_CONTROL_WS_ENDPOINT) {
-            controlRoom.setBehaviour(
-                session = this@webSocket,
-                onStart = { scoreboardManager.start() },
-                onStop = { scoreboardManager.stop() },
-                onUp = { scoreboardManager.up() },
-                onDown = { scoreboardManager.down() },
-                onChangeDirection = { scoreboardManager.changeDirection() },
-                onApplyFactor = { factor -> scoreboardManager.applySpeedFactor(factor) }
-            )
+            with(scoreboardManager) {
+                controlRoom.setBehaviour(
+                    session = this@webSocket,
+                    onStart = ::start,
+                    onStop = ::stop,
+                    onUp = ::up,
+                    onDown = ::down,
+                    onChangeDirection = ::changeDirection,
+                    onApplyFactor = ::applySpeedFactor
+                )
+            }
         }
     }
 }
