@@ -11,7 +11,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -29,6 +28,7 @@ class ServerImpl(
     private val isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
+    private val controlRoom = ResolutionControlRoom()
 
     override suspend fun start(port: Int, host: String): StartResult {
         return try {
@@ -97,41 +97,15 @@ class ServerImpl(
 
     private fun Routing.setResolutionControlWebSocketRoute() {
         webSocket(RESOLUTION_CONTROL_WS_ENDPOINT) {
-            runCatching {
-                incoming.consumeEach { frame ->
-                    if (frame is Frame.Text) {
-                        val receivedText = frame.readText()
-                        val parts = receivedText.split(SPACE)
-                        if (parts.size == 2) {
-                            if (parts[0] == SIG_APPLY_FACTOR) {
-                                parts[1].toDoubleOrNull()?.let { factor ->
-                                    scoreboardManager.applySpeedFactor(factor)
-                                }
-                            }
-                        }
-                        with(scoreboardManager) {
-                            when (receivedText) {
-                                SIG_STOP -> stop()
-                                SIG_START -> start()
-                                SIG_UP -> up()
-                                SIG_DOWN -> down()
-                                SIG_CHANGE_DIRECTION -> changeDirection()
-                                else -> {}
-                            }
-                        }
-                    }
-                }
-            }
+            controlRoom.setBehaviour(
+                session = this@webSocket,
+                onStart = { scoreboardManager.start() },
+                onStop = { scoreboardManager.stop() },
+                onUp = { scoreboardManager.up() },
+                onDown = { scoreboardManager.down() },
+                onChangeDirection = { scoreboardManager.changeDirection() },
+                onApplyFactor = { factor -> scoreboardManager.applySpeedFactor(factor) }
+            )
         }
-    }
-
-    companion object {
-        private const val SIG_STOP = "0"
-        private const val SIG_START = "1"
-        private const val SIG_UP = "2"
-        private const val SIG_DOWN = "3"
-        private const val SIG_APPLY_FACTOR = "4"
-        private const val SIG_CHANGE_DIRECTION = "5"
-        private const val SPACE = ' '
     }
 }

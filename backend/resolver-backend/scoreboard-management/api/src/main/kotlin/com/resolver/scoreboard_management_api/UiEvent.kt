@@ -6,6 +6,7 @@ import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
 
+@Serializable
 sealed interface UiEvent {
     @Serializable
     @SerialName("ChooseRow")
