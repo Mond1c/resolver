@@ -26,7 +26,7 @@ class ServerImpl(
     serverDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Server(scoreboardManager) {
     private lateinit var server: EmbeddedServer<*, *>
-    private var isStarted = AtomicBoolean(false)
+    private val isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
 
