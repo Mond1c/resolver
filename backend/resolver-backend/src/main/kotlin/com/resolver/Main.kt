@@ -7,6 +7,7 @@ import com.resolver.resolution_logic_di.ResolutionLogicComponent
 import com.resolver.resolver_server_api.StartResult
 import com.resolver.resolver_server_di.ResolverServerComponent
 import com.resolver.scoreboard_management_di.ScoreboardManagementComponent
+import com.resolver.util_di.ResolverUtilComponent
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -17,6 +18,9 @@ import org.icpclive.cds.adapters.addComputedData
 import org.icpclive.cds.adapters.contestState
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ContestStatus
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
+import kotlin.system.exitProcess
 
 object App : CliktCommand() {
     private val resolverOptions by ResolverCommandLineOptions()
@@ -26,6 +30,37 @@ object App : CliktCommand() {
         val notFrozen = mutableListOf<ContestState>()
         val semaphore = Semaphore(2, 2)
         runBlocking {
+            if (resolverOptions.genAwards) {
+                val awardsSemaphore = Semaphore(1, 1)
+                val dst = mutableListOf<ContestState>()
+                val awardsJob = launch {
+                    loadContestStates(
+                        dst = dst,
+                        semaphore = awardsSemaphore,
+                        submissionResultsAfterFreezeInput = true
+                    )
+                }
+                awardsSemaphore.acquire()
+                awardsJob.cancel()
+                val calculator = ResolverUtilComponent.scoreboardCalculator1
+                val calculations = calculator.calculateScoreboard(dst.last())
+                val awards = calculations?.ranks?.awards ?: TODO("Unexpected null")
+                resolverOptions.configDirectory.resolve("awards_behaviour.json").writeText(
+                    ScoreboardManagementComponent.json.encodeToString(awards.map {
+                        AwardInfo(
+                            awardId = it.id
+                        )
+                    })
+                )
+                exitProcess(0)
+            }
+
+            val awardIdToBehaviour = resolverOptions.configDirectory.resolve("awards_behaviour.json")
+                .readText()
+                .let { ScoreboardManagementComponent.json.decodeFromString<List<AwardInfo>>(it) }
+                .groupBy { it.awardId }
+
+
             val frozenJob = launch {
                 loadContestStates(
                     dst = frozen,

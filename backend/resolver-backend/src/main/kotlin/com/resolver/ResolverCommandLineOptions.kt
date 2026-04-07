@@ -2,6 +2,7 @@ package com.resolver
 
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import org.icpclive.cds.cli.CdsCommandLineOptions
 
@@ -18,4 +19,14 @@ open class ResolverCommandLineOptions : CdsCommandLineOptions() {
         help = "Host to connect to"
     )
         .default("0.0.0.0")
+
+    val genAwards by option(
+        "--gen-awards",
+        help = "Write file in config directory where time of award appearance can be redetermined. " +
+                "If true, then file is written and program exits. " +
+                "If false: each award appears after each fully resolved team got it, if corresponding file does not " +
+                "exist in config directory, else file awards_behaviour.json is used."
+    )
+        .boolean()
+        .default(false)
 }

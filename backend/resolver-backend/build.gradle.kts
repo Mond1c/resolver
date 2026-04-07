@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     application
     alias(libs.plugins.gradle.shadow)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "com.resolver"

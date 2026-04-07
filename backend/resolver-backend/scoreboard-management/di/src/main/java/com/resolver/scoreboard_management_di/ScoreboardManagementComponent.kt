@@ -17,6 +17,8 @@ object ScoreboardManagementComponent {
 
     val json: Json by lazy {
         Json {
+            prettyPrint = true
+            encodeDefaults = true
         }
     }
 

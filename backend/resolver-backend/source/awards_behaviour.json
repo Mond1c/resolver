@@ -1,0 +1,104 @@
+[
+    {
+        "awardId": "winner",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "first-diploma",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "second-diploma",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "third-diploma",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-1",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-2",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-3",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-4",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-5",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-6",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-7",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-8",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-9",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-10",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-11",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-12",
+        "behaviour": {
+            "type": "after each"
+        }
+    },
+    {
+        "awardId": "rank-13",
+        "behaviour": {
+            "type": "after each"
+        }
+    }
+]

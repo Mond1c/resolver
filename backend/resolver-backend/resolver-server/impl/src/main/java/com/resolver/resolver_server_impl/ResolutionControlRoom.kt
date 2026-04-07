@@ -21,9 +21,7 @@ internal class ResolutionControlRoom {
                         val parts = receivedText.split(SPACE)
                         if (parts.size == 2) {
                             if (parts[0] == SIG_APPLY_FACTOR) {
-                                parts[1].toDoubleOrNull()?.let { factor ->
-                                    onApplyFactor(factor)
-                                }
+                                parts[1].toDoubleOrNull()?.let(onApplyFactor)
                             }
                         }
                         when (receivedText) {

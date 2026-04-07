@@ -103,7 +103,6 @@ class ScoreboardManagerImpl(
                         }
                         emit(uiEvents[currentUnusedUiEventsIndex])
                         currentUnusedUiEventsIndex++
-                        delay(timeBetween.value)
                     }
                 }
             }
@@ -123,7 +122,6 @@ class ScoreboardManagerImpl(
                             }
                         }
                         emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex])
-                        delay(timeBetween.value)
                     }
                 }
             }
