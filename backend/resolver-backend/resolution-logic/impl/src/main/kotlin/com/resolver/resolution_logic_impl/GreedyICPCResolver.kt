@@ -1,5 +1,6 @@
 package com.resolver.resolution_logic_impl
 
+import com.resolver.resolution_logic_api.AwardBehaviour
 import com.resolver.resolution_logic_api.ResolutionResult
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.resolution_logic_api.Resolver
@@ -26,7 +27,17 @@ class GreedyICPCResolver(
         val currentUnresolvedIndexResult: Int
     )
 
-    override fun resolve(states: List<ContestState>): ResolutionResult {
+    override fun resolve(
+        states: List<ContestState>,
+        awardIdToAwardBehaviour: Map<String, AwardBehaviour>
+    ): ResolutionResult {
+        val calculations = scoreboardCalculator.calculateScoreboard(states.last())
+        val awards = calculations?.ranks?.awards ?: TODO("Unexpected null")
+        val awardIdToTeamIds = HashMap(
+            awards
+                .groupBy { it.id }
+                .mapValues { (it.value.firstOrNull() ?: TODO("Unexpected null")).teams.toHashSet() }
+        )
         val teamsCount =
             states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
         val runs = states.filter { it.lastEvent is RunUpdate }
@@ -57,6 +68,13 @@ class GreedyICPCResolver(
             val teamId = ranking.order[currentUnresolvedIndex]
             val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
             if (problemIdToFrozenContestStates == null) {
+                addAwards(
+                    steps = steps,
+                    awards = ranking.awards,
+                    teamId = teamId,
+                    awardIdToAwardBehaviour = awardIdToAwardBehaviour,
+                    awardIdToTeamIds = awardIdToTeamIds
+                )
                 currentUnresolvedIndex--
                 continue
             }
@@ -101,6 +119,9 @@ class GreedyICPCResolver(
                 problemIdToResolve?.let { problemId ->
                     (teamIdToProblemIdToFrozenContestStates[teamId]
                         ?: TODO("Unexpected null")).remove(problemId)
+                    if (teamIdToProblemIdToFrozenContestStates[teamId]?.isEmpty() == true) {
+                        teamIdToProblemIdToFrozenContestStates.remove(teamId)
+                    }
                 }
                 step?.let { step ->
                     steps.add(step)
@@ -192,14 +213,14 @@ class GreedyICPCResolver(
             val problemResult = scoreboardRowAfterResolution.problemResults[problemIdToIndex[runInfo.problemId]
                 ?: TODO("Unexpected null")] as ICPCProblemResult
             resolutionStep = if (!icpcResult.verdict.isAccepted) {
-                ResolutionStep.RejectResolutionStep(
+                ResolutionStep.WithTeamId.RejectResolutionStep(
                     oldIndex,
                     runInfo.teamId,
                     runInfo.problemId,
                     problemResult.wrongAttempts
                 )
             } else {
-                ResolutionStep.ICPCAcceptResolutionStep(
+                ResolutionStep.WithTeamId.ICPCAcceptResolutionStep(
                     teamId = runInfo.teamId,
                     problemId = runInfo.problemId,
                     oldRank = oldRank,
@@ -219,5 +240,45 @@ class GreedyICPCResolver(
             problemIdToResolve = problemIdToResolve,
             currentUnresolvedIndexResult = currentUnresolvedIndexResult
         )
+    }
+
+    private fun addAwards(
+        steps: MutableList<ResolutionStep>,
+        awards: List<Award>,
+        teamId: TeamId,
+        awardIdToAwardBehaviour: Map<String, AwardBehaviour>,
+        awardIdToTeamIds: HashMap<String, HashSet<TeamId>>
+    ) {
+        val teamAwardsToShow = mutableListOf<Award>()
+        val groupAwardsToShow = mutableListOf<Award>()
+        for (award in awards) {
+            if (!award.teams.contains(teamId) || awardIdToAwardBehaviour[award.id] == AwardBehaviour.IGNORE) {
+                continue
+            }
+            (awardIdToTeamIds[award.id] ?: TODO("Unexpected null")).remove(teamId)
+            if (
+                award.teams.size == 1 ||
+                awardIdToAwardBehaviour[award.id] == AwardBehaviour.AFTER_EACH
+            ) {
+                teamAwardsToShow.add(award)
+            } else if (awardIdToTeamIds[award.id]?.isEmpty() ?: TODO("Unexpected null")) {
+                groupAwardsToShow.add(award)
+            }
+        }
+        if (teamAwardsToShow.isNotEmpty()) {
+            steps.add(
+                ResolutionStep.WithTeamId.TeamAwardsResolutionStep(
+                    teamId = teamId,
+                    awards = teamAwardsToShow
+                )
+            )
+        }
+        if (groupAwardsToShow.isNotEmpty()) {
+            steps.add(
+                ResolutionStep.GroupAwardsResolutionStep(
+                    awards = groupAwardsToShow
+                )
+            )
+        }
     }
 }

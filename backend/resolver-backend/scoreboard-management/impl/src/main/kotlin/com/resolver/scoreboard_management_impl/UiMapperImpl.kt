@@ -10,27 +10,35 @@ object UiMapperImpl : UiMapper {
         return buildList {
             for (i in 0..<steps.size) {
                 when (val step = steps[i]) {
-                    is ResolutionStep.ICPCAcceptResolutionStep -> {
+                    is ResolutionStep.WithTeamId.ICPCAcceptResolutionStep -> {
                         isPrevTheSame = handleICPCAcceptResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1)
+                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
                         )
                     }
 
-                    is ResolutionStep.RejectResolutionStep -> {
+                    is ResolutionStep.WithTeamId.RejectResolutionStep -> {
                         isPrevTheSame = handleRejectResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1)
+                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
                         )
+                    }
+
+                    is ResolutionStep.GroupAwardsResolutionStep -> {
+                        isPrevTheSame = handleGroupAwardsResolutionStep(step)
+                    }
+
+                    is ResolutionStep.WithTeamId.TeamAwardsResolutionStep -> {
+                        isPrevTheSame = handleTeamAwardsResolutionStep(step)
                     }
                 }
             }
         }
     }
 
-    override fun mapToUiEvent(step: ResolutionStep.ICPCAcceptResolutionStep): UiEvent {
+    override fun mapToUiEvent(step: ResolutionStep.WithTeamId.ICPCAcceptResolutionStep): UiEvent {
         return with(step) {
             UiEvent.AcceptICPC(
                 teamId = teamId,
@@ -47,7 +55,7 @@ object UiMapperImpl : UiMapper {
         }
     }
 
-    override fun mapToUiEvent(step: ResolutionStep.RejectResolutionStep): UiEvent {
+    override fun mapToUiEvent(step: ResolutionStep.WithTeamId.RejectResolutionStep): UiEvent {
         return with(step) {
             UiEvent.Reject(
                 teamId = teamId,
@@ -98,14 +106,32 @@ object UiMapperImpl : UiMapper {
                 problemId = uiEvent.problemId
             )
 
+            is UiEvent.ShowTeamAwards -> UiEvent.HideTeamAwards(
+                teamId = uiEvent.teamId,
+                awards = uiEvent.awards
+            )
+
+            is UiEvent.HideTeamAwards -> UiEvent.ShowTeamAwards(
+                teamId = uiEvent.teamId,
+                awards = uiEvent.awards
+            )
+
+            is UiEvent.ShowGroupAwards -> UiEvent.HideGroupAwards(
+                awards = uiEvent.awards
+            )
+
+            is UiEvent.HideGroupAwards -> UiEvent.ShowGroupAwards(
+                awards = uiEvent.awards
+            )
+
             else -> UiEvent.NoOp
         }
     }
 
     private fun MutableList<UiEvent>.handleICPCAcceptResolutionStep(
-        step: ResolutionStep.ICPCAcceptResolutionStep,
+        step: ResolutionStep.WithTeamId.ICPCAcceptResolutionStep,
         currentIsPrevTheSame: Boolean,
-        nextOrNull: ResolutionStep?
+        nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
             add(UiEvent.ChooseRow(index = step.oldIndex))
@@ -123,20 +149,18 @@ object UiMapperImpl : UiMapper {
                 problemId = step.problemId
             )
         )
-        var newIsPrevTheSame: Boolean
-        if (nextOrNull?.teamId == step.teamId) {
-            newIsPrevTheSame = true
+        return if (nextOrNull?.teamId == step.teamId) {
+            true
         } else {
-            newIsPrevTheSame = false
             add(UiEvent.UnchooseRow(index = step.oldIndex))
+            false
         }
-        return newIsPrevTheSame
     }
 
     private fun MutableList<UiEvent>.handleRejectResolutionStep(
-        step: ResolutionStep.RejectResolutionStep,
+        step: ResolutionStep.WithTeamId.RejectResolutionStep,
         currentIsPrevTheSame: Boolean,
-        nextOrNull: ResolutionStep?
+        nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
             add(UiEvent.ChooseRow(index = step.index))
@@ -154,13 +178,45 @@ object UiMapperImpl : UiMapper {
                 problemId = step.problemId
             )
         )
-        var newIsPrevTheSame: Boolean
-        if (nextOrNull?.teamId == step.teamId) {
-            newIsPrevTheSame = true
+        return if (nextOrNull?.teamId == step.teamId) {
+            true
         } else {
-            newIsPrevTheSame = false
             add(UiEvent.UnchooseRow(index = step.index))
+            false
         }
-        return newIsPrevTheSame
+    }
+
+    private fun MutableList<UiEvent>.handleTeamAwardsResolutionStep(
+        step: ResolutionStep.WithTeamId.TeamAwardsResolutionStep
+    ): Boolean {
+        add(
+            UiEvent.ShowTeamAwards(
+                teamId = step.teamId,
+                awards = step.awards
+            )
+        )
+        add(
+            UiEvent.HideTeamAwards(
+                teamId = step.teamId,
+                awards = step.awards
+            )
+        )
+        return false
+    }
+
+    private fun MutableList<UiEvent>.handleGroupAwardsResolutionStep(
+        step: ResolutionStep.GroupAwardsResolutionStep
+    ): Boolean {
+        add(
+            UiEvent.ShowGroupAwards(
+                awards = step.awards
+            )
+        )
+        add(
+            UiEvent.HideGroupAwards(
+                awards = step.awards
+            )
+        )
+        return false
     }
 }

@@ -17,6 +17,10 @@ tasks.shadowJar {
     mergeServiceFiles()
 }
 
+tasks.runShadow {
+    standardInput = System.`in`
+}
+
 dependencies {
     implementation(libs.logger)
 

@@ -2,6 +2,7 @@ package com.resolver.scoreboard_management_api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.icpclive.cds.api.Award
 import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
@@ -76,6 +77,32 @@ sealed interface UiEvent {
         val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("ShowTeamAwards")
+    data class ShowTeamAwards(
+        val teamId: TeamId,
+        val awards: List<Award>
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("HideTeamAwards")
+    data class HideTeamAwards(
+        val teamId: TeamId,
+        val awards: List<Award>
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("ShowGroupAwards")
+    data class ShowGroupAwards(
+        val awards: List<Award>
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("HideGroupAwards")
+    data class HideGroupAwards(
+        val awards: List<Award>
     ) : UiEvent
 
     @Serializable
