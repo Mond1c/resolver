@@ -7,7 +7,11 @@ interface UiMapper {
 
     infix fun mapToUiEvent(step: ResolutionStep.WithTeamId.ICPCAcceptResolutionStep): UiEvent
 
-    infix fun mapToUiEvent(step: ResolutionStep.WithTeamId.RejectResolutionStep): UiEvent
+    infix fun mapToUiEvent(step: ResolutionStep.WithTeamId.ICPCRejectResolutionStep): UiEvent
+
+    infix fun mapToUiEvent(step: ResolutionStep.WithTeamId.IOIAcceptResolutionStep): UiEvent
+
+    infix fun mapToUiEvent(step: ResolutionStep.WithTeamId.IOIRejectResolutionStep): UiEvent
 
     infix fun reverse(uiEvent: UiEvent): UiEvent
 }

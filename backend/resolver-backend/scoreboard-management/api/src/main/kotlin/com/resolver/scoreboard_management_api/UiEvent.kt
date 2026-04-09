@@ -64,19 +64,79 @@ sealed interface UiEvent {
     ) : UiEvent
 
     @Serializable
-    @SerialName("Reject")
-    data class Reject(
+    @SerialName("RejectICPC")
+    data class RejectICPC(
+        val teamId: TeamId,
+        val problemId: ProblemId,
+        val wrongAttempts: Int // TODO: oldWrongAttempts newWrongAttempts ???
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("ReverseRejectICPC")
+    data class ReverseRejectICPC(
         val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int
     ) : UiEvent
 
     @Serializable
-    @SerialName("ReverseReject")
-    data class ReverseReject(
+    @SerialName("AcceptIOI")
+    data class AcceptIOI(
         val teamId: TeamId,
         val problemId: ProblemId,
-        val wrongAttempts: Int
+        val oldRank: Int,
+        val newRank: Int,
+        val oldIndex: Int,
+        val newIndex: Int,
+        val isFirstBest: Boolean,
+        val score: Double,
+        val oldTotalScore: Double,
+        val newTotalScore: Double,
+        val totalAttempts: Int,
+        val oldTotalPenalty: Duration,
+        val newTotalPenalty: Duration
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("ReverseAcceptIOI")
+    data class ReverseAcceptIOI(
+        val teamId: TeamId,
+        val problemId: ProblemId,
+        val oldRank: Int,
+        val newRank: Int,
+        val oldIndex: Int,
+        val newIndex: Int,
+        val isFirstBest: Boolean,
+        val score: Double,
+        val oldTotalScore: Double,
+        val newTotalScore: Double,
+        val totalAttempts: Int,
+        val oldTotalPenalty: Duration,
+        val newTotalPenalty: Duration
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("RejectIOI")
+    data class RejectIOI(
+        val teamId: TeamId,
+        val index: Int,
+        val problemId: ProblemId,
+        val score: Double,
+        val oldTotalScore: Double,
+        val newTotalScore: Double,
+        val totalAttempts: Int
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("ReverseRejectIOI")
+    data class ReverseRejectIOI(
+        val teamId: TeamId,
+        val index: Int,
+        val problemId: ProblemId,
+        val score: Double,
+        val oldTotalScore: Double,
+        val newTotalScore: Double,
+        val totalAttempts: Int
     ) : UiEvent
 
     @Serializable

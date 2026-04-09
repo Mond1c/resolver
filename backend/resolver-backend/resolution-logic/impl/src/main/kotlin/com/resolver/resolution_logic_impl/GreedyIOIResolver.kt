@@ -7,15 +7,15 @@ import org.icpclive.cds.api.*
 import kotlin.time.Duration
 
 @Suppress("DuplicatedCode")
-class GreedyICPCResolver(
+class GreedyIOIResolver(
     private val scoreboardCalculator: ScoreboardCalculator,
     private val awardsHandler: AwardsHandler
 ) : Resolver {
     private class CellAnalyzeResult(
         val contestStatesToApply: List<ContestState>? = null,
-        val isSolvedFoundResult: Boolean,
+        val currentIsBetterFoundResult: Boolean,
         val currentPenaltyDeltaResult: Duration,
-        val currentMaxSolvedResult: Double
+        val currentTotalScoreResult: Double
     )
 
     private class DecisionPreparationResult(
@@ -33,6 +33,7 @@ class GreedyICPCResolver(
         val teamsCount =
             states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
         val runs = states.getRunUpdates()
+        val problemIdToFirstBestSolvedTeamId = runs.getFrozenAmongRunUpdates().getProblemIdToFirstBestSolvedTeamId()
         val notFrozenContestStates = runs.getNotFrozenAmongRunUpdates()
         val teamIdToProblemIdToFrozenContestStates = runs.getProblemIdToTeamIdToFrozenContestStates()
         var currentContestState = notFrozenContestStates.lastOrNull() ?: TODO("Interesting case")
@@ -62,20 +63,20 @@ class GreedyICPCResolver(
             val oldRank = ranking.ranks[oldIndex]
             val oldPenalty = scoreboardRowBeforeResolution.penalty
             var currentPenaltyDelta = Duration.INFINITE
-            var currentMaxSolved = scoreboardRowBeforeResolution.totalScore
-            var isSolvedFound = false
+            var currentIsBetterFound = false
+            var currentTotalScore = scoreboardRowBeforeResolution.totalScore
             for (entry in problemIdToFrozenContestStates) {
                 analyzePendingCell(
                     currentContestState = currentContestState,
                     frozenContestStates = entry.value,
                     teamId = teamId,
-                    currentMaxSolved = currentMaxSolved,
-                    isSolvedFound = isSolvedFound,
                     currentPenaltyDelta = currentPenaltyDelta,
-                    oldPenalty = oldPenalty
+                    currentTotalScore = currentTotalScore,
+                    oldPenalty = oldPenalty,
+                    currentIsBetterFound = currentIsBetterFound,
                 ).apply {
-                    isSolvedFound = isSolvedFoundResult
-                    currentMaxSolved = currentMaxSolvedResult
+                    currentIsBetterFound = currentIsBetterFoundResult
+                    currentTotalScore = currentTotalScoreResult
                     currentPenaltyDelta = currentPenaltyDeltaResult
                     this.contestStatesToApply?.let { result ->
                         contestStatesToApply = result
@@ -86,6 +87,7 @@ class GreedyICPCResolver(
                 currentContestState = currentContestState,
                 contestStatesToApply = contestStatesToApply,
                 scoreboardRowBeforeResolution = scoreboardRowBeforeResolution,
+                problemIdToFirstBestSolvedTeamId = problemIdToFirstBestSolvedTeamId,
                 problemIdToIndex = problemIdToIndex,
                 teamId = teamId,
                 oldRank = oldRank,
@@ -117,10 +119,10 @@ class GreedyICPCResolver(
         currentContestState: ContestState,
         frozenContestStates: List<ContestState>,
         teamId: TeamId,
-        currentMaxSolved: Double,
-        isSolvedFound: Boolean,
+        currentTotalScore: Double,
         currentPenaltyDelta: Duration,
-        oldPenalty: Duration
+        oldPenalty: Duration,
+        currentIsBetterFound: Boolean
     ): CellAnalyzeResult {
         val newRuns = frozenContestStates + currentContestState
         val (rows, ranking) = scoreboardCalculator.calculateScoreboard(
@@ -130,27 +132,26 @@ class GreedyICPCResolver(
         val newIndex = ranking.order.indexOf(teamId)
         val scoreboardRowAfterTestResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
         val testPenalty = scoreboardRowAfterTestResolution.penalty
-        val testSolved = scoreboardRowAfterTestResolution.totalScore
+        val testTotalScore = scoreboardRowAfterTestResolution.totalScore
         var contestStatesToApply: List<ContestState>? = null
-        var isSolvedFoundResult = isSolvedFound
         var currentPenaltyDeltaResult = currentPenaltyDelta
-        var currentMaxSolvedResult = currentMaxSolved
-        if (testSolved > currentMaxSolved) {
-            currentMaxSolvedResult = testSolved
-            isSolvedFoundResult = true
+        var currentTotalScoreResult = currentTotalScore
+        var currentIsBetterFoundResult = currentIsBetterFound
+        if (testTotalScore > currentTotalScore ||
+            (testTotalScore == currentTotalScore && testPenalty - oldPenalty < currentPenaltyDeltaResult)
+        ) {
+            currentTotalScoreResult = testTotalScore
             contestStatesToApply = frozenContestStates
-        } else if (isSolvedFound && testPenalty != oldPenalty && testPenalty - oldPenalty < currentPenaltyDelta) {
+            currentIsBetterFoundResult = true
             currentPenaltyDeltaResult = testPenalty - oldPenalty
-            contestStatesToApply = frozenContestStates
-        } else if (!isSolvedFound) {
-            // TODO: problem was solved before freeze, but there are submissions after freeze
+        } else if (!currentIsBetterFound) {
             contestStatesToApply = frozenContestStates
         }
         return CellAnalyzeResult(
             contestStatesToApply = contestStatesToApply,
-            isSolvedFoundResult = isSolvedFoundResult,
+            currentIsBetterFoundResult = currentIsBetterFoundResult,
             currentPenaltyDeltaResult = currentPenaltyDeltaResult,
-            currentMaxSolvedResult = currentMaxSolvedResult
+            currentTotalScoreResult = currentTotalScoreResult,
         )
     }
 
@@ -158,6 +159,7 @@ class GreedyICPCResolver(
         currentContestState: ContestState,
         contestStatesToApply: List<ContestState>?,
         problemIdToIndex: Map<ProblemId, Int>,
+        problemIdToFirstBestSolvedTeamId: Map<ProblemId, TeamId>,
         scoreboardRowBeforeResolution: ScoreboardRow,
         teamId: TeamId,
         oldRank: Int,
@@ -182,28 +184,34 @@ class GreedyICPCResolver(
             val newRank = ranking.ranks[newIndex]
             val scoreboardRowAfterResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
             val runInfo = (currentContestStateResult.lastEvent as RunUpdate).newInfo
-            val icpcResult = runInfo.result as RunResult.ICPC
+            val ioiResult = runInfo.result as RunResult.IOI
             val problemResult = scoreboardRowAfterResolution.problemResults[problemIdToIndex[runInfo.problemId]
-                ?: TODO("Unexpected null")] as ICPCProblemResult
-            resolutionStep = if (!icpcResult.verdict.isAccepted) {
-                ResolutionStep.WithTeamId.ICPCRejectResolutionStep(
-                    runInfo.teamId,
-                    oldIndex,
-                    runInfo.problemId,
-                    problemResult.wrongAttempts
+                ?: TODO("Unexpected null")] as IOIProblemResult
+            resolutionStep = if (ioiResult.wrongVerdict != null) {
+                ResolutionStep.WithTeamId.IOIRejectResolutionStep(
+                    teamId = runInfo.teamId,
+                    problemId = runInfo.problemId,
+                    index = newIndex,
+                    score = problemResult.score ?: TODO("How is it possible?"),
+                    oldTotalScore = scoreboardRowBeforeResolution.totalScore,
+                    newTotalScore = scoreboardRowAfterResolution.totalScore,
+                    totalAttempts = problemResult.totalAttempts
                 )
             } else {
-                ResolutionStep.WithTeamId.ICPCAcceptResolutionStep(
+                ResolutionStep.WithTeamId.IOIAcceptResolutionStep(
                     teamId = runInfo.teamId,
                     problemId = runInfo.problemId,
                     oldRank = oldRank,
                     newRank = newRank,
                     oldIndex = oldIndex,
                     newIndex = newIndex,
-                    isFirstToSolve = problemResult.isFirstToSolve,
-                    wrongAttempts = problemResult.wrongAttempts,
+                    isFirstBest = problemIdToFirstBestSolvedTeamId[runInfo.problemId] == teamId,
+                    totalAttempts = problemResult.totalAttempts,
                     oldTotalPenalty = scoreboardRowBeforeResolution.penalty,
-                    newTotalPenalty = scoreboardRowAfterResolution.penalty
+                    newTotalPenalty = scoreboardRowAfterResolution.penalty,
+                    score = ioiResult.scoreAfter,
+                    oldTotalScore = scoreboardRowBeforeResolution.totalScore,
+                    newTotalScore = scoreboardRowAfterResolution.totalScore
                 )
             }
         }

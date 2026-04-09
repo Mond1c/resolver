@@ -22,7 +22,8 @@ copy --from=builder /resolver/source ./source
 
 env port=8080
 env host=0.0.0.0
+env source=./source/1
 
 expose ${port}
 
-entrypoint ["sh", "-c", "java -jar resolver.jar -c ./source -h ${host} -p ${port}"]
+entrypoint ["sh", "-c", "java -jar resolver.jar -c ${source} -h ${host} -p ${port}"]
