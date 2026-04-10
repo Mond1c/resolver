@@ -10,9 +10,9 @@ object UiMapperImpl : UiMapper {
         var isPrevTheSame = false
         return buildList {
             for (i in 0..<steps.size) {
-                when (val step = steps[i]) {
+                isPrevTheSame = when (val step = steps[i]) {
                     is ResolutionStep.WithTeamId.ICPCAcceptResolutionStep -> {
-                        isPrevTheSame = handleICPCAcceptResolutionStep(
+                        handleICPCAcceptResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
                             nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
@@ -20,7 +20,7 @@ object UiMapperImpl : UiMapper {
                     }
 
                     is ResolutionStep.WithTeamId.ICPCRejectResolutionStep -> {
-                        isPrevTheSame = handleICPCRejectResolutionStep(
+                        handleICPCRejectResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
                             nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
@@ -28,15 +28,15 @@ object UiMapperImpl : UiMapper {
                     }
 
                     is ResolutionStep.GroupAwardsResolutionStep -> {
-                        isPrevTheSame = handleGroupAwardsResolutionStep(step)
+                        handleGroupAwardsResolutionStep(step)
                     }
 
                     is ResolutionStep.WithTeamId.TeamAwardsResolutionStep -> {
-                        isPrevTheSame = handleTeamAwardsResolutionStep(step)
+                        handleTeamAwardsResolutionStep(step)
                     }
 
                     is ResolutionStep.WithTeamId.IOIAcceptResolutionStep -> {
-                        isPrevTheSame = handleIOIAcceptResolutionStep(
+                        handleIOIAcceptResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
                             nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
@@ -44,7 +44,7 @@ object UiMapperImpl : UiMapper {
                     }
 
                     is ResolutionStep.WithTeamId.IOIRejectResolutionStep -> {
-                        isPrevTheSame = handleIOIRejectResolutionStep(
+                        handleIOIRejectResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
                             nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId

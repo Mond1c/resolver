@@ -64,19 +64,7 @@ object App : CliktCommand() {
             notFrozenJob.cancel()
 
             val frozenState = frozen.lastOrNull() ?: TODO("Handle this case gracefully")
-            val resolver = when (frozenState.infoAfterEvent?.resultType) {
-                ContestResultType.ICPC -> {
-                    ResolutionLogicComponent.greedyICPCResolver
-                }
-
-                ContestResultType.IOI -> {
-                    ResolutionLogicComponent.greedyIOIResolver
-                }
-
-                else -> {
-                    TODO("Unsupported contest result type")
-                }
-            }
+            val resolver = chooseResolver(frozenState)
             val result = resolver.resolve(notFrozen, awardIdToBehaviour)
             val manager = ScoreboardManagementComponent.provideScoreboardManager1(
                 frozenState = frozenState,
@@ -181,5 +169,15 @@ object App : CliktCommand() {
             .mapValues { it.value.firstOrNull()?.behaviour ?: TODO("Unexpected null") }
     } catch (_: Exception) {
         hashMapOf()
+    }
+
+    private fun chooseResolver(state: ContestState) = when (state.infoAfterEvent?.resultType ?: TODO()) {
+        ContestResultType.ICPC -> {
+            ResolutionLogicComponent.greedyICPCResolver
+        }
+
+        ContestResultType.IOI -> {
+            ResolutionLogicComponent.greedyIOIResolver
+        }
     }
 }
