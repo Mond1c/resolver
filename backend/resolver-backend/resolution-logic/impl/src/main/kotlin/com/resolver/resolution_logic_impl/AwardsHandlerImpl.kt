@@ -23,7 +23,8 @@ object AwardsHandlerImpl : AwardsHandler {
             (awardIdToTeamIds[award.id] ?: TODO("Unexpected null")).remove(teamId)
             if (
                 award.teams.size == 1 ||
-                awardIdToAwardBehaviour[award.id] == AwardBehaviour.AFTER_EACH
+                awardIdToAwardBehaviour[award.id] == AwardBehaviour.AFTER_EACH ||
+                awardIdToAwardBehaviour[award.id] == null
             ) {
                 teamAwardsToShow.add(award)
             } else if (awardIdToTeamIds[award.id]?.isEmpty() ?: TODO("Unexpected null")) {

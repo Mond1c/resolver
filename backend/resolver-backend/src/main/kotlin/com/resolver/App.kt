@@ -39,15 +39,7 @@ object App : CliktCommand() {
             val notFrozen = mutableListOf<ContestState>()
             val semaphore = Semaphore(2, 2)
 
-            val awardIdToBehaviour = try {
-                awardsBehaviourPath
-                    .readText()
-                    .let { ScoreboardManagementComponent.json.decodeFromString<List<AwardInfo>>(it) }
-                    .groupBy { it.awardId }
-                    .mapValues { it.value.firstOrNull()?.behaviour ?: TODO("Unexpected null") }
-            } catch (_: Exception) {
-                hashMapOf()
-            }
+            val awardIdToBehaviour = getAwardIdToBehaviour()
 
             val frozenJob = launch {
                 loadContestStates(
@@ -179,5 +171,15 @@ object App : CliktCommand() {
             }
             exitProcess(0)
         }
+    }
+
+    private fun getAwardIdToBehaviour() = try {
+        awardsBehaviourPath
+            .readText()
+            .let { ScoreboardManagementComponent.json.decodeFromString<List<AwardInfo>>(it) }
+            .groupBy { it.awardId }
+            .mapValues { it.value.firstOrNull()?.behaviour ?: TODO("Unexpected null") }
+    } catch (_: Exception) {
+        hashMapOf()
     }
 }
