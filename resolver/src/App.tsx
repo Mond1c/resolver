@@ -8,6 +8,7 @@ import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
 import {handleRow} from "./row";
 import {handleProblem} from "./problem";
 import config from "./config";
+import {setInfo} from "@/redux/contest/contestInfo";
 
 export function App() {
     const dispatch = useAppDispatch()
@@ -47,6 +48,7 @@ export function App() {
                             }
                         }
                     ))
+                    dispatch(setInfo(data.contestInfo))
                     break;
                 }
                 case UiEvent.Type.AcceptICPC:
@@ -77,6 +79,20 @@ export function App() {
                     break;
                 }
                 case UiEvent.Type.ChooseRow: {
+                    dispatch(showWidget(
+                        {
+                            settings: {
+                                scrollDirection: ScoreboardScrollDirection.Up,
+                                lastVisible: scoreboardData.orderById[data.teamId],
+                                group: "all",
+                                optimismLevel: OptimismLevel.normal
+                            },
+                            statisticsId: "scoreboard",
+                            widgetId: "scoreboard",
+                            widgetLocationId: "scoreboard",
+                            type: Widget.Type.ScoreboardWidget
+                        }
+                    ))
                     dispatch(
                         handleRow({
                             row: {
@@ -155,7 +171,15 @@ export function App() {
             {Object.values(widgets).map((widget) => {
                 const Component = widgetComponents[widget.type]
                 return <div
-                    key={widget.widgetId}>
+                    key={widget.widgetId}
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%"
+                    }}
+                >
                     <Component widgetData={widget}></Component>
                 </div>
             })}

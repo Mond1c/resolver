@@ -23,6 +23,7 @@ export interface ResolverConfig {
     VERDICT_CELL_TRANSITION_TIME: number;
     VERDICT_CELL_BRODER_RADIUS: string;
 
+    SCOREBOARD_CHOSEN_ROW_COLOR: string;
     SCOREBOARD_BACKGROUND_COLOR: string;
     SCOREBOARD_BORDER_RADIUS: string;
     SCOREBOARD_TEXT_COLOR: string;

@@ -3,10 +3,11 @@ import config from "./config";
 import {useAnimatedRow} from "@/components/organisms/widgets/scoreboard/ScoreboardRow";
 import {AnimatingTeam} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardAnimation";
 import {ContestInfo, ProblemInfo, ScoreboardRow as APIScoreboardRow, TeamInfo} from "@shared/api";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import {ShrinkingBox} from "@/components/atoms/ShrinkingBox";
 import {RankLabel, TaskResultLabel} from "@/components/atoms/ContestLabels";
 import {formatScore, useFormatPenalty, useNeedPenalty} from "@/services/displayUtils";
+import {useAppSelector} from "./hooks";
 
 type ContestDataWithMaps = ContestInfo & {
     teamsId: Record<TeamInfo["id"], TeamInfo>;
@@ -18,13 +19,13 @@ const ScoreboardTableRowWrap = styled.div<{
     nProblems: number;
 }>`
     display: grid;
-    grid-template-columns:
+    grid-template-columns: 
         ${config.SCOREBOARD_CELL_PLACE_SIZE}
         ${config.SCOREBOARD_CELL_TEAMNAME_SIZE}
-        ${config.SCOREBOARD_CELL_POINTS_SIZE}
+        repeat(${(props) => props.nProblems}, 1fr)
         ${({needPenalty}) =>
                 needPenalty ? config.SCOREBOARD_CELL_PENALTY_SIZE : ""}
-        repeat(${(props) => props.nProblems}, 1fr);
+        ${config.SCOREBOARD_CELL_POINTS_SIZE};
     gap: ${config.SCOREBOARD_BETWEEN_HEADER_PADDING}px;
 
     box-sizing: border-box;
@@ -32,10 +33,12 @@ const ScoreboardTableRowWrap = styled.div<{
     background-color: ${config.SCOREBOARD_BACKGROUND_COLOR};
 `;
 
-const ScoreboardRowWrap = styled(ScoreboardTableRowWrap)`
+const ScoreboardRowWrap = styled(ScoreboardTableRowWrap)<{ isChosen?: boolean }>`
     overflow: hidden;
     align-items: center;
 
+    background-color: ${props => props.isChosen ?
+            config.SCOREBOARD_CHOSEN_ROW_COLOR : config.SCOREBOARD_BACKGROUND_COLOR};
     box-sizing: content-box;
     height: ${config.SCOREBOARD_ROW_HEIGHT}px;
 
@@ -59,13 +62,30 @@ const ScoreboardRankLabel = styled(RankLabel)`
     justify-content: center;
 `;
 
-export const ScoreboardTaskResultLabel = styled(TaskResultLabel)`
+const pulse = keyframes`
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+`
+
+export const ScoreboardTaskResultLabel = styled(TaskResultLabel)<{ isChosen?: boolean }>`
     display: flex;
     align-items: center;
     align-self: stretch;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    animation: ${({isChosen}) =>
+            (isChosen ? pulse : "none")} 0.5s ease-in-out infinite;
 `;
 
 const PositionedScoreboardRowDiv = styled.div`
@@ -97,6 +117,7 @@ const ScoreboardTeamRow = React.memo(
          needPenalty,
          contestData,
      }: ScoreboardTeamRowProps) => {
+        const chosenProblem = useAppSelector((state) => state.problem)
         const teamData = contestData?.teamsId[teamId];
         const formatPenalty = useFormatPenalty();
 
@@ -120,6 +141,9 @@ const ScoreboardTeamRow = React.memo(
                         problemColor={contestData?.problems[i]?.color}
                         minScore={contestData?.problems[i]?.minScore}
                         maxScore={contestData?.problems[i]?.maxScore}
+                        isChosen={chosenProblem.teamId === teamId &&
+                            contestData?.problems[i].id === chosenProblem.problemId &&
+                            chosenProblem.chosen}
                     />
                 ))}
                 {needPenalty && (
@@ -154,6 +178,7 @@ interface ScoreboardRowProps {
     rank: number;
     teamId: string;
     contestData: ContestDataWithMaps;
+    isChosen: boolean;
 }
 
 export const ScoreboardRow = React.memo(
@@ -162,6 +187,7 @@ export const ScoreboardRow = React.memo(
          rank,
          teamId,
          contestData,
+         isChosen
      }: ScoreboardRowProps) => {
         const needPenalty = useNeedPenalty();
 
@@ -169,6 +195,7 @@ export const ScoreboardRow = React.memo(
             <ScoreboardRowWrap
                 nProblems={Math.max(contestData?.problems?.length ?? 0, 1)}
                 needPenalty={needPenalty}
+                isChosen={isChosen}
             >
                 <ScoreboardRankLabel
                     rank={rank}
@@ -212,6 +239,8 @@ export const AnimatedRow = React.memo(
          contestData,
      }: AnimatedRowProps) => {
         const rowRef = useRef<HTMLDivElement>(null);
+        const chosenRow = useAppSelector((state) => state.row)
+
         useAnimatedRow(
             config.SCOREBOARD_ROW_PADDING,
             config.SCOREBOARD_ROW_TRANSITION_TIME,
@@ -235,6 +264,7 @@ export const AnimatedRow = React.memo(
                     rank={rank}
                     teamId={teamId}
                     contestData={contestData}
+                    isChosen={chosenRow.teamId === teamId && chosenRow.chosen}
                 />
             </PositionedScoreboardRowDiv>
         );

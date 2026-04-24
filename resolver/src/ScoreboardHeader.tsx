@@ -32,10 +32,10 @@ const ScoreboardTableRowWrap = styled.div<{
     grid-template-columns:
         ${config.SCOREBOARD_CELL_PLACE_SIZE}
         ${config.SCOREBOARD_CELL_TEAMNAME_SIZE}
-        ${config.SCOREBOARD_CELL_POINTS_SIZE}
+        repeat(${(props) => props.nProblems}, 1fr)
         ${({needPenalty}) =>
                 needPenalty ? config.SCOREBOARD_CELL_PENALTY_SIZE : ""}
-        repeat(${(props) => props.nProblems}, 1fr);
+        ${config.SCOREBOARD_CELL_POINTS_SIZE};
     gap: ${config.SCOREBOARD_BETWEEN_HEADER_PADDING}px;
 
     box-sizing: border-box;

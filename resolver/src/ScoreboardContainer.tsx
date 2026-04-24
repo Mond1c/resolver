@@ -3,7 +3,7 @@ import config from "./config";
 import {useScoreboardData, useScoreboardRows} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardData";
 import {useAnimatedScrollPos} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardScroll";
 import {useAnimatingTeams} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardAnimation";
-import React, {startTransition, useCallback, useEffect, useRef, useState} from "react";
+import React, {startTransition, useEffect, useRef, useState} from "react";
 import {useResizeObserver} from "usehooks-ts";
 import {useTeams} from "@/components/organisms/widgets/scoreboard/ScoreboardContainer";
 import {ScoreboardHeader, ScoreboardTableHeader} from "./ScoreboardHeader";
@@ -53,39 +53,22 @@ export function useScroller(
     totalRows: number,
     singleScreenRowCount: number,
     direction: ScoreboardScrollDirection | undefined,
+    lastVisible?: number
 ) {
     const effectiveRowCount = Math.max(1, singleScreenRowCount);
-    const showRows = totalRows;
-    const numPages = Math.max(1, Math.ceil(showRows / effectiveRowCount));
-    const singlePageRowCount = Math.ceil(showRows / numPages);
-
-    const curPageRef = useRef(0);
+    const maxScroll = Math.max(0, totalRows - effectiveRowCount)
     const [scrollPos, setScrollPos] = useState(0);
-
-    const calcScrollPos = useCallback(
-        (page: number) => {
-            const pageEndRow = Math.min(
-                (page + 1) * singlePageRowCount,
-                totalRows,
-            );
-            return Math.max(0, pageEndRow - effectiveRowCount);
-        },
-        [singlePageRowCount, totalRows, effectiveRowCount],
-    );
 
     useEffect(() => {
         if (direction === ScoreboardScrollDirection.FirstPage) {
-            curPageRef.current = 0;
-            startTransition(() => setScrollPos(calcScrollPos(0)));
+            startTransition(() => setScrollPos(0));
         } else if (direction === ScoreboardScrollDirection.LastPage) {
-            curPageRef.current = numPages - 1;
-            startTransition(() => setScrollPos(calcScrollPos(numPages - 1)));
+            startTransition(() => setScrollPos(maxScroll));
         } else if (direction === ScoreboardScrollDirection.Up) {
-            const newPage = curPageRef.current - 1
-            curPageRef.current = newPage
-            startTransition(() => setScrollPos(calcScrollPos(newPage)))
+            startTransition(() => setScrollPos((_) =>
+                Math.max(0, Math.min(lastVisible - effectiveRowCount + 1, maxScroll))))
         }
-    }, [direction, numPages, calcScrollPos]);
+    }, [direction, maxScroll, lastVisible]);
 
     return scrollPos;
 }
@@ -97,7 +80,8 @@ const ScoreboardRows = ({settings, onPage}: ScoreboardRowsProps) => {
     const targetScrollPos = useScroller(
         rows.length,
         onPage,
-        settings.scrollDirection
+        settings.scrollDirection,
+        settings.lastVisible
     );
 
     const {getScrollPos, subscribe} = useAnimatedScrollPos(targetScrollPos, config.SCOREBOARD_ROW_TRANSITION_TIME);
