@@ -1,14 +1,162 @@
 import {ShrinkingBox} from "@/components/atoms/ShrinkingBox";
-
+import {useAppDispatch, useAppSelector} from "./hooks";
+import {OptimismLevel} from "@shared/api";
+import {useCallback, useEffect} from "react";
+import {ScoreboardScrollDirection, showWidget, Widget} from "./widgets";
+import {UiEvent} from "./models";
+import {useWebSocket} from "./useWebSocket";
+import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
+import {handleRow} from "./row";
+import {handleProblem} from "./problem";
 
 function App() {
-  return (
-    <>
-      <ShrinkingBox text={"ABC"}>
+    const dispatch = useAppDispatch()
+    const scoreboardData = useAppSelector(state => state.scoreboard[OptimismLevel.normal])
+    const contestInfo = useAppSelector(state => state.contestInfo.info)
+    const widgets = useAppSelector(state => state.widgets.widgets)
 
-      </ShrinkingBox>
-    </>
-  )
+    useEffect(() => {
+        dispatch(showWidget(
+            {
+                settings: {
+                    scrollDirection: ScoreboardScrollDirection.LastPage,
+                    group: "all",
+                    optimismLevel: OptimismLevel.normal
+                },
+                statisticsId: "scoreboard",
+                widgetId: "scoreboard",
+                widgetLocationId: "scoreboard",
+                type: Widget.Type.ScoreboardWidget
+            }
+        ))
+    }, [dispatch]);
+
+    const handleMessage = useCallback((data: UiEvent) => {
+            switch (data.type) {
+                case UiEvent.Type.NoOp:
+                    break;
+                case UiEvent.Type.Scoreboard: {
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: data.teamIdToScoreboardRow,
+                                order: data.order,
+                                ranks: data.ranks,
+                                awards: []
+                            }
+                        }
+                    ))
+                    break;
+                }
+                case UiEvent.Type.AcceptICPC:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.row},
+                                order: data.order,
+                                ranks: data.ranks,
+                                awards: []
+                            }
+                        }
+                    ))
+                    break;
+                case UiEvent.Type.AcceptIOI:
+                    break;
+                case UiEvent.Type.ChooseProblem: {
+                    dispatch(
+                        handleProblem({
+                            problem: {
+                                teamId: data.teamId,
+                                problemId: data.problemId,
+                                chosen: true
+                            }
+                        })
+                    )
+                    break;
+                }
+                case UiEvent.Type.ChooseRow: {
+                    dispatch(
+                        handleRow({
+                            row: {
+                                teamId: data.teamId,
+                                chosen: true
+                            }
+                        })
+                    )
+                    break;
+                }
+                case UiEvent.Type.HideGroupAwards:
+                    break;
+                case UiEvent.Type.HideTeamAwards:
+                    break;
+                case UiEvent.Type.RejectICPC:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.row},
+                                order: scoreboardData.order,
+                                ranks: scoreboardData.ranks,
+                                awards: []
+                            }
+                        }
+                    ))
+                    break;
+                case UiEvent.Type.RejectIOI:
+                    break;
+                case UiEvent.Type.ReverseAcceptICPC:
+                    break;
+                case UiEvent.Type.ReverseAcceptIOI:
+                    break;
+                case UiEvent.Type.ReverseRejectICPC:
+                    break;
+                case UiEvent.Type.ReverseRejectIOI:
+                    break;
+                case UiEvent.Type.ShowGroupAwards:
+                    break;
+                case UiEvent.Type.ShowTeamAwards:
+                    break;
+                case UiEvent.Type.UnchooseProblem: {
+                    dispatch(
+                        handleProblem({
+                            problem: {
+                                teamId: data.teamId,
+                                problemId: data.problemId,
+                                chosen: false
+                            }
+                        })
+                    )
+                    break;
+                }
+                case UiEvent.Type.UnchooseRow: {
+                    dispatch(
+                        handleRow({
+                            row: {
+                                teamId: data.teamId,
+                                chosen: false
+                            }
+                        })
+                    )
+                }
+            }
+        },
+        [dispatch, scoreboardData, contestInfo]
+    )
+
+    useWebSocket({
+        onMessage: handleMessage,
+        url: "ws://localhost:8080/resolution"
+    })
+
+    return (
+        <>
+            <ShrinkingBox text={"ABC"}>
+
+            </ShrinkingBox>
+        </>
+    )
 }
 
 export default App
