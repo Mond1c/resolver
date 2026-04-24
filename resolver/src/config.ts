@@ -21,6 +21,7 @@ function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
         CONTEST_CAPTION: "",
         BASE_URL_WS: "ws://localhost:9999/resolution",
 
+        SCOREBOARD_RESOLVED_ROWS_BELOW: 5,
         GLOBAL_DEFAULT_FONT_FAMILY: "Helvetica, serif", // css-property
         GLOBAL_DEFAULT_FONT_SIZE: "22px", // css-property
         GLOBAL_DEFAULT_FONT_WEIGHT: 400, // css-property

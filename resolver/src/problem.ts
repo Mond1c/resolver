@@ -15,7 +15,7 @@ const initialState: ProblemData =
     };
 
 const problemSlice = createSlice({
-    name: "row",
+    name: "problem",
     initialState,
     reducers: {
         handleProblem(

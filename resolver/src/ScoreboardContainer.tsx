@@ -66,7 +66,8 @@ export function useScroller(
             startTransition(() => setScrollPos(maxScroll));
         } else if (direction === ScoreboardScrollDirection.Up) {
             startTransition(() => setScrollPos((_) =>
-                Math.max(0, Math.min(lastVisible - effectiveRowCount + 1, maxScroll))))
+                Math.max(0, Math.min(lastVisible - effectiveRowCount + 1 +
+                    config.SCOREBOARD_RESOLVED_ROWS_BELOW, maxScroll))))
         }
     }, [direction, maxScroll, lastVisible]);
 
