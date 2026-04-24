@@ -5,15 +5,15 @@
     },
     {
         "awardId": "first-diploma",
-        "behaviour": "after_all"
+        "behaviour": "after_each"
     },
     {
         "awardId": "second-diploma",
-        "behaviour": "after_all"
+        "behaviour": "after_each"
     },
     {
         "awardId": "third-diploma",
-        "behaviour": "after_all"
+        "behaviour": "after_each"
     },
     {
         "awardId": "rank-1",

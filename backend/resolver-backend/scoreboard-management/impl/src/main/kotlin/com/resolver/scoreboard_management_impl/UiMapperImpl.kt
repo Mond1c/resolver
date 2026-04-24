@@ -67,7 +67,10 @@ object UiMapperImpl : UiMapper {
                 newTotalPenalty = newTotalPenalty,
                 oldTotalPenalty = oldTotalPenalty,
                 wrongAttempts = wrongAttempts,
-                isFirstToSolve = isFirstToSolve
+                isFirstToSolve = isFirstToSolve,
+                row = row,
+                ranks = ranks,
+                order = order
             )
         }
     }
@@ -77,7 +80,8 @@ object UiMapperImpl : UiMapper {
             UiEvent.RejectICPC(
                 teamId = teamId,
                 problemId = problemId,
-                wrongAttempts = wrongAttempts
+                wrongAttempts = wrongAttempts,
+                row = row
             )
         }
     }
@@ -135,11 +139,13 @@ object UiMapperImpl : UiMapper {
 
             is UiEvent.ChooseProblem -> UiEvent.UnchooseProblem(
                 index = uiEvent.index,
-                problemId = uiEvent.problemId
+                problemId = uiEvent.problemId,
+                teamId = uiEvent.teamId,
             )
 
             is UiEvent.ChooseRow -> UiEvent.UnchooseRow(
-                index = uiEvent.index
+                index = uiEvent.index,
+                teamId = uiEvent.teamId
             )
 
             is UiEvent.RejectICPC -> UiEvent.ReverseRejectICPC(
@@ -149,12 +155,14 @@ object UiMapperImpl : UiMapper {
             )
 
             is UiEvent.UnchooseRow -> UiEvent.ChooseRow(
-                index = uiEvent.index
+                index = uiEvent.index,
+                teamId = uiEvent.teamId 
             )
 
             is UiEvent.UnchooseProblem -> UiEvent.ChooseProblem(
                 index = uiEvent.index,
-                problemId = uiEvent.problemId
+                problemId = uiEvent.problemId,
+                teamId = uiEvent.teamId,
             )
 
             is UiEvent.ShowTeamAwards -> UiEvent.HideTeamAwards(
@@ -219,25 +227,27 @@ object UiMapperImpl : UiMapper {
         nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
-            add(UiEvent.ChooseRow(index = step.oldIndex))
+            add(UiEvent.ChooseRow(index = step.oldIndex, teamId = step.teamId))
         }
         add(
             UiEvent.ChooseProblem(
                 index = step.oldIndex,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         add(this@UiMapperImpl mapToUiEvent step)
         add(
             UiEvent.UnchooseProblem(
                 index = step.newIndex,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         return if (nextOrNull?.teamId == step.teamId) {
             true
         } else {
-            add(UiEvent.UnchooseRow(index = step.oldIndex))
+            add(UiEvent.UnchooseRow(index = step.oldIndex, teamId = step.teamId))
             false
         }
     }
@@ -248,25 +258,27 @@ object UiMapperImpl : UiMapper {
         nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
-            add(UiEvent.ChooseRow(index = step.oldIndex))
+            add(UiEvent.ChooseRow(index = step.oldIndex, teamId = step.teamId))
         }
         add(
             UiEvent.ChooseProblem(
                 index = step.oldIndex,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         add(this@UiMapperImpl mapToUiEvent step)
         add(
             UiEvent.UnchooseProblem(
                 index = step.newIndex,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         return if (nextOrNull?.teamId == step.teamId) {
             true
         } else {
-            add(UiEvent.UnchooseRow(index = step.oldIndex))
+            add(UiEvent.UnchooseRow(index = step.oldIndex, teamId = step.teamId))
             false
         }
     }
@@ -277,25 +289,27 @@ object UiMapperImpl : UiMapper {
         nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
-            add(UiEvent.ChooseRow(index = step.index))
+            add(UiEvent.ChooseRow(index = step.index, teamId = step.teamId))
         }
         add(
             UiEvent.ChooseProblem(
                 index = step.index,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         add(this@UiMapperImpl mapToUiEvent step)
         add(
             UiEvent.UnchooseProblem(
                 index = step.index,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         return if (nextOrNull?.teamId == step.teamId) {
             true
         } else {
-            add(UiEvent.UnchooseRow(index = step.index))
+            add(UiEvent.UnchooseRow(index = step.index, teamId = step.teamId))
             false
         }
     }
@@ -306,25 +320,27 @@ object UiMapperImpl : UiMapper {
         nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
         if (!currentIsPrevTheSame) {
-            add(UiEvent.ChooseRow(index = step.index))
+            add(UiEvent.ChooseRow(index = step.index, teamId = step.teamId))
         }
         add(
             UiEvent.ChooseProblem(
                 index = step.index,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         add(this@UiMapperImpl mapToUiEvent step)
         add(
             UiEvent.UnchooseProblem(
                 index = step.index,
-                problemId = step.problemId
+                problemId = step.problemId,
+                teamId = step.teamId,
             )
         )
         return if (nextOrNull?.teamId == step.teamId) {
             true
         } else {
-            add(UiEvent.UnchooseRow(index = step.index))
+            add(UiEvent.UnchooseRow(index = step.index, teamId = step.teamId))
             false
         }
     }

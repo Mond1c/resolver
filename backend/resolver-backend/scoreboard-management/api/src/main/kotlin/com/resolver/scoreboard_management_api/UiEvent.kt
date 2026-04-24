@@ -3,8 +3,10 @@ package com.resolver.scoreboard_management_api
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.icpclive.cds.api.Award
+import org.icpclive.cds.api.ContestInfo
 import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
+import org.icpclive.cds.api.ScoreboardRow
 import kotlin.time.Duration
 
 @Serializable
@@ -12,19 +14,22 @@ sealed interface UiEvent {
     @Serializable
     @SerialName("ChooseRow")
     data class ChooseRow(
-        val index: Int
+        val index: Int,
+        val teamId: TeamId
     ) : UiEvent
 
     @Serializable
     @SerialName("UnchooseRow")
     data class UnchooseRow(
-        val index: Int
+        val index: Int,
+        val teamId: TeamId
     ) : UiEvent
 
     @Serializable
     @SerialName("ChooseProblem")
     data class ChooseProblem(
         val index: Int,
+        val teamId: TeamId,
         val problemId: ProblemId
     ) : UiEvent
 
@@ -32,12 +37,16 @@ sealed interface UiEvent {
     @SerialName("UnchooseProblem")
     data class UnchooseProblem(
         val index: Int,
+        val teamId: TeamId,
         val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
     @SerialName("AcceptICPC")
     data class AcceptICPC(
+        val row: ScoreboardRow,
+        val ranks: List<Int>,
+        val order: List<TeamId>,
         val teamId: TeamId,
         val problemId: ProblemId,
         val oldRank: Int,
@@ -66,6 +75,7 @@ sealed interface UiEvent {
     @Serializable
     @SerialName("RejectICPC")
     data class RejectICPC(
+        val row: ScoreboardRow,
         val teamId: TeamId,
         val problemId: ProblemId,
         val wrongAttempts: Int // TODO: oldWrongAttempts newWrongAttempts ???
@@ -163,6 +173,15 @@ sealed interface UiEvent {
     @SerialName("HideGroupAwards")
     data class HideGroupAwards(
         val awards: List<Award>
+    ) : UiEvent
+
+    @Serializable
+    @SerialName("Scoreboard")
+    class Scoreboard(
+        val teamIdToScoreboardRow: Map<TeamId, ScoreboardRow>,
+        val order: List<TeamId>,
+        val ranks: List<Int>,
+        val contestInfo: ContestInfo
     ) : UiEvent
 
     @Serializable

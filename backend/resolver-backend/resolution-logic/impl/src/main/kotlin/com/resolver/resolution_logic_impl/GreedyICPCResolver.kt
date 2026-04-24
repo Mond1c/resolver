@@ -26,6 +26,7 @@ class GreedyICPCResolver(
     )
 
     override fun resolve(
+        frozenState: ContestState,
         states: List<ContestState>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>
     ): ResolutionResult {
@@ -33,9 +34,9 @@ class GreedyICPCResolver(
         val teamsCount =
             states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
         val runs = states.getRunUpdates()
-        val notFrozenContestStates = runs.getNotFrozenAmongRunUpdates()
+//        val notFrozenContestStates = runs.getNotFrozenAmongRunUpdates()
         val teamIdToProblemIdToFrozenContestStates = runs.getProblemIdToTeamIdToFrozenContestStates()
-        var currentContestState = notFrozenContestStates.lastOrNull() ?: TODO("Interesting case")
+        var currentContestState = frozenState
         val steps = mutableListOf<ResolutionStep>()
         var currentUnresolvedIndex = teamsCount - 1
         val problemIdToIndex = currentContestState.getProblemIdToIndex() ?: TODO("infoAfterEvent is null")
@@ -187,10 +188,11 @@ class GreedyICPCResolver(
                 ?: TODO("Unexpected null")] as ICPCProblemResult
             resolutionStep = if (!icpcResult.verdict.isAccepted) {
                 ResolutionStep.WithTeamId.ICPCRejectResolutionStep(
+                    rows[teamId]!!,
                     runInfo.teamId,
                     oldIndex,
                     runInfo.problemId,
-                    problemResult.wrongAttempts
+                    problemResult.wrongAttempts,
                 )
             } else {
                 ResolutionStep.WithTeamId.ICPCAcceptResolutionStep(
@@ -203,7 +205,10 @@ class GreedyICPCResolver(
                     isFirstToSolve = problemResult.isFirstToSolve,
                     wrongAttempts = problemResult.wrongAttempts,
                     oldTotalPenalty = scoreboardRowBeforeResolution.penalty,
-                    newTotalPenalty = scoreboardRowAfterResolution.penalty
+                    newTotalPenalty = scoreboardRowAfterResolution.penalty,
+                    row = rows[teamId]!!,
+                    ranks = ranking.ranks,
+                    order = ranking.order,
                 )
             }
         }

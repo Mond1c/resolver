@@ -2,8 +2,10 @@ package com.resolver.resolver_server_impl
 
 import com.resolver.resolver_server_api.Server
 import com.resolver.resolver_server_api.StartResult
+import com.resolver.resolver_server_api.StartServerOptions
 import com.resolver.resolver_server_api.StopResult
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.scoreboard_management_api.UiEvent
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -30,7 +32,7 @@ class ServerImpl(
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
     private val controlRoom = ResolutionControlRoom()
 
-    override suspend fun start(port: Int, host: String): StartResult {
+    override suspend fun start(startServerOptions: StartServerOptions): StartResult {
         return try {
             mtx.withLock {
                 if (isStarted.load()) {
@@ -38,8 +40,8 @@ class ServerImpl(
                 }
                 server = embeddedServer(
                     Netty,
-                    port = port,
-                    host = host
+                    port = startServerOptions.port,
+                    host = startServerOptions.host
                 ) { module() }
                 val startJob = serverScope.launch {
                     try {
@@ -87,7 +89,7 @@ class ServerImpl(
 
     private fun Routing.setResolutionWebSocketRoute() {
         webSocket(RESOLUTION_WS_ENDPOINT) {
-//                send(json.encodeToString(scoreboardManager.getScoreboard()))
+            send(json.encodeToString<UiEvent>(scoreboardManager.getScoreboard()))
             scoreboardManager.getUiEventsFlow()
                 .collect { event ->
                     send(json.encodeToString(event))

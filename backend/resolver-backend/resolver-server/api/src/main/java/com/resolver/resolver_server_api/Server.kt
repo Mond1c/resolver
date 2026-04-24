@@ -6,8 +6,7 @@ abstract class Server(
     protected val scoreboardManager: ScoreboardManager
 ) {
     abstract suspend fun start(
-        port: Int,
-        host: String
+        startServerOptions: StartServerOptions
     ): StartResult
 
     abstract suspend fun stop(): StopResult

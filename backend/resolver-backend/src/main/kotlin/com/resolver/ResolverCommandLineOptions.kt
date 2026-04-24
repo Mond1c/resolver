@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
+import com.resolver.resolver_server_api.StartServerOptions
 import org.icpclive.cds.cli.CdsCommandLineOptions
 
 open class ResolverCommandLineOptions : CdsCommandLineOptions() {
@@ -29,4 +30,9 @@ open class ResolverCommandLineOptions : CdsCommandLineOptions() {
     )
         .boolean()
         .default(false)
+
+    fun extractStartServerOptions(): StartServerOptions = StartServerOptions(
+        host = host,
+        port = port
+    )
 }

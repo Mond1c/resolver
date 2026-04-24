@@ -26,6 +26,7 @@ class GreedyIOIResolver(
     )
 
     override fun resolve(
+        frozenState: ContestState,
         states: List<ContestState>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>
     ): ResolutionResult {
@@ -34,9 +35,9 @@ class GreedyIOIResolver(
             states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
         val runs = states.getRunUpdates()
         val problemIdToFirstBestSolvedTeamId = runs.getFrozenAmongRunUpdates().getProblemIdToFirstBestSolvedTeamId()
-        val notFrozenContestStates = runs.getNotFrozenAmongRunUpdates()
+//        val notFrozenContestStates = runs.getNotFrozenAmongRunUpdates()
         val teamIdToProblemIdToFrozenContestStates = runs.getProblemIdToTeamIdToFrozenContestStates()
-        var currentContestState = notFrozenContestStates.lastOrNull() ?: TODO("Interesting case")
+        var currentContestState = frozenState
         val steps = mutableListOf<ResolutionStep>()
         var currentUnresolvedIndex = teamsCount - 1
         val problemIdToIndex = currentContestState.getProblemIdToIndex() ?: TODO("infoAfterEvent is null")
@@ -195,7 +196,8 @@ class GreedyIOIResolver(
                     score = problemResult.score ?: TODO("How is it possible?"),
                     oldTotalScore = scoreboardRowBeforeResolution.totalScore,
                     newTotalScore = scoreboardRowAfterResolution.totalScore,
-                    totalAttempts = problemResult.totalAttempts
+                    totalAttempts = problemResult.totalAttempts,
+                    row = rows[teamId]!!,
                 )
             } else {
                 ResolutionStep.WithTeamId.IOIAcceptResolutionStep(

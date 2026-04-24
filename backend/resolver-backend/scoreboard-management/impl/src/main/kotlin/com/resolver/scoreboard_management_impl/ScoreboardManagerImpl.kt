@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.icpclive.cds.api.ContestState
-import org.icpclive.cds.api.ScoreboardRow
 
 @ExperimentalCoroutinesApi
 class ScoreboardManagerImpl(
@@ -85,9 +84,14 @@ class ScoreboardManagerImpl(
             .flowOn(scoreboardCoroutineDispatcher)
     }
 
-    override fun getScoreboard(): List<ScoreboardRow> {
+    override fun getScoreboard(): UiEvent.Scoreboard {
         val (rows, ranking) = calculator.calculateScoreboard(currentState.value) ?: TODO("Unexpected null")
-        return ranking.order.map { rows[it] ?: TODO("Unexpected null") }
+        return UiEvent.Scoreboard(
+            teamIdToScoreboardRow = rows,
+            order = ranking.order,
+            ranks = ranking.ranks,
+            contestInfo = currentState.value.infoAfterEvent!!
+        )
     }
 
     private fun getUpFlow(): Flow<UiEvent> {
@@ -131,6 +135,10 @@ class ScoreboardManagerImpl(
     private fun getAutoUpFlow(): Flow<UiEvent> {
         return flow {
             while (true) {
+                if (isStopped.value || !isUp.value) {
+                    delay(timeBetween.value)
+                    continue
+                }
                 mtx.withLock {
                     if (!isStopped.value && isUp.value && currentUnusedUiEventsIndex < uiEvents.size) {
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
@@ -151,6 +159,10 @@ class ScoreboardManagerImpl(
     private fun getAutoDownFlow(): Flow<UiEvent> {
         return flow {
             while (true) {
+                if (isStopped.value || isUp.value) {
+                    delay(timeBetween.value)
+                    continue
+                }
                 mtx.withLock {
                     if (!isStopped.value && !isUp.value && currentUnusedUiEventsIndex > 0) {
                         currentUnusedUiEventsIndex--

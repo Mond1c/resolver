@@ -2,6 +2,7 @@ package com.resolver.resolution_logic_api
 
 import org.icpclive.cds.api.Award
 import org.icpclive.cds.api.ProblemId
+import org.icpclive.cds.api.ScoreboardRow
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
 
@@ -10,6 +11,7 @@ sealed interface ResolutionStep {
         val teamId: TeamId
 
         data class ICPCRejectResolutionStep(
+            val row: ScoreboardRow,
             override val teamId: TeamId,
             val index: Int,
             val problemId: ProblemId,
@@ -17,6 +19,9 @@ sealed interface ResolutionStep {
         ) : WithTeamId
 
         data class ICPCAcceptResolutionStep(
+            val row: ScoreboardRow,
+            val ranks: List<Int>,
+            val order: List<TeamId>,
             override val teamId: TeamId,
             val problemId: ProblemId,
             val oldRank: Int,
@@ -30,6 +35,7 @@ sealed interface ResolutionStep {
         ) : WithTeamId
 
         data class IOIRejectResolutionStep(
+            val row: ScoreboardRow,
             override val teamId: TeamId,
             val index: Int,
             val problemId: ProblemId,

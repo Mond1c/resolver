@@ -7,7 +7,7 @@ import com.resolver.resolution_logic_di.ResolutionLogicComponent
 import com.resolver.resolver_server_api.StartResult
 import com.resolver.resolver_server_di.ResolverServerComponent
 import com.resolver.scoreboard_management_di.ScoreboardManagementComponent
-import com.resolver.util_di.ResolverUtilComponent
+import com.resolver.util_api.ScoreboardCalculator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,7 +26,9 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.system.exitProcess
 
-object App : CliktCommand() {
+class App(
+    private val calculator: ScoreboardCalculator
+) : CliktCommand() {
     private val resolverOptions by ResolverCommandLineOptions()
     private val awardsBehaviourPath: Path
         get() = resolverOptions.configDirectory.resolve("awards_behaviour.json")
@@ -65,7 +67,7 @@ object App : CliktCommand() {
 
             val frozenState = frozen.lastOrNull() ?: TODO("Handle this case gracefully")
             val resolver = chooseResolver(frozenState)
-            val result = resolver.resolve(notFrozen, awardIdToBehaviour)
+            val result = resolver.resolve(frozenState, notFrozen, awardIdToBehaviour)
             val manager = ScoreboardManagementComponent.provideScoreboardManager1(
                 frozenState = frozenState,
                 snapshots = result.snapshots,
@@ -75,7 +77,7 @@ object App : CliktCommand() {
                 manager,
                 ScoreboardManagementComponent.json
             )
-            when (val startResult = server.start(resolverOptions.port, resolverOptions.host)) {
+            when (val startResult = server.start(resolverOptions.extractStartServerOptions())) {
                 StartResult.AlreadyStarted -> {}
                 StartResult.Failure -> {}
                 is StartResult.MaybeSuccess -> {
@@ -145,7 +147,6 @@ object App : CliktCommand() {
                 }
                 awardsSemaphore.acquire()
                 awardsJob.cancel()
-                val calculator = ResolverUtilComponent.scoreboardCalculator1
                 val calculations =
                     calculator.calculateScoreboard(dst.lastOrNull() ?: TODO("Handle this case gracefully"))
                 val awards = calculations?.ranks?.awards ?: TODO("Unexpected null")
