@@ -20,6 +20,6 @@ kotlin {
     jvmToolchain(25)
 
     compilerOptions {
-        freeCompilerArgs.add("-Xvalue-classes")
+        freeCompilerArgs.addAll("-Xskip-prerelease-check", "-Xvalue-classes")
     }
 }
