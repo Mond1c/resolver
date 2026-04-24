@@ -1,5 +1,7 @@
-import _ from "lodash";
 import {OptimismLevel} from "@shared/api";
+import React, {FC} from "react";
+import Scoreboard from "./ScoreboardContainer";
+import _ from "lodash";
 
 export interface AwardsSettings {
 }
@@ -43,6 +45,21 @@ export namespace Widget {
         settings: ScoreboardSettings;
     }
 }
+
+export const widgetComponents: Record<Widget["type"], React.ComponentType<any>> = {
+    [Widget.Type.ScoreboardWidget]: Scoreboard,
+    [Widget.Type.AwardsWidget]: undefined
+}
+
+export type ResolverWidgetProps<W extends Widget> = {
+    widgetData: W;
+    transitionState: string;
+};
+
+export type ResolverWidgetC<W extends Widget> = FC<ResolverWidgetProps<W>> & {
+    ignoreAnimation?: boolean;
+    overrideTimeout?: number;
+};
 
 const ActionTypes = {
     SHOW_WIDGET: "SHOW_WIDGET",

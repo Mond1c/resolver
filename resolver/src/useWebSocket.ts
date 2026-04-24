@@ -6,7 +6,7 @@ interface UseWebSocketParams {
 }
 
 export function useWebSocket(params: UseWebSocketParams) {
-    const { url, onMessage } = params
+    const {url, onMessage} = params
     const wsRef = useRef<WebSocket | null>(null)
     const onMessageRef = useRef(onMessage)
 
@@ -23,8 +23,7 @@ export function useWebSocket(params: UseWebSocketParams) {
         }
 
         socket.onerror = () => {
-            console.log("Error in web socket occurred. Closing.")
-            socket.close()
+            console.log("Error in web socket occurred.")
         }
 
         return () => {
@@ -32,5 +31,5 @@ export function useWebSocket(params: UseWebSocketParams) {
         }
     }, [url]);
 
-    return { ws: wsRef.current }
+    return {ws: wsRef.current}
 }

@@ -1,15 +1,15 @@
-import {ShrinkingBox} from "@/components/atoms/ShrinkingBox";
 import {useAppDispatch, useAppSelector} from "./hooks";
 import {OptimismLevel} from "@shared/api";
 import {useCallback, useEffect} from "react";
-import {ScoreboardScrollDirection, showWidget, Widget} from "./widgets";
+import {ScoreboardScrollDirection, showWidget, Widget, widgetComponents} from "./widgets";
 import {UiEvent} from "./models";
 import {useWebSocket} from "./useWebSocket";
 import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
 import {handleRow} from "./row";
 import {handleProblem} from "./problem";
+import config from "./config";
 
-function App() {
+export function App() {
     const dispatch = useAppDispatch()
     const scoreboardData = useAppSelector(state => state.scoreboard[OptimismLevel.normal])
     const contestInfo = useAppSelector(state => state.contestInfo.info)
@@ -147,16 +147,18 @@ function App() {
 
     useWebSocket({
         onMessage: handleMessage,
-        url: "ws://localhost:8080/resolution"
+        url: config.BASE_URL_WS
     })
 
     return (
         <>
-            <ShrinkingBox text={"ABC"}>
-
-            </ShrinkingBox>
+            {Object.values(widgets).map((widget) => {
+                const Component = widgetComponents[widget.type]
+                return <div
+                    key={widget.widgetId}>
+                    <Component widgetData={widget}></Component>
+                </div>
+            })}
         </>
     )
 }
-
-export default App
