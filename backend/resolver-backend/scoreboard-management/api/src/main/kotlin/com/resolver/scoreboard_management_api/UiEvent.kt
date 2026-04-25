@@ -2,11 +2,8 @@ package com.resolver.scoreboard_management_api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.icpclive.cds.api.Award
-import org.icpclive.cds.api.ContestInfo
-import org.icpclive.cds.api.ProblemId
-import org.icpclive.cds.api.TeamId
-import org.icpclive.cds.api.ScoreboardRow
+import kotlinx.serialization.Transient
+import org.icpclive.cds.api.*
 import kotlin.time.Duration
 
 @Serializable
@@ -47,46 +44,38 @@ sealed interface UiEvent {
         val row: ScoreboardRow,
         val ranks: List<Int>,
         val order: List<TeamId>,
+        @Transient val oldRow: ScoreboardRow? = null,
+        @Transient val oldRanks: List<Int>? = null,
+        @Transient val oldOrder: List<TeamId>? = null,
         val teamId: TeamId,
-        val problemId: ProblemId,
-        val oldRank: Int,
-        val newRank: Int,
-        val oldIndex: Int,
-        val newIndex: Int,
-        val newTotalPenalty: Duration,
-        val oldTotalPenalty: Duration,
-        val wrongAttempts: Int,
-        val isFirstToSolve: Boolean
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
     @SerialName("ReverseAcceptICPC")
     data class ReverseAcceptICPC(
+        val oldRow: ScoreboardRow,
+        val oldRanks: List<Int>,
+        val oldOrder: List<TeamId>,
         val teamId: TeamId,
         val problemId: ProblemId,
-        val oldRank: Int,
-        val newRank: Int,
-        val oldIndex: Int,
-        val newIndex: Int,
-        val wrongAttempts: Int,
-        val newTotalPenalty: Duration
     ) : UiEvent
 
     @Serializable
     @SerialName("RejectICPC")
     data class RejectICPC(
         val row: ScoreboardRow,
+        @Transient val oldRow: ScoreboardRow? = null,
         val teamId: TeamId,
-        val problemId: ProblemId,
-        val wrongAttempts: Int // TODO: oldWrongAttempts newWrongAttempts ???
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
     @SerialName("ReverseRejectICPC")
     data class ReverseRejectICPC(
+        val oldRow: ScoreboardRow,
         val teamId: TeamId,
-        val problemId: ProblemId,
-        val wrongAttempts: Int
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable

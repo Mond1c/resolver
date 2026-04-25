@@ -15,7 +15,7 @@ sealed interface ResolutionStep {
             override val teamId: TeamId,
             val index: Int,
             val problemId: ProblemId,
-            val wrongAttempts: Int
+            val oldRow: ScoreboardRow
         ) : WithTeamId
 
         data class ICPCAcceptResolutionStep(
@@ -23,15 +23,12 @@ sealed interface ResolutionStep {
             val ranks: List<Int>,
             val order: List<TeamId>,
             override val teamId: TeamId,
-            val problemId: ProblemId,
-            val oldRank: Int,
-            val newRank: Int,
             val oldIndex: Int,
             val newIndex: Int,
-            val isFirstToSolve: Boolean,
-            val wrongAttempts: Int,
-            val oldTotalPenalty: Duration,
-            val newTotalPenalty: Duration
+            val problemId: ProblemId,
+            val oldRow: ScoreboardRow,
+            val oldRanks: List<Int>,
+            val oldOrder: List<TeamId>
         ) : WithTeamId
 
         data class IOIRejectResolutionStep(

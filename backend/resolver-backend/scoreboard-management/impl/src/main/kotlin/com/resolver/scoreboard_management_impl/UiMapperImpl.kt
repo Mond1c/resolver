@@ -60,17 +60,12 @@ object UiMapperImpl : UiMapper {
             UiEvent.AcceptICPC(
                 teamId = teamId,
                 problemId = problemId,
-                oldRank = oldRank,
-                newRank = newRank,
-                oldIndex = oldIndex,
-                newIndex = newIndex,
-                newTotalPenalty = newTotalPenalty,
-                oldTotalPenalty = oldTotalPenalty,
-                wrongAttempts = wrongAttempts,
-                isFirstToSolve = isFirstToSolve,
                 row = row,
                 ranks = ranks,
-                order = order
+                order = order,
+                oldRow = oldRow,
+                oldRanks = oldRanks,
+                oldOrder = oldOrder
             )
         }
     }
@@ -80,8 +75,8 @@ object UiMapperImpl : UiMapper {
             UiEvent.RejectICPC(
                 teamId = teamId,
                 problemId = problemId,
-                wrongAttempts = wrongAttempts,
-                row = row
+                row = row,
+                oldRow = oldRow
             )
         }
     }
@@ -127,12 +122,9 @@ object UiMapperImpl : UiMapper {
                     UiEvent.ReverseAcceptICPC(
                         teamId = teamId,
                         problemId = problemId,
-                        oldRank = newRank,
-                        newRank = oldRank,
-                        oldIndex = newIndex,
-                        newIndex = oldIndex,
-                        wrongAttempts = wrongAttempts,
-                        newTotalPenalty = oldTotalPenalty
+                        oldRow = oldRow!!,
+                        oldRanks = oldRanks!!,
+                        oldOrder = oldOrder!!,
                     )
                 }
             }
@@ -151,12 +143,12 @@ object UiMapperImpl : UiMapper {
             is UiEvent.RejectICPC -> UiEvent.ReverseRejectICPC(
                 teamId = uiEvent.teamId,
                 problemId = uiEvent.problemId,
-                wrongAttempts = uiEvent.wrongAttempts - 1 // TODO
+                oldRow = uiEvent.oldRow!!
             )
 
             is UiEvent.UnchooseRow -> UiEvent.ChooseRow(
                 index = uiEvent.index,
-                teamId = uiEvent.teamId 
+                teamId = uiEvent.teamId
             )
 
             is UiEvent.UnchooseProblem -> UiEvent.ChooseProblem(
