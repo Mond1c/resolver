@@ -83,7 +83,7 @@ export function App() {
                         {
                             settings: {
                                 scrollDirection: ScoreboardScrollDirection.Up,
-                                lastVisible: scoreboardData.orderById[data.teamId],
+                                targetPos: scoreboardData.orderById[data.teamId],
                                 group: "all",
                                 optimismLevel: OptimismLevel.normal
                             },
@@ -123,10 +123,32 @@ export function App() {
                 case UiEvent.Type.RejectIOI:
                     break;
                 case UiEvent.Type.ReverseAcceptICPC:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.oldRow},
+                                order: data.oldOrder,
+                                ranks: data.oldRanks,
+                                awards: []
+                            }
+                        }
+                    ));
                     break;
                 case UiEvent.Type.ReverseAcceptIOI:
                     break;
                 case UiEvent.Type.ReverseRejectICPC:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.oldRow},
+                                order: scoreboardData.order,
+                                ranks: scoreboardData.ranks,
+                                awards: []
+                            }
+                        }
+                    ));
                     break;
                 case UiEvent.Type.ReverseRejectIOI:
                     break;

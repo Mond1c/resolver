@@ -135,12 +135,9 @@ export namespace UiEvent {
         type: UiEvent.Type.ReverseAcceptICPC;
         teamId: TeamId;
         problemId: ProblemId;
-        oldRank: number;
-        newRank: number;
-        oldIndex: number;
-        newIndex: number;
-        wrongAttempts: number;
-        newTotalPenalty: string;
+        oldRanks: number[];
+        oldOrder: TeamId[];
+        oldRow: ScoreboardRow;
     }
 
     export interface ReverseAcceptIOI {
@@ -151,20 +148,13 @@ export namespace UiEvent {
         newRank: number;
         oldIndex: number;
         newIndex: number;
-        isFirstBest: boolean;
-        score: number;
-        oldTotalScore: number;
-        newTotalScore: number;
-        totalAttempts: number;
-        oldTotalPenalty: string;
-        newTotalPenalty: string;
     }
 
     export interface ReverseRejectICPC {
         type: UiEvent.Type.ReverseRejectICPC;
         teamId: TeamId;
         problemId: ProblemId;
-        wrongAttempts: number;
+        oldRow: ScoreboardRow;
     }
 
     export interface ReverseRejectIOI {

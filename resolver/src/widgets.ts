@@ -8,7 +8,7 @@ export interface AwardsSettings {
 
 export interface ScoreboardSettings {
     scrollDirection?: ScoreboardScrollDirection
-    lastVisible?: number
+    targetPos?: number
     optimismLevel?: OptimismLevel
     group?: string
 }

@@ -53,7 +53,7 @@ export function useScroller(
     totalRows: number,
     singleScreenRowCount: number,
     direction: ScoreboardScrollDirection | undefined,
-    lastVisible?: number
+    targetPos?: number
 ) {
     const effectiveRowCount = Math.max(1, singleScreenRowCount);
     const maxScroll = Math.max(0, totalRows - effectiveRowCount)
@@ -66,10 +66,10 @@ export function useScroller(
             startTransition(() => setScrollPos(maxScroll));
         } else if (direction === ScoreboardScrollDirection.Up) {
             startTransition(() => setScrollPos((_) =>
-                Math.max(0, Math.min(lastVisible - effectiveRowCount + 1 +
+                Math.max(0, Math.min(targetPos - effectiveRowCount + 1 +
                     config.SCOREBOARD_RESOLVED_ROWS_BELOW, maxScroll))))
         }
-    }, [direction, maxScroll, lastVisible]);
+    }, [direction, maxScroll, targetPos]);
 
     return scrollPos;
 }
@@ -82,7 +82,7 @@ const ScoreboardRows = ({settings, onPage}: ScoreboardRowsProps) => {
         rows.length,
         onPage,
         settings.scrollDirection,
-        settings.lastVisible
+        settings.targetPos
     );
 
     const {getScrollPos, subscribe} = useAnimatedScrollPos(targetScrollPos, config.SCOREBOARD_ROW_TRANSITION_TIME);
