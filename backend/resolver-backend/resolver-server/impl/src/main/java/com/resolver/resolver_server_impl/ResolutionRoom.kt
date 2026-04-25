@@ -20,9 +20,10 @@ internal class ResolutionRoom(
         scope.launch {
             scoreboardManager.getUiEventsFlow()
                 .collect { event ->
+                    val message = json.encodeToString(event)
                     for (client in clients) {
                         try {
-                            client.send(json.encodeToString(event))
+                            client.send(message)
                         } catch (_: Exception) {
                             clients.remove(client)
                         }
