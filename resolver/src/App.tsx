@@ -65,6 +65,17 @@ export function App() {
                     ))
                     break;
                 case UiEvent.Type.AcceptIOI:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.row},
+                                order: data.order,
+                                ranks: data.ranks,
+                                awards: []
+                            }
+                        }
+                    ))
                     break;
                 case UiEvent.Type.ChooseProblem: {
                     dispatch(
@@ -82,7 +93,7 @@ export function App() {
                     dispatch(showWidget(
                         {
                             settings: {
-                                scrollDirection: ScoreboardScrollDirection.Up,
+                                scrollDirection: ScoreboardScrollDirection.Goto,
                                 targetPos: scoreboardData.orderById[data.teamId],
                                 group: "all",
                                 optimismLevel: OptimismLevel.normal
@@ -121,6 +132,17 @@ export function App() {
                     ))
                     break;
                 case UiEvent.Type.RejectIOI:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.row},
+                                order: scoreboardData.order,
+                                ranks: scoreboardData.ranks,
+                                awards: []
+                            }
+                        }
+                    ))
                     break;
                 case UiEvent.Type.ReverseAcceptICPC:
                     dispatch(handleScoreboardDiff(
@@ -136,6 +158,17 @@ export function App() {
                     ));
                     break;
                 case UiEvent.Type.ReverseAcceptIOI:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.oldRow},
+                                order: data.oldOrder,
+                                ranks: data.oldRanks,
+                                awards: []
+                            }
+                        }
+                    ));
                     break;
                 case UiEvent.Type.ReverseRejectICPC:
                     dispatch(handleScoreboardDiff(
@@ -151,6 +184,17 @@ export function App() {
                     ));
                     break;
                 case UiEvent.Type.ReverseRejectIOI:
+                    dispatch(handleScoreboardDiff(
+                        {
+                            optimism: OptimismLevel.normal,
+                            diff: {
+                                rows: {[data.teamId]: data.oldRow},
+                                order: scoreboardData.order,
+                                ranks: scoreboardData.ranks,
+                                awards: []
+                            }
+                        }
+                    ));
                     break;
                 case UiEvent.Type.ShowGroupAwards:
                     break;

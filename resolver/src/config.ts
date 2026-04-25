@@ -19,7 +19,7 @@ function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
     return {
         CONTEST_COLOR: "#4C83C3",
         CONTEST_CAPTION: "",
-        BASE_URL_WS: "ws://localhost:9999/resolution",
+        BASE_URL_WS: "ws://localhost:8080/resolution",
 
         SCOREBOARD_RESOLVED_ROWS_BELOW: 5,
         GLOBAL_DEFAULT_FONT_FAMILY: "Helvetica, serif", // css-property

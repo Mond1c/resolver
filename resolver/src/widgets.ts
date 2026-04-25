@@ -15,8 +15,7 @@ export interface ScoreboardSettings {
 
 export enum ScoreboardScrollDirection {
     FirstPage = "FirstPage",
-    Up = "Up",
-    Down = "Down",
+    Goto = "Goto",
     LastPage = "LastPage",
 }
 

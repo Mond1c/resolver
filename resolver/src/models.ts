@@ -57,31 +57,19 @@ export namespace UiEvent {
         order: string[],
         teamId: TeamId;
         problemId: ProblemId;
-        oldRank: number;
-        newRank: number;
         oldIndex: number;
         newIndex: number;
-        newTotalPenalty: string;
-        oldTotalPenalty: string;
-        wrongAttempts: number;
-        isFirstToSolve: boolean;
     }
 
     export interface AcceptIOI {
         type: UiEvent.Type.AcceptIOI;
+        row: ScoreboardRow,
+        ranks: number[],
+        order: string[],
         teamId: TeamId;
         problemId: ProblemId;
-        oldRank: number;
-        newRank: number;
         oldIndex: number;
         newIndex: number;
-        isFirstBest: boolean;
-        score: number;
-        oldTotalScore: number;
-        newTotalScore: number;
-        totalAttempts: number;
-        oldTotalPenalty: string;
-        newTotalPenalty: string;
     }
 
     export interface ChooseProblem {
@@ -117,18 +105,13 @@ export namespace UiEvent {
         row: ScoreboardRow,
         teamId: TeamId;
         problemId: ProblemId;
-        wrongAttempts: number;
     }
 
     export interface RejectIOI {
         type: UiEvent.Type.RejectIOI;
+        row: ScoreboardRow,
         teamId: TeamId;
-        index: number;
         problemId: ProblemId;
-        score: number;
-        oldTotalScore: number;
-        newTotalScore: number;
-        totalAttempts: number;
     }
 
     export interface ReverseAcceptICPC {
@@ -144,10 +127,9 @@ export namespace UiEvent {
         type: UiEvent.Type.ReverseAcceptIOI;
         teamId: TeamId;
         problemId: ProblemId;
-        oldRank: number;
-        newRank: number;
-        oldIndex: number;
-        newIndex: number;
+        oldRanks: number[];
+        oldOrder: TeamId[];
+        oldRow: ScoreboardRow;
     }
 
     export interface ReverseRejectICPC {
@@ -160,12 +142,8 @@ export namespace UiEvent {
     export interface ReverseRejectIOI {
         type: UiEvent.Type.ReverseRejectIOI;
         teamId: TeamId;
-        index: number;
         problemId: ProblemId;
-        score: number;
-        oldTotalScore: number;
-        newTotalScore: number;
-        totalAttempts: number;
+        oldRow: ScoreboardRow;
     }
 
     export interface ShowGroupAwards {
