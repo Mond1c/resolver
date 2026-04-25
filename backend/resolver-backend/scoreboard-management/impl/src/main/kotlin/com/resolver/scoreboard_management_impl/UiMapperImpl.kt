@@ -15,7 +15,7 @@ object UiMapperImpl : UiMapper {
                         handleICPCAcceptResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
+                            nextOrNull = steps.getNextAcceptOrRejectOrNull(i + 1)
                         )
                     }
 
@@ -23,7 +23,7 @@ object UiMapperImpl : UiMapper {
                         handleICPCRejectResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
+                            nextOrNull = steps.getNextAcceptOrRejectOrNull(i + 1)
                         )
                     }
 
@@ -39,7 +39,7 @@ object UiMapperImpl : UiMapper {
                         handleIOIAcceptResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
+                            nextOrNull = steps.getNextAcceptOrRejectOrNull(i + 1)
                         )
                     }
 
@@ -47,8 +47,12 @@ object UiMapperImpl : UiMapper {
                         handleIOIRejectResolutionStep(
                             step = step,
                             currentIsPrevTheSame = isPrevTheSame,
-                            nextOrNull = steps.getOrNull(i + 1) as? ResolutionStep.WithTeamId
+                            nextOrNull = steps.getNextAcceptOrRejectOrNull(i + 1)
                         )
+                    }
+
+                    is ResolutionStep.WithTeamId.NoResolvedProblemsForTeam -> {
+                        handleNoResolvedProblemsForTeam(step = step)
                     }
                 }
             }
@@ -368,6 +372,14 @@ object UiMapperImpl : UiMapper {
                 awards = step.awards
             )
         )
+        return false
+    }
+
+    private fun MutableList<UiEvent>.handleNoResolvedProblemsForTeam(
+        step: ResolutionStep.WithTeamId.NoResolvedProblemsForTeam
+    ): Boolean {
+        add(UiEvent.ChooseRow(index = step.index, teamId = step.teamId))
+        add(UiEvent.UnchooseRow(index = step.index, teamId = step.teamId))
         return false
     }
 }

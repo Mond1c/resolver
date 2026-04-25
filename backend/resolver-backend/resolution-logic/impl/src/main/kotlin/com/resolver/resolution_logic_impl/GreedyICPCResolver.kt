@@ -39,12 +39,19 @@ class GreedyICPCResolver(
         val steps = mutableListOf<ResolutionStep>()
         var currentUnresolvedIndex = teamsCount - 1
         val snapshots = mutableListOf<ContestState>()
+        val teamsWhoHaveAtLeastOneResolvedProblem = hashSetOf<TeamId>()
         while (currentUnresolvedIndex >= 0) {
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestState)
                 ?: TODO("Unexpected null")
             val teamId = ranking.order[currentUnresolvedIndex]
             val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
             if (problemIdToFrozenContestStates == null) {
+                if (!teamsWhoHaveAtLeastOneResolvedProblem.contains(teamId)) {
+                    steps.add(ResolutionStep.WithTeamId.NoResolvedProblemsForTeam(
+                        teamId = teamId,
+                        index = currentUnresolvedIndex
+                    ))
+                }
                 awardsHandler.handleAwards(
                     steps = steps,
                     awards = ranking.awards,
@@ -55,6 +62,7 @@ class GreedyICPCResolver(
                 currentUnresolvedIndex--
                 continue
             }
+            teamsWhoHaveAtLeastOneResolvedProblem.add(teamId)
             var contestStatesToApply: List<ContestState>? = null
             val scoreboardRowBeforeResolution = rows[ranking.order[currentUnresolvedIndex]] ?: TODO("Unexpected null")
             val oldIndex = currentUnresolvedIndex

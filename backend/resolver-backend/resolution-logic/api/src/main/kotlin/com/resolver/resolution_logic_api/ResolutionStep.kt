@@ -10,6 +10,11 @@ sealed interface ResolutionStep {
     sealed interface WithTeamId : ResolutionStep {
         val teamId: TeamId
 
+        data class NoResolvedProblemsForTeam(
+            override val teamId: TeamId,
+            val index: Int
+        ) : WithTeamId
+
         data class ICPCRejectResolutionStep(
             val row: ScoreboardRow,
             override val teamId: TeamId,
