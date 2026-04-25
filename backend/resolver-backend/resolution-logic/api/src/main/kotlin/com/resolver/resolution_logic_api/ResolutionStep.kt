@@ -4,7 +4,6 @@ import org.icpclive.cds.api.Award
 import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.ScoreboardRow
 import org.icpclive.cds.api.TeamId
-import kotlin.time.Duration
 
 sealed interface ResolutionStep {
     sealed interface WithTeamId : ResolutionStep {
@@ -41,26 +40,20 @@ sealed interface ResolutionStep {
             override val teamId: TeamId,
             val index: Int,
             val problemId: ProblemId,
-            val score: Double,
-            val oldTotalScore: Double,
-            val newTotalScore: Double,
-            val totalAttempts: Int
+            val oldRow: ScoreboardRow
         ) : WithTeamId
 
         data class IOIAcceptResolutionStep(
+            val row: ScoreboardRow,
+            val ranks: List<Int>,
+            val order: List<TeamId>,
             override val teamId: TeamId,
             val problemId: ProblemId,
-            val oldRank: Int,
-            val newRank: Int,
             val oldIndex: Int,
             val newIndex: Int,
-            val isFirstBest: Boolean,
-            val score: Double,
-            val oldTotalScore: Double,
-            val newTotalScore: Double,
-            val totalAttempts: Int,
-            val oldTotalPenalty: Duration,
-            val newTotalPenalty: Duration
+            val oldRow: ScoreboardRow,
+            val oldRanks: List<Int>,
+            val oldOrder: List<TeamId>
         ) : WithTeamId
 
         data class TeamAwardsResolutionStep(

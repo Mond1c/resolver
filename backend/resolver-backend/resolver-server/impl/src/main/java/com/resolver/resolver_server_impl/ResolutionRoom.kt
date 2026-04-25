@@ -1,38 +1,34 @@
 package com.resolver.resolver_server_impl
 
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.scoreboard_management_api.UiEvent
 import io.ktor.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.serialization.json.Json
-import java.util.concurrent.ConcurrentHashMap
 
 internal class ResolutionRoom(
     private val scoreboardManager: ScoreboardManager,
     private val json: Json,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 ) {
-    private val clients = ConcurrentHashMap.newKeySet<DefaultWebSocketSession>()
+    private val eventsFlow = scoreboardManager.getUiEventsFlow()
+        .map { json.encodeToString(it) }
+        .shareIn(scope, SharingStarted.Eagerly)
 
-    init {
-        scope.launch {
-            scoreboardManager.getUiEventsFlow()
-                .collect { event ->
-                    val message = json.encodeToString(event)
-                    for (client in clients) {
-                        try {
-                            client.send(message)
-                        } catch (_: Exception) {
-                            clients.remove(client)
-                        }
-                    }
+    fun addClient(session: DefaultWebSocketSession): Job {
+        return scope.launch {
+            try {
+                session.send(json.encodeToString<UiEvent>(scoreboardManager.getScoreboard()))
+                eventsFlow.collect { serializedEvent ->
+                    session.send(serializedEvent)
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+            }
         }
-    }
-
-    fun addClient(session: DefaultWebSocketSession) {
-        clients.add(session)
     }
 }

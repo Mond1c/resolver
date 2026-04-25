@@ -90,17 +90,12 @@ object UiMapperImpl : UiMapper {
             UiEvent.AcceptIOI(
                 teamId = teamId,
                 problemId = problemId,
-                oldRank = oldRank,
-                newRank = newRank,
-                oldIndex = oldIndex,
-                newIndex = newIndex,
-                isFirstBest = isFirstBest,
-                score = score,
-                oldTotalScore = oldTotalScore,
-                newTotalScore = newTotalScore,
-                totalAttempts = totalAttempts,
-                oldTotalPenalty = oldTotalPenalty,
-                newTotalPenalty = newTotalPenalty
+                row = row,
+                ranks = ranks,
+                order = order,
+                oldRow = oldRow,
+                oldRanks = oldRanks,
+                oldOrder = oldOrder
             )
         }
     }
@@ -109,12 +104,9 @@ object UiMapperImpl : UiMapper {
         return with(step) {
             UiEvent.RejectIOI(
                 teamId = teamId,
-                index = index,
                 problemId = problemId,
-                score = score,
-                oldTotalScore = oldTotalScore,
-                newTotalScore = newTotalScore,
-                totalAttempts = totalAttempts
+                row = row,
+                oldRow = oldRow
             )
         }
     }
@@ -184,17 +176,9 @@ object UiMapperImpl : UiMapper {
                     UiEvent.ReverseAcceptIOI(
                         teamId = teamId,
                         problemId = problemId,
-                        oldRank = newRank,
-                        newRank = oldRank,
-                        oldIndex = newIndex,
-                        newIndex = oldIndex,
-                        isFirstBest = false, // TODO: first best is possible before freeze ???
-                        score = score,
-                        oldTotalScore = newTotalScore,
-                        newTotalScore = oldTotalScore,
-                        totalAttempts = totalAttempts - 1, // TODO: use oldTotalAttempts and newTotalAttempts instead ???
-                        oldTotalPenalty = newTotalPenalty,
-                        newTotalPenalty = oldTotalPenalty
+                        oldRow = oldRow!!,
+                        oldRanks = oldRanks!!,
+                        oldOrder = oldOrder!!
                     )
                 }
             }
@@ -203,12 +187,8 @@ object UiMapperImpl : UiMapper {
                 with(uiEvent) {
                     UiEvent.ReverseRejectIOI(
                         teamId = teamId,
-                        index = index,
                         problemId = problemId,
-                        score = score,
-                        oldTotalScore = newTotalScore,
-                        newTotalScore = oldTotalScore,
-                        totalAttempts = totalAttempts - 1 // TODO
+                        oldRow = oldRow!!
                     )
                 }
             }

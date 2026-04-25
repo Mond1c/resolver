@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.icpclive.cds.api.*
-import kotlin.time.Duration
 
 @Serializable
 sealed interface UiEvent {
@@ -58,7 +57,7 @@ sealed interface UiEvent {
         val oldRanks: List<Int>,
         val oldOrder: List<TeamId>,
         val teamId: TeamId,
-        val problemId: ProblemId,
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
@@ -81,61 +80,41 @@ sealed interface UiEvent {
     @Serializable
     @SerialName("AcceptIOI")
     data class AcceptIOI(
+        val row: ScoreboardRow,
+        val ranks: List<Int>,
+        val order: List<TeamId>,
+        @Transient val oldRow: ScoreboardRow? = null,
+        @Transient val oldRanks: List<Int>? = null,
+        @Transient val oldOrder: List<TeamId>? = null,
         val teamId: TeamId,
-        val problemId: ProblemId,
-        val oldRank: Int,
-        val newRank: Int,
-        val oldIndex: Int,
-        val newIndex: Int,
-        val isFirstBest: Boolean,
-        val score: Double,
-        val oldTotalScore: Double,
-        val newTotalScore: Double,
-        val totalAttempts: Int,
-        val oldTotalPenalty: Duration,
-        val newTotalPenalty: Duration
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
     @SerialName("ReverseAcceptIOI")
     data class ReverseAcceptIOI(
+        val oldRow: ScoreboardRow,
+        val oldRanks: List<Int>,
+        val oldOrder: List<TeamId>,
         val teamId: TeamId,
         val problemId: ProblemId,
-        val oldRank: Int,
-        val newRank: Int,
-        val oldIndex: Int,
-        val newIndex: Int,
-        val isFirstBest: Boolean,
-        val score: Double,
-        val oldTotalScore: Double,
-        val newTotalScore: Double,
-        val totalAttempts: Int,
-        val oldTotalPenalty: Duration,
-        val newTotalPenalty: Duration
     ) : UiEvent
 
     @Serializable
     @SerialName("RejectIOI")
     data class RejectIOI(
+        val row: ScoreboardRow,
+        @Transient val oldRow: ScoreboardRow? = null,
         val teamId: TeamId,
-        val index: Int,
-        val problemId: ProblemId,
-        val score: Double,
-        val oldTotalScore: Double,
-        val newTotalScore: Double,
-        val totalAttempts: Int
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable
     @SerialName("ReverseRejectIOI")
     data class ReverseRejectIOI(
+        val oldRow: ScoreboardRow,
         val teamId: TeamId,
-        val index: Int,
-        val problemId: ProblemId,
-        val score: Double,
-        val oldTotalScore: Double,
-        val newTotalScore: Double,
-        val totalAttempts: Int
+        val problemId: ProblemId
     ) : UiEvent
 
     @Serializable

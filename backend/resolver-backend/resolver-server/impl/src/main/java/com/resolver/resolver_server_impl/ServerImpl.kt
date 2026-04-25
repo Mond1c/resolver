@@ -5,15 +5,12 @@ import com.resolver.resolver_server_api.StartResult
 import com.resolver.resolver_server_api.StartServerOptions
 import com.resolver.resolver_server_api.StopResult
 import com.resolver.scoreboard_management_api.ScoreboardManager
-import com.resolver.scoreboard_management_api.UiEvent
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.ktor.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -94,11 +91,7 @@ class ServerImpl(
 
     private fun Routing.setResolutionWebSocketRoute() {
         webSocket(RESOLUTION_WS_ENDPOINT) {
-            send(json.encodeToString<UiEvent>(scoreboardManager.getScoreboard()))
-            resolutionRoom.addClient(this)
-            runCatching {
-                incoming.consumeEach { }
-            }
+            resolutionRoom.addClient(this).join()
         }
     }
 

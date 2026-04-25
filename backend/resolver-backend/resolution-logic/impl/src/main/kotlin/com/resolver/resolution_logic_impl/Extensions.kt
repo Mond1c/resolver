@@ -24,11 +24,6 @@ internal fun ScoreboardCalculator.getAwardIdToTeamIds(contestStates: List<Contes
 
 internal fun List<ContestState>.getRunUpdates() = filter { contestState -> contestState.lastEvent is RunUpdate }
 
-internal fun List<ContestState>.getNotFrozenAmongRunUpdates() = filter {
-    (it.lastEvent as RunUpdate).newInfo.time < (it.infoAfterEvent?.freezeTime
-        ?: TODO("infoAfterEvent or freezeTime is null"))
-}
-
 internal fun List<ContestState>.getFrozenAmongRunUpdates() = filter {
     (it.lastEvent as RunUpdate).newInfo.time >= (it.infoAfterEvent?.freezeTime
         ?: TODO("infoAfterEvent or freezeTime is null"))
@@ -37,15 +32,13 @@ internal fun List<ContestState>.getFrozenAmongRunUpdates() = filter {
 internal fun List<ContestState>.getProblemIdToTeamIdToFrozenContestStates(): HashMap<TeamId, HashMap<ProblemId, List<ContestState>>> =
     HashMap(
         getFrozenAmongRunUpdates()
-        .groupBy { state ->
-            (state.lastEvent as RunUpdate).newInfo.teamId
-        }.mapValues { contestStates ->
-            HashMap(contestStates.value.groupBy { state ->
-                (state.lastEvent as RunUpdate).newInfo.problemId
+            .groupBy { state ->
+                (state.lastEvent as RunUpdate).newInfo.teamId
+            }.mapValues { contestStates ->
+                HashMap(contestStates.value.groupBy { state ->
+                    (state.lastEvent as RunUpdate).newInfo.problemId
+                })
             })
-        })
-
-internal fun ContestState.getProblemIdToIndex() = infoAfterEvent?.scoreboardProblems?.associate { it.id to it.ordinal }
 
 internal operator fun List<ContestState>.plus(contestState: ContestState): PersistentMap<RunId, RunInfo> {
     return fold(contestState.runsAfterEvent) { runs, state ->
@@ -53,10 +46,3 @@ internal operator fun List<ContestState>.plus(contestState: ContestState): Persi
         runs.put(runInfo.id, runInfo)
     }
 }
-
-internal fun List<ContestState>.getProblemIdToFirstBestSolvedTeamId() =
-    filter { contestState -> ((contestState.lastEvent as RunUpdate).newInfo.result as RunResult.IOI).isFirstBestRun }
-        .groupBy { contestState -> (contestState.lastEvent as RunUpdate).newInfo.problemId }
-        .mapValues { entry ->
-            ((entry.value.firstOrNull() ?: TODO("Unexpected null")).lastEvent as RunUpdate).newInfo.teamId
-        }

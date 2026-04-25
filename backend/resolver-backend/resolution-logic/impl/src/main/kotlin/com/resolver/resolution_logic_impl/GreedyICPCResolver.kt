@@ -47,10 +47,12 @@ class GreedyICPCResolver(
             val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
             if (problemIdToFrozenContestStates == null) {
                 if (!teamsWhoHaveAtLeastOneResolvedProblem.contains(teamId)) {
-                    steps.add(ResolutionStep.WithTeamId.NoResolvedProblemsForTeam(
-                        teamId = teamId,
-                        index = currentUnresolvedIndex
-                    ))
+                    steps.add(
+                        ResolutionStep.WithTeamId.NoResolvedProblemsForTeam(
+                            teamId = teamId,
+                            index = currentUnresolvedIndex
+                        )
+                    )
                 }
                 awardsHandler.handleAwards(
                     steps = steps,
