@@ -13,6 +13,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -31,6 +32,10 @@ class ServerImpl(
     private val mtx = Mutex()
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
     private val controlRoom = ResolutionControlRoom()
+    private val resolutionRoom = ResolutionRoom(
+        scoreboardManager = scoreboardManager,
+        json = json
+    )
 
     override suspend fun start(startServerOptions: StartServerOptions): StartResult {
         return try {
@@ -90,10 +95,10 @@ class ServerImpl(
     private fun Routing.setResolutionWebSocketRoute() {
         webSocket(RESOLUTION_WS_ENDPOINT) {
             send(json.encodeToString<UiEvent>(scoreboardManager.getScoreboard()))
-            scoreboardManager.getUiEventsFlow()
-                .collect { event ->
-                    send(json.encodeToString(event))
-                }
+            resolutionRoom.addClient(this)
+            runCatching {
+                incoming.consumeEach { }
+            }
         }
     }
 
