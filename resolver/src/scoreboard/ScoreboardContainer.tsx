@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import config from "./config";
+import config from "../config/config";
 import {useScoreboardData, useScoreboardRows} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardData";
 import {useAnimatedScrollPos} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardScroll";
 import {useAnimatingTeams} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardAnimation";
@@ -7,7 +7,7 @@ import React, {startTransition, useEffect, useRef, useState} from "react";
 import {useResizeObserver} from "usehooks-ts";
 import {useTeams} from "@/components/organisms/widgets/scoreboard/ScoreboardContainer";
 import {ScoreboardHeader, ScoreboardTableHeader} from "./ScoreboardHeader";
-import {ResolverWidgetC, ScoreboardScrollDirection, ScoreboardSettings, Widget} from "./widgets";
+import {ResolverWidgetC, ScoreboardScrollDirection, ScoreboardSettings, Widget} from "../widgets";
 import {AnimatedRow} from "./ScoreboardRow";
 
 const ScoreboardWrap = styled.div`
@@ -121,6 +121,14 @@ const ScoreboardRows = ({settings, onPage}: ScoreboardRowsProps) => {
         </ScoreboardRowsWrap>
     );
 };
+
+export const WidgetWrap = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+`
 
 export const Scoreboard: ResolverWidgetC<Widget.ScoreboardWidget> = (
     {

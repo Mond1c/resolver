@@ -1,7 +1,7 @@
 import {configureStore} from "@reduxjs/toolkit";
 import scoreboardReducer from "@/redux/contest/scoreboard";
 import {contestInfoReducer} from "@/redux/contest/contestInfo";
-import {widgetsReducer} from "./widgets";
+import {widgetsReducer} from "../widgets";
 import problemReducer from "./problem"
 import rowReducer from "./row"
 

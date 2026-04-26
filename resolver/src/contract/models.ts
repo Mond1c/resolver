@@ -47,7 +47,10 @@ export namespace UiEvent {
         teamIdToScoreboardRow: Record<TeamId, ScoreboardRow>,
         order: TeamId[],
         ranks: number[],
-        contestInfo: ContestInfo
+        contestInfo: ContestInfo,
+        indexOfLastChosenRow: number,
+        teamOfLastChosenRow: TeamId,
+        isLastChosenRowChosenNow: boolean
     }
 
     export interface AcceptICPC {

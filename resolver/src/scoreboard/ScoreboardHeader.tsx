@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import config from "./config";
+import config from "../config/config";
 import {ProblemLabel} from "@/components/atoms/ProblemLabel";
 import {useNeedPenalty} from "@/services/displayUtils";
 import {useAppSelector} from "@/redux/hooks";

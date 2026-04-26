@@ -1,6 +1,6 @@
 import {OptimismLevel} from "@shared/api";
 import React, {FC} from "react";
-import Scoreboard from "./ScoreboardContainer";
+import Scoreboard from "./scoreboard/ScoreboardContainer";
 import _ from "lodash";
 
 export interface AwardsSettings {

@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import config from "./config";
+import config from "../config/config";
 import {useAnimatedRow} from "@/components/organisms/widgets/scoreboard/ScoreboardRow";
 import {AnimatingTeam} from "@/components/organisms/widgets/scoreboard/hooks/useScoreboardAnimation";
 import {ContestInfo, ProblemInfo, ScoreboardRow as APIScoreboardRow, TeamInfo} from "@shared/api";
@@ -7,7 +7,7 @@ import styled, {keyframes} from "styled-components";
 import {ShrinkingBox} from "@/components/atoms/ShrinkingBox";
 import {RankLabel, TaskResultLabel} from "@/components/atoms/ContestLabels";
 import {formatScore, useFormatPenalty, useNeedPenalty} from "@/services/displayUtils";
-import {useAppSelector} from "./hooks";
+import {useAppSelector} from "../redux/hooks";
 
 type ContestDataWithMaps = ContestInfo & {
     teamsId: Record<TeamInfo["id"], TeamInfo>;
