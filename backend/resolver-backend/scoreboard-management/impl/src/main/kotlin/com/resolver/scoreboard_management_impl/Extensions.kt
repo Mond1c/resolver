@@ -21,7 +21,8 @@ internal fun List<ResolutionStep>.getNextAcceptOrRejectOrNull(start: Int): Resol
         if (got is ResolutionStep.WithTeamId.ICPCAcceptResolutionStep ||
             got is ResolutionStep.WithTeamId.IOIAcceptResolutionStep ||
             got is ResolutionStep.WithTeamId.ICPCRejectResolutionStep ||
-            got is ResolutionStep.WithTeamId.IOIRejectResolutionStep
+            got is ResolutionStep.WithTeamId.IOIRejectResolutionStep ||
+            got is ResolutionStep.WithTeamId.TeamAwardsResolutionStep
         ) {
             return got
         }

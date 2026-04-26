@@ -16,7 +16,7 @@ internal class ResolutionRoom(
 ) {
     private val eventsFlow = scoreboardManager.getUiEventsFlow()
         .map { json.encodeToString(it) }
-        .shareIn(scope, SharingStarted.Eagerly)
+        .shareIn(scope, SharingStarted.Eagerly, 3 * scoreboardManager.getCountOfProblems() + 1)
 
     fun addClient(session: DefaultWebSocketSession): Job {
         return scope.launch {

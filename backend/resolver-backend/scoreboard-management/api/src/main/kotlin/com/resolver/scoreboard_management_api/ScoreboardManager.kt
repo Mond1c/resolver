@@ -19,6 +19,8 @@ interface ScoreboardManager {
 
     fun getScoreboard(): UiEvent.Scoreboard
 
+    fun getCountOfProblems(): Int
+
     companion object {
         const val BASE_TIME_BETWEEN_MS = 1000L
     }

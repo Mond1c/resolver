@@ -9,6 +9,7 @@ interface AwardsHandler {
         awards: List<Award>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>,
         awardIdToTeamIds: HashMap<String, HashSet<TeamId>>,
-        teamId: TeamId
+        teamId: TeamId,
+        teamIndex: Int
     )
 }

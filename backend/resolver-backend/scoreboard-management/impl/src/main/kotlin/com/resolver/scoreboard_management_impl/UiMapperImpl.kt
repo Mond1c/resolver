@@ -336,6 +336,12 @@ object UiMapperImpl : UiMapper {
                 awards = step.awards
             )
         )
+        add(
+            UiEvent.UnchooseRow(
+                index = step.teamIndex,
+                teamId = step.teamId
+            )
+        )
         return false
     }
 

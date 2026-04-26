@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.icpclive.cds.api.ContestState
+import org.icpclive.cds.api.TeamId
 
 @ExperimentalCoroutinesApi
+@Suppress("DuplicatedCode")
 class ScoreboardManagerImpl(
     frozenState: ContestState,
     private val snapshots: List<ContestState>,
@@ -20,6 +22,20 @@ class ScoreboardManagerImpl(
     private val uiMapper: UiMapper,
     private val scoreboardCoroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ScoreboardManager {
+    private data class LastChosenRowInfo(
+        val indexOfLastChosenRow: Int?,
+        val teamOfLastChosenRow: TeamId?,
+        val isLastChosenRowChosenNow: Boolean
+    ) {
+        companion object {
+            val DEFAULT = LastChosenRowInfo(
+                indexOfLastChosenRow = null,
+                teamOfLastChosenRow = null,
+                isLastChosenRowChosenNow = false
+            )
+        }
+    }
+
     private val uiEvents = mutableListOf<UiEvent>()
     private val currentState = MutableStateFlow(frozenState)
 
@@ -36,6 +52,7 @@ class ScoreboardManagerImpl(
     private val mtx = Mutex()
     private var currentUnusedUiEventsIndex = 0
     private var currentUnusedSnapshotsIndex = 0
+    private val lastChosenRowInfo = MutableStateFlow(LastChosenRowInfo.DEFAULT)
 
     override fun start() {
         isStopped.update {
@@ -85,13 +102,21 @@ class ScoreboardManagerImpl(
     }
 
     override fun getScoreboard(): UiEvent.Scoreboard {
+        val (indexOfLastChosenRow, teamOfLastChosenRow, isLastChosenRowChosenNow) = lastChosenRowInfo.value
         val (rows, ranking) = calculator.calculateScoreboard(currentState.value) ?: TODO("Unexpected null")
         return UiEvent.Scoreboard(
             teamIdToScoreboardRow = rows,
             order = ranking.order,
             ranks = ranking.ranks,
-            contestInfo = currentState.value.infoAfterEvent!!
+            contestInfo = currentState.value.infoAfterEvent!!,
+            indexOfLastChosenRow = indexOfLastChosenRow,
+            teamOfLastChosenRow = teamOfLastChosenRow,
+            isLastChosenRowChosenNow = isLastChosenRowChosenNow
         )
+    }
+
+    override fun getCountOfProblems(): Int {
+        return currentState.value.infoAfterEvent!!.problems.keys.size
     }
 
     private fun getUpFlow(): Flow<UiEvent> {
@@ -105,6 +130,7 @@ class ScoreboardManagerImpl(
                             }
                             currentUnusedSnapshotsIndex++
                         }
+                        handleLastChosenRow(uiEvents[currentUnusedUiEventsIndex])
                         emit(uiEvents[currentUnusedUiEventsIndex])
                         currentUnusedUiEventsIndex++
                     }
@@ -125,7 +151,9 @@ class ScoreboardManagerImpl(
                                 snapshots[currentUnusedSnapshotsIndex]
                             }
                         }
-                        emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex])
+                        val uiEvent = uiMapper reverse uiEvents[currentUnusedUiEventsIndex]
+                        handleLastChosenRow(uiEvent)
+                        emit(uiEvent)
                     }
                 }
             }
@@ -147,6 +175,7 @@ class ScoreboardManagerImpl(
                             }
                             currentUnusedSnapshotsIndex++
                         }
+                        handleLastChosenRow(uiEvents[currentUnusedUiEventsIndex])
                         emit(uiEvents[currentUnusedUiEventsIndex])
                         currentUnusedUiEventsIndex++
                     }
@@ -172,9 +201,37 @@ class ScoreboardManagerImpl(
                                 snapshots[currentUnusedSnapshotsIndex]
                             }
                         }
-                        emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex])
+                        val uiEvent = uiMapper reverse uiEvents[currentUnusedUiEventsIndex]
+                        handleLastChosenRow(uiEvent)
+                        emit(uiEvent)
                     }
                     delay(timeBetween.value)
+                }
+            }
+        }
+    }
+
+    private fun handleLastChosenRow(uiEvent: UiEvent) {
+        lastChosenRowInfo.update {
+            when (uiEvent) {
+                is UiEvent.ChooseRow -> {
+                    LastChosenRowInfo(
+                        indexOfLastChosenRow = uiEvent.index,
+                        teamOfLastChosenRow = uiEvent.teamId,
+                        isLastChosenRowChosenNow = true
+                    )
+                }
+
+                is UiEvent.UnchooseRow -> {
+                    LastChosenRowInfo(
+                        indexOfLastChosenRow = uiEvent.index,
+                        teamOfLastChosenRow = uiEvent.teamId,
+                        isLastChosenRowChosenNow = false
+                    )
+                }
+
+                else -> {
+                    it
                 }
             }
         }

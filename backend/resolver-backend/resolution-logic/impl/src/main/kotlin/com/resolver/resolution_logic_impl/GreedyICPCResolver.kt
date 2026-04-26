@@ -59,7 +59,8 @@ class GreedyICPCResolver(
                     awards = ranking.awards,
                     awardIdToAwardBehaviour = awardIdToAwardBehaviour,
                     awardIdToTeamIds = awardIdToTeamIds,
-                    teamId = teamId
+                    teamId = teamId,
+                    teamIndex = currentUnresolvedIndex
                 )
                 currentUnresolvedIndex--
                 continue

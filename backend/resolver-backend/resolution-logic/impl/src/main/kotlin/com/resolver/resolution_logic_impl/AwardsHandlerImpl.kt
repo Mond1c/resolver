@@ -12,7 +12,8 @@ object AwardsHandlerImpl : AwardsHandler {
         awards: List<Award>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>,
         awardIdToTeamIds: HashMap<String, HashSet<TeamId>>,
-        teamId: TeamId
+        teamId: TeamId,
+        teamIndex: Int
     ) {
         val teamAwardsToShow = mutableListOf<Award>()
         val groupAwardsToShow = mutableListOf<Award>()
@@ -35,7 +36,8 @@ object AwardsHandlerImpl : AwardsHandler {
             steps.add(
                 ResolutionStep.WithTeamId.TeamAwardsResolutionStep(
                     teamId = teamId,
-                    awards = teamAwardsToShow
+                    awards = teamAwardsToShow,
+                    teamIndex = teamIndex
                 )
             )
         }

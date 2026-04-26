@@ -149,7 +149,10 @@ sealed interface UiEvent {
         val teamIdToScoreboardRow: Map<TeamId, ScoreboardRow>,
         val order: List<TeamId>,
         val ranks: List<Int>,
-        val contestInfo: ContestInfo
+        val contestInfo: ContestInfo,
+        val indexOfLastChosenRow: Int?,
+        val teamOfLastChosenRow: TeamId?,
+        val isLastChosenRowChosenNow: Boolean
     ) : UiEvent
 
     @Serializable

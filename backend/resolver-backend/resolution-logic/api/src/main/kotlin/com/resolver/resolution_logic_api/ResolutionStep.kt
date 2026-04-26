@@ -58,6 +58,7 @@ sealed interface ResolutionStep {
 
         data class TeamAwardsResolutionStep(
             override val teamId: TeamId,
+            val teamIndex: Int,
             val awards: List<Award>
         ) : WithTeamId
     }
