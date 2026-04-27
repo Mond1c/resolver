@@ -32,7 +32,10 @@ object UiMapperImpl : UiMapper {
                     }
 
                     is ResolutionStep.WithTeamId.TeamAwardsResolutionStep -> {
-                        handleTeamAwardsResolutionStep(step)
+                        handleTeamAwardsResolutionStep(
+                            step = step,
+                            prevOrNull = steps.getPrevWithTeamIdOrNull(i - 1)
+                        )
                     }
 
                     is ResolutionStep.WithTeamId.IOIAcceptResolutionStep -> {
@@ -53,8 +56,7 @@ object UiMapperImpl : UiMapper {
 
                     is ResolutionStep.WithTeamId.NoResolvedProblemsForTeam -> {
                         handleNoResolvedProblemsForTeam(
-                            step = step,
-                            nextOrNull = steps.getNextWithTeamIdOrNull(i + 1)
+                            step = step, nextOrNull = steps.getNextWithTeamIdOrNull(i + 1)
                         )
                     }
                 }
@@ -80,10 +82,7 @@ object UiMapperImpl : UiMapper {
     override fun mapToUiEvent(step: ResolutionStep.WithTeamId.ICPCRejectResolutionStep): UiEvent {
         return with(step) {
             UiEvent.RejectICPC(
-                teamId = teamId,
-                problemId = problemId,
-                row = row,
-                oldRow = oldRow
+                teamId = teamId, problemId = problemId, row = row, oldRow = oldRow
             )
         }
     }
@@ -106,10 +105,7 @@ object UiMapperImpl : UiMapper {
     override fun mapToUiEvent(step: ResolutionStep.WithTeamId.IOIRejectResolutionStep): UiEvent {
         return with(step) {
             UiEvent.RejectIOI(
-                teamId = teamId,
-                problemId = problemId,
-                row = row,
-                oldRow = oldRow
+                teamId = teamId, problemId = problemId, row = row, oldRow = oldRow
             )
         }
     }
@@ -135,19 +131,15 @@ object UiMapperImpl : UiMapper {
             )
 
             is UiEvent.ChooseRow -> UiEvent.UnchooseRow(
-                index = uiEvent.index,
-                teamId = uiEvent.teamId
+                index = uiEvent.index, teamId = uiEvent.teamId
             )
 
             is UiEvent.RejectICPC -> UiEvent.ReverseRejectICPC(
-                teamId = uiEvent.teamId,
-                problemId = uiEvent.problemId,
-                oldRow = uiEvent.oldRow!!
+                teamId = uiEvent.teamId, problemId = uiEvent.problemId, oldRow = uiEvent.oldRow!!
             )
 
             is UiEvent.UnchooseRow -> UiEvent.ChooseRow(
-                index = uiEvent.index,
-                teamId = uiEvent.teamId
+                index = uiEvent.index, teamId = uiEvent.teamId
             )
 
             is UiEvent.UnchooseProblem -> UiEvent.ChooseProblem(
@@ -157,13 +149,11 @@ object UiMapperImpl : UiMapper {
             )
 
             is UiEvent.ShowTeamAwards -> UiEvent.HideTeamAwards(
-                teamId = uiEvent.teamId,
-                awards = uiEvent.awards
+                teamId = uiEvent.teamId, awards = uiEvent.awards
             )
 
             is UiEvent.HideTeamAwards -> UiEvent.ShowTeamAwards(
-                teamId = uiEvent.teamId,
-                awards = uiEvent.awards
+                teamId = uiEvent.teamId, awards = uiEvent.awards
             )
 
             is UiEvent.ShowGroupAwards -> UiEvent.HideGroupAwards(
@@ -189,9 +179,7 @@ object UiMapperImpl : UiMapper {
             is UiEvent.RejectIOI -> {
                 with(uiEvent) {
                     UiEvent.ReverseRejectIOI(
-                        teamId = teamId,
-                        problemId = problemId,
-                        oldRow = oldRow!!
+                        teamId = teamId, problemId = problemId, oldRow = oldRow!!
                     )
                 }
             }
@@ -325,24 +313,29 @@ object UiMapperImpl : UiMapper {
     }
 
     private fun MutableList<UiEvent>.handleTeamAwardsResolutionStep(
-        step: ResolutionStep.WithTeamId.TeamAwardsResolutionStep
+        step: ResolutionStep.WithTeamId.TeamAwardsResolutionStep,
+        prevOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
+        if (prevOrNull?.teamId != step.teamId) {
+            add(
+                UiEvent.ChooseRow(
+                    index = step.teamIndex, teamId = step.teamId
+                )
+            )
+        }
         add(
             UiEvent.ShowTeamAwards(
-                teamId = step.teamId,
-                awards = step.awards
+                teamId = step.teamId, awards = step.awards
             )
         )
         add(
             UiEvent.HideTeamAwards(
-                teamId = step.teamId,
-                awards = step.awards
+                teamId = step.teamId, awards = step.awards
             )
         )
         add(
             UiEvent.UnchooseRow(
-                index = step.teamIndex,
-                teamId = step.teamId
+                index = step.teamIndex, teamId = step.teamId
             )
         )
         return false
@@ -365,11 +358,10 @@ object UiMapperImpl : UiMapper {
     }
 
     private fun MutableList<UiEvent>.handleNoResolvedProblemsForTeam(
-        step: ResolutionStep.WithTeamId.NoResolvedProblemsForTeam,
-        nextOrNull: ResolutionStep.WithTeamId?
+        step: ResolutionStep.WithTeamId.NoResolvedProblemsForTeam, nextOrNull: ResolutionStep.WithTeamId?
     ): Boolean {
-        add(UiEvent.ChooseRow(index = step.index, teamId = step.teamId))
         if (step.teamId != nextOrNull?.teamId) {
+            add(UiEvent.ChooseRow(index = step.index, teamId = step.teamId))
             add(UiEvent.UnchooseRow(index = step.index, teamId = step.teamId))
         }
         return false

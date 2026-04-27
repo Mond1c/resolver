@@ -23,6 +23,7 @@ ktor-server-websockets = { version.ref = "ktor", group = "io.ktor", name = "ktor
 full = { version.ref = "live-v3", group = "com.github.icpc.live-v3", name = "org.icpclive.cds.full" }
 
 kotlin-junit = { version.ref = "kotlin", group = "org.jetbrains.kotlin", name = "kotlin-test-junit5" }
+kotlinx-coroutines-test = { version.ref = "coroutines", group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
