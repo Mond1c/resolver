@@ -1,9 +1,12 @@
-import {OptimismLevel} from "@shared/api";
+import {Award, OptimismLevel, TeamId} from "@shared/api";
 import React, {FC} from "react";
 import Scoreboard from "./scoreboard/ScoreboardContainer";
 import _ from "lodash";
+import Awards from "./awards/AwardsContainer";
 
 export interface AwardsSettings {
+    teamId?: TeamId,
+    awards: Award[]
 }
 
 export interface ScoreboardSettings {
@@ -34,7 +37,7 @@ export namespace Widget {
         widgetId: string;
         widgetLocationId: string;
         statisticsId: string;
-        advertisement: AwardsSettings;
+        settings: AwardsSettings;
     }
 
     export interface ScoreboardWidget {
@@ -48,7 +51,7 @@ export namespace Widget {
 
 export const widgetComponents: Record<Widget["type"], React.ComponentType<any>> = {
     [Widget.Type.ScoreboardWidget]: Scoreboard,
-    [Widget.Type.AwardsWidget]: undefined
+    [Widget.Type.AwardsWidget]: Awards
 }
 
 export type ResolverWidgetProps<W extends Widget> = {

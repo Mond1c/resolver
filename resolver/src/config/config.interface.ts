@@ -3,6 +3,14 @@ export interface ResolverConfig {
     CONTEST_CAPTION: string;
     BASE_URL_WS: string;
 
+    AWARDS_GAP: string;
+    AWARDS_PADDING_TOP: string;
+    AWARDS_PADDING_RIGHT: string;
+    AWARDS_PADDING_LEFT: string;
+    AWARDS_TEXT_COLOR: string;
+    AWARDS_BACKGROUND_COLOR: string;
+    AWARDS_BORDER_RADIUS: string;
+
     SCOREBOARD_ROW_TRANSITION_TIME: number; // ms
     SCOREBOARD_SCROLL_INTERVAL: number; // ms
 

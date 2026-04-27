@@ -4,7 +4,7 @@ import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
 import {OptimismLevel} from "@shared/api";
 import {setInfo} from "@/redux/contest/contestInfo";
 import {store} from "../redux/store";
-import {ScoreboardScrollDirection, showWidget, Widget} from "../widgets";
+import {hideWidget, ScoreboardScrollDirection, showWidget, Widget} from "../widgets";
 import {handleRow} from "../redux/row";
 import {handleProblem} from "../redux/problem";
 import {useAppDispatch, useAppSelector} from "../redux/hooks";
@@ -124,6 +124,7 @@ export function useHandleMessage() {
                 case UiEvent.Type.HideGroupAwards:
                     break;
                 case UiEvent.Type.HideTeamAwards:
+                    dispatch(hideWidget("awards"))
                     break;
                 case UiEvent.Type.RejectICPC:
                     dispatch(handleScoreboardDiff(
@@ -206,6 +207,18 @@ export function useHandleMessage() {
                 case UiEvent.Type.ShowGroupAwards:
                     break;
                 case UiEvent.Type.ShowTeamAwards:
+                    dispatch(showWidget(
+                        {
+                            settings: {
+                                teamId: data.teamId,
+                                awards: data.awards
+                            },
+                            statisticsId: "awards",
+                            widgetId: "awards",
+                            widgetLocationId: "awards",
+                            type: Widget.Type.AwardsWidget
+                        }
+                    ))
                     break;
                 case UiEvent.Type.UnchooseProblem: {
                     dispatch(

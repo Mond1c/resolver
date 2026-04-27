@@ -17,6 +17,14 @@ const config = evaluateConfig(getDefaultConfig())
 
 function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
     return {
+        AWARDS_BACKGROUND_COLOR: "#242425",
+        AWARDS_BORDER_RADIUS: "0px",
+        AWARDS_GAP: "14px",
+        AWARDS_PADDING_LEFT: "16px",
+        AWARDS_PADDING_RIGHT: "16px",
+        AWARDS_PADDING_TOP: "7px",
+        AWARDS_TEXT_COLOR: (cfg: ResolverConfig) => cfg.GLOBAL_TEXT_COLOR,
+
         CONTEST_COLOR: "#4C83C3",
         CONTEST_CAPTION: "",
         BASE_URL_WS: "ws://localhost:8080/resolution",
