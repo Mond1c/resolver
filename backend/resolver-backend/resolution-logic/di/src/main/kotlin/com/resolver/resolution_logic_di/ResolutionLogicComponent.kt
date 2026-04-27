@@ -5,6 +5,8 @@ import com.resolver.resolution_logic_impl.AwardsHandlerImpl
 import com.resolver.resolution_logic_impl.GreedyICPCResolver
 import com.resolver.resolution_logic_impl.GreedyIOIResolver
 import com.resolver.util_di.ResolverUtilComponent
+import org.icpclive.cds.api.ContestResultType
+import org.icpclive.cds.api.ContestState
 
 object ResolutionLogicComponent {
     val greedyICPCResolver: Resolver by lazy {
@@ -19,5 +21,15 @@ object ResolutionLogicComponent {
             ResolverUtilComponent.scoreboardCalculator1,
             AwardsHandlerImpl
         )
+    }
+
+    fun provideResolver(state: ContestState): Resolver = when (state.infoAfterEvent?.resultType ?: TODO()) {
+        ContestResultType.ICPC -> {
+            greedyICPCResolver
+        }
+
+        ContestResultType.IOI -> {
+            greedyIOIResolver
+        }
     }
 }

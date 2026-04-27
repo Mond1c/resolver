@@ -12,9 +12,13 @@ dependencies {
 
     implementation(libs.full)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation(libs.coroutines)
 
     testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation(project(":util:di"))
+    testImplementation(project(":scoreboard-management:di"))
+    testImplementation(project(":resolution-logic:di"))
 }
 
 tasks.test {

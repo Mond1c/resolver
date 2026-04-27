@@ -12,7 +12,7 @@ internal fun UiEvent.isImportant() = when (this) {
     else -> false
 }
 
-internal fun List<ResolutionStep>.getNextAcceptOrRejectOrNull(start: Int): ResolutionStep.WithTeamId? {
+internal fun List<ResolutionStep>.getNextWithTeamIdOrNull(start: Int): ResolutionStep.WithTeamId? {
     if (start + 1 >= size) {
         return null
     }

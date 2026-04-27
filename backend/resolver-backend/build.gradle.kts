@@ -24,14 +24,14 @@ tasks.runShadow {
 dependencies {
     implementation(libs.logger)
 
-    implementation(project(":resolver-server:api"))
-    implementation(project(":resolver-server:di"))
-    implementation(project(":resolution-logic:api"))
-    implementation(project(":resolution-logic:di"))
-    implementation(project(":scoreboard-management:api"))
     implementation(project(":scoreboard-management:di"))
-    implementation(project(":util:api"))
+    implementation(project(":resolver-server:di"))
+    implementation(project(":resolution-logic:di"))
     implementation(project(":util:di"))
+    implementation(project(":scoreboard-management:api"))
+    implementation(project(":resolver-server:api"))
+    implementation(project(":resolution-logic:api"))
+    implementation(project(":util:api"))
 
     implementation(libs.full)
 

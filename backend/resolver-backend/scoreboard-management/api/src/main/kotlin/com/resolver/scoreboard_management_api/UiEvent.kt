@@ -143,6 +143,7 @@ sealed interface UiEvent {
         val awards: List<Award>
     ) : UiEvent
 
+    @Suppress("UNUSED")
     @Serializable
     @SerialName("Scoreboard")
     class Scoreboard(

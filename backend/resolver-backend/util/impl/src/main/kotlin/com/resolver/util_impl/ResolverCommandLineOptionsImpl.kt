@@ -1,27 +1,27 @@
-package com.resolver
+package com.resolver.util_impl
 
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import com.resolver.resolver_server_api.StartServerOptions
-import org.icpclive.cds.cli.CdsCommandLineOptions
+import com.resolver.util_api.ResolverCommandLineOptions
 
-open class ResolverCommandLineOptions : CdsCommandLineOptions() {
-    val port by option(
+open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
+    override val port by option(
         "-p", "--port",
         help = "Port to connect to"
     )
         .int()
         .default(8080)
 
-    val host by option(
+    override val host by option(
         "-h", "--host",
         help = "Host to connect to"
     )
         .default("0.0.0.0")
 
-    val genAwards by option(
+    override val genAwards by option(
         "--gen-awards",
         help = "Write file in config directory where time of award appearance can be redetermined. " +
                 "If true, then file is written and program exits. " +
