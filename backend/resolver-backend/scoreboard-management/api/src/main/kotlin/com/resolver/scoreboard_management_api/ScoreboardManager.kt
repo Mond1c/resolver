@@ -2,26 +2,24 @@ package com.resolver.scoreboard_management_api
 
 import kotlinx.coroutines.flow.Flow
 
-interface ScoreboardManager {
-    fun start()
+abstract class ScoreboardManager(
+    protected val scoreboardManagerOptions: ScoreboardManagerOptions
+) {
+    abstract fun start()
 
-    fun stop()
+    abstract fun stop()
 
-    fun changeDirection()
+    abstract fun changeDirection()
 
-    fun applySpeedFactor(speedFactor: Double)
+    abstract fun applySpeedFactor(speedFactor: Double)
 
-    fun up()
+    abstract fun up()
 
-    fun down()
+    abstract fun down()
 
-    fun getUiEventsFlow(): Flow<UiEvent>
+    abstract fun getUiEventsFlow(): Flow<UiEvent>
 
-    fun getScoreboard(): UiEvent.Scoreboard
+    abstract fun getScoreboard(): UiEvent.Scoreboard
 
-    fun getCountOfProblems(): Int
-
-    companion object {
-        const val BASE_TIME_BETWEEN_MS = 1000L
-    }
+    abstract fun getCountOfProblems(): Int
 }

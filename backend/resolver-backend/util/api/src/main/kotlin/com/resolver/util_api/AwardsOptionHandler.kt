@@ -8,7 +8,8 @@ interface AwardsOptionHandler {
     suspend fun handleGenAwardsOption(
         scope: CoroutineScope,
         isGenAwardsOptionEnabled: Boolean,
-        awardsBehaviourPath: Path
+        awardsBehaviourPath: Path,
+        isAnotherGenNeeded: Boolean
     )
 
     fun getAwardIdToBehaviour(awardsBehaviourPath: Path): Map<String, AwardBehaviour>

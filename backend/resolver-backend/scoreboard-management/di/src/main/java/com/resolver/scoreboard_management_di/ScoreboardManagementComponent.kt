@@ -2,6 +2,7 @@ package com.resolver.scoreboard_management_di
 
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
 import com.resolver.scoreboard_management_api.UiMapper
 import com.resolver.scoreboard_management_impl.ScoreboardManagerImpl
 import com.resolver.scoreboard_management_impl.UiMapperImpl
@@ -26,7 +27,8 @@ object ScoreboardManagementComponent {
     fun provideScoreboardManager1(
         frozenState: ContestState,
         snapshots: List<ContestState>,
-        steps: List<ResolutionStep>
+        steps: List<ResolutionStep>,
+        scoreboardManagerOptions: ScoreboardManagerOptions
     ): ScoreboardManager {
         return ScoreboardManagerImpl(
             frozenState = frozenState,
@@ -34,6 +36,7 @@ object ScoreboardManagementComponent {
             calculator = ResolverUtilComponent.scoreboardCalculator1,
             steps = steps,
             uiMapper = uiMapper,
+            scoreboardManagerOptions = scoreboardManagerOptions
         )
     }
 }

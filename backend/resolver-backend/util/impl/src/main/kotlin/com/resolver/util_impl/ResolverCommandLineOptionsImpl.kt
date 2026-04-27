@@ -1,10 +1,8 @@
 package com.resolver.util_impl
 
-import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
-import com.resolver.resolver_server_api.StartServerOptions
 import com.resolver.util_api.ResolverCommandLineOptions
 
 open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
@@ -13,13 +11,11 @@ open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
         help = "Port to connect to"
     )
         .int()
-        .default(8080)
 
     override val host by option(
         "-h", "--host",
         help = "Host to connect to"
     )
-        .default("0.0.0.0")
 
     override val genAwards by option(
         "--gen-awards",
@@ -28,11 +24,11 @@ open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
                 "If false: each award appears after each fully resolved team got it, if corresponding file does not " +
                 "exist in config directory, else file awards_behaviour.json is used."
     )
-        .boolean()
-        .default(false)
+        .flag(default = false)
 
-    fun extractStartServerOptions(): StartServerOptions = StartServerOptions(
-        host = host,
-        port = port
+    override val genResolverOptions by option(
+        "--gen-resolver-options",
+        help = "Write file in config directory where resolver option can be redetermined."
     )
+        .flag(default = false)
 }

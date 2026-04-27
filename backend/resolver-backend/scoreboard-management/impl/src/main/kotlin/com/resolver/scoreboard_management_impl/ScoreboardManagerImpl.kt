@@ -2,6 +2,7 @@ package com.resolver.scoreboard_management_impl
 
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
 import com.resolver.scoreboard_management_api.UiEvent
 import com.resolver.scoreboard_management_api.UiMapper
 import com.resolver.util_api.ScoreboardCalculator
@@ -20,8 +21,9 @@ class ScoreboardManagerImpl(
     private val calculator: ScoreboardCalculator,
     steps: List<ResolutionStep>,
     private val uiMapper: UiMapper,
+    scoreboardManagerOptions: ScoreboardManagerOptions,
     private val scoreboardCoroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : ScoreboardManager {
+) : ScoreboardManager(scoreboardManagerOptions) {
     private data class LastChosenRowInfo(
         val indexOfLastChosenRow: Int?,
         val teamOfLastChosenRow: TeamId?,
@@ -43,7 +45,7 @@ class ScoreboardManagerImpl(
         uiEvents.addAll(uiMapper mapToUiEvents steps)
     }
 
-    private val timeBetween = MutableStateFlow(ScoreboardManager.BASE_TIME_BETWEEN_MS)
+    private val timeBetween = MutableStateFlow(scoreboardManagerOptions.baseTimeBetweenMs)
     private val isUp = MutableStateFlow(true)
     private val isStopped = MutableStateFlow(true)
     private val upSignal = MutableSharedFlow<Unit>()
@@ -74,7 +76,7 @@ class ScoreboardManagerImpl(
 
     override fun applySpeedFactor(speedFactor: Double) {
         timeBetween.update {
-            (ScoreboardManager.BASE_TIME_BETWEEN_MS / speedFactor).toLong()
+            (scoreboardManagerOptions.baseTimeBetweenMs / speedFactor).toLong()
         }
     }
 

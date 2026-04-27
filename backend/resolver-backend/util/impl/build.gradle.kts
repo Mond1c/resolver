@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "com.resolver_util"
@@ -11,8 +12,7 @@ dependencies {
     implementation(project(":resolution-logic:api"))
     implementation(project(":scoreboard-management:api"))
 
-    implementation(project(":util:api"))
-
+    implementation(libs.serialization)
     implementation(libs.full)
 
     testImplementation(kotlin("test"))

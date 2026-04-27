@@ -25,6 +25,7 @@ class AwardsOptionHandlerImpl(
         scope: CoroutineScope,
         isGenAwardsOptionEnabled: Boolean,
         awardsBehaviourPath: Path,
+        isAnotherGenNeeded: Boolean
     ) {
         if (isGenAwardsOptionEnabled) {
             val yes = if (awardsBehaviourPath.exists()) {
@@ -55,7 +56,9 @@ class AwardsOptionHandlerImpl(
                     })
                 )
             }
-            exitProcess(0)
+            if (!isAnotherGenNeeded) {
+                exitProcess(0)
+            }
         }
     }
 

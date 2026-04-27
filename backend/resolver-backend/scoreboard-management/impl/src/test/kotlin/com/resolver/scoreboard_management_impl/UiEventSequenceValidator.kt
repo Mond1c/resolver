@@ -119,7 +119,6 @@ object UiEventSequenceValidator {
                     when (uiEvents[i + 1]) {
                         is UiEvent.ChooseRow, is UiEvent.ShowGroupAwards -> {}
                         else -> {
-                            println((uiEvents[i + 1] as UiEvent.ShowTeamAwards).teamId)
                             log(i)
                             return false
                         }

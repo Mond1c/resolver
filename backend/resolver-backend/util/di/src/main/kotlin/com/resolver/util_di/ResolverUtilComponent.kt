@@ -3,7 +3,9 @@ package com.resolver.util_di
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.resolution_logic_api.Resolver
 import com.resolver.resolver_server_api.Server
+import com.resolver.resolver_server_api.ServerOptions
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
 import com.resolver.util_api.*
 import com.resolver.util_impl.*
 import kotlinx.serialization.json.Json
@@ -47,8 +49,10 @@ object ResolverUtilComponent {
 
     fun provideApp(
         json: Json,
-        createScoreboardManager: (ContestState, List<ContestState>, List<ResolutionStep>) -> ScoreboardManager,
-        createServer: (ScoreboardManager, Json) -> Server,
+        createScoreboardManager: (
+            ContestState, List<ContestState>, List<ResolutionStep>, ScoreboardManagerOptions
+        ) -> ScoreboardManager,
+        createServer: (ScoreboardManager, Json, ServerOptions) -> Server,
         chooseResolver: (ContestState) -> Resolver
     ): App {
         return AppImpl(

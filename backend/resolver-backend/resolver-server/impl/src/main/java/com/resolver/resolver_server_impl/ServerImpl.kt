@@ -1,9 +1,6 @@
 package com.resolver.resolver_server_impl
 
-import com.resolver.resolver_server_api.Server
-import com.resolver.resolver_server_api.StartResult
-import com.resolver.resolver_server_api.StartServerOptions
-import com.resolver.resolver_server_api.StopResult
+import com.resolver.resolver_server_api.*
 import com.resolver.scoreboard_management_api.ScoreboardManager
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -21,9 +18,10 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalAtomicApi::class)
 class ServerImpl(
     private val json: Json,
+    serverOptions: ServerOptions,
     scoreboardManager: ScoreboardManager,
     serverDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : Server(scoreboardManager) {
+) : Server(scoreboardManager, serverOptions) {
     private lateinit var server: EmbeddedServer<*, *>
     private val isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
@@ -90,13 +88,13 @@ class ServerImpl(
     }
 
     private fun Routing.setResolutionWebSocketRoute() {
-        webSocket(RESOLUTION_WS_ENDPOINT) {
+        webSocket(serverOptions.resolutionWsEndpoint) {
             resolutionRoom.addClient(this).join()
         }
     }
 
     private fun Routing.setResolutionControlWebSocketRoute() {
-        webSocket(RESOLUTION_CONTROL_WS_ENDPOINT) {
+        webSocket(serverOptions.resolutionControlWsEndpoint) {
             with(scoreboardManager) {
                 controlRoom.setBehaviour(
                     session = this@webSocket,
