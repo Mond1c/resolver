@@ -1,10 +1,7 @@
 package com.resolver.scoreboard_management_impl
 
 import com.resolver.resolution_logic_api.ResolutionStep
-import com.resolver.scoreboard_management_api.ScoreboardManager
-import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
-import com.resolver.scoreboard_management_api.UiEvent
-import com.resolver.scoreboard_management_api.UiMapper
+import com.resolver.scoreboard_management_api.*
 import com.resolver.util_api.ScoreboardCalculator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -16,7 +13,7 @@ import org.icpclive.cds.api.TeamId
 @ExperimentalCoroutinesApi
 @Suppress("DuplicatedCode")
 class ScoreboardManagerImpl(
-    frozenState: ContestState,
+    private val frozenState: ContestState,
     private val snapshots: List<ContestState>,
     private val calculator: ScoreboardCalculator,
     steps: List<ResolutionStep>,
@@ -38,6 +35,11 @@ class ScoreboardManagerImpl(
         }
     }
 
+    private data class GotoQuery(
+        val stateIndex: Int,
+        val teamId: TeamId
+    )
+
     private val uiEvents = mutableListOf<UiEvent>()
     private val currentState = MutableStateFlow(frozenState)
 
@@ -50,6 +52,7 @@ class ScoreboardManagerImpl(
     private val isStopped = MutableStateFlow(true)
     private val upSignal = MutableSharedFlow<Unit>()
     private val downSignal = MutableSharedFlow<Unit>()
+    private val gotoSignal = MutableSharedFlow<GotoQuery>()
     private val scoreboardManagerScope = CoroutineScope(SupervisorJob() + scoreboardCoroutineDispatcher)
     private val mtx = Mutex()
     private var currentUnusedUiEventsIndex = 0
@@ -97,7 +100,8 @@ class ScoreboardManagerImpl(
             getUpFlow(),
             getDownFlow(),
             getAutoUpFlow(),
-            getAutoDownFlow()
+            getAutoDownFlow(),
+            getGotoFlow()
         )
             .flattenMerge()
             .flowOn(scoreboardCoroutineDispatcher)
@@ -119,6 +123,110 @@ class ScoreboardManagerImpl(
 
     override fun getCountOfProblems(): Int {
         return currentState.value.infoAfterEvent!!.problems.keys.size
+    }
+
+    override fun goto(stateIndex: Int, teamId: TeamId) {
+        scoreboardManagerScope.launch {
+            gotoSignal.emit(GotoQuery(stateIndex, teamId))
+        }
+    }
+
+    override fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto {
+        val variants = mutableListOf<VariantToGoto>()
+        val fullName = currentState.value.infoAfterEvent!!.teams[teamId]!!.fullName
+        var stateIndex = -1
+        for (i in 0..<uiEvents.size) {
+            val uiEvent = uiEvents[i]
+            if (uiEvent.isImportant()) {
+                stateIndex++
+            }
+            if (uiEvent is UiEvent.ChooseRow && uiEvent.teamId == teamId) {
+                val problemsToResolveDisplayNames = mutableListOf<String>()
+                when (val next = uiEvents[i + 1]) {
+                    is UiEvent.ChooseProblem -> {
+                        problemsToResolveDisplayNames.add(
+                            currentState.value.infoAfterEvent!!.problems[next.problemId]!!.displayName
+                        )
+                        var j = i + 2
+                        while (j < uiEvents.size && uiEvents[j] !is UiEvent.UnchooseRow) {
+                            val nextNext = uiEvents[j]
+                            if (nextNext is UiEvent.ChooseProblem) {
+                                problemsToResolveDisplayNames.add(
+                                    currentState.value.infoAfterEvent!!.problems[nextNext.problemId]!!.displayName
+                                )
+                            }
+                            j++
+                        }
+                        variants.add(VariantToGoto(stateIndex, problemsToResolveDisplayNames))
+                    }
+
+                    is UiEvent.ShowTeamAwards, is UiEvent.UnchooseRow -> {
+                        variants.add(VariantToGoto(stateIndex, problemsToResolveDisplayNames))
+                    }
+
+                    else -> TODO("Unexpected case")
+                }
+            }
+        }
+        return ServerToControllerMessage.VariantsToGoto(teamId, fullName, variants)
+    }
+
+    private fun getGotoFlow(): Flow<UiEvent> {
+        return flow {
+            gotoSignal.collect { (stateIndex, teamId) ->
+                mtx.withLock {
+                    if (uiEvents.isEmpty()) {
+                        return@withLock
+                    }
+                    stop()
+                    val resultIndex = uiEvents.findFirstChooseRow(stateIndex, teamId)
+                    repeat(10) {
+                        emit(UiEvent.NoOp)
+                    }
+                    if (currentUnusedUiEventsIndex > 0 &&
+                        uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.ChooseProblem
+                    ) {
+                        emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex - 1])
+                    }
+                    if (stateIndex == -1) {
+                        handleLastChosenRow(uiEvents[0])
+                        currentState.update {
+                            frozenState
+                        }
+                        currentUnusedSnapshotsIndex = 0
+                        currentUnusedUiEventsIndex = 1
+                        emit(getScoreboard())
+                        repeat(10) {
+                            emit(UiEvent.NoOp)
+                        }
+                        emit(uiEvents[0])
+                    } else if (resultIndex == null) {
+                        handleLastChosenRow(uiEvents.findLast { it is UiEvent.UnchooseRow } ?: TODO("Is it reachable?"))
+                        currentState.update {
+                            snapshots.lastOrNull() ?: frozenState
+                        }
+                        currentUnusedSnapshotsIndex = snapshots.size
+                        currentUnusedUiEventsIndex = uiEvents.size
+                        emit(getScoreboard())
+                        repeat(10) {
+                            emit(UiEvent.NoOp)
+                        }
+                    } else {
+                        handleLastChosenRow(uiEvents[resultIndex])
+                        currentState.update {
+                            snapshots[stateIndex]
+                        }
+                        currentUnusedSnapshotsIndex = stateIndex + 1
+                        currentUnusedUiEventsIndex = resultIndex + 1
+                        emit(getScoreboard())
+                        repeat(10) {
+                            emit(UiEvent.NoOp)
+                        }
+                        emit(uiEvents[resultIndex])
+                    }
+                }
+            }
+        }
     }
 
     private fun getUpFlow(): Flow<UiEvent> {

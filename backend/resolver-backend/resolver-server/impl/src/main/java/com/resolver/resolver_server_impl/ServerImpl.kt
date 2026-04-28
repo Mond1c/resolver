@@ -26,7 +26,7 @@ class ServerImpl(
     private val isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
-    private val controlRoom = ResolutionControlRoom()
+    private val controlRoom = ResolutionControlRoom(json = json)
     private val resolutionRoom = ResolutionRoom(
         scoreboardManager = scoreboardManager,
         json = json
@@ -103,7 +103,9 @@ class ServerImpl(
                     onUp = ::up,
                     onDown = ::down,
                     onChangeDirection = ::changeDirection,
-                    onApplyFactor = ::applySpeedFactor
+                    onApplyFactor = ::applySpeedFactor,
+                    onGetVariantsToGoto = ::getVariantsToGoto,
+                    onGoto = { stateIndex, teamId -> goto(stateIndex, teamId) }
                 )
             }
         }
