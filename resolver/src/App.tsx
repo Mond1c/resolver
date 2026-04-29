@@ -1,16 +1,28 @@
-import {useAppSelector} from "./redux/hooks";
+import {useAppDispatch, useAppSelector} from "./redux/hooks";
 import {widgetComponents} from "./widgets";
-import {useWebSocket} from "./contract/useWebSocket";
+import {useResolutionWebSocket} from "./contract/useResolutionWebSocket";
 import config from "./config/config";
 import {useHandleMessage} from "./contract/useHandleMessage";
 import {WidgetWrap} from "./scoreboard/ScoreboardContainer";
+import {OptimismLevel} from "@shared/api";
+import {store} from "./redux/store";
 
 export function App() {
+    const dispatch = useAppDispatch()
     const widgets = useAppSelector(state => state.widgets.widgets)
+    const scoreboardData = useAppSelector(state => state.scoreboard[OptimismLevel.normal])
+    const contestInfo = useAppSelector(state => state.contestInfo.info)
 
-    const handleMessage = useHandleMessage()
+    const handleMessage = useHandleMessage(
+        {
+            contestInfo: contestInfo,
+            dispatch: dispatch,
+            getScoreboardData: () => store.getState().scoreboard[OptimismLevel.normal],
+            scoreboardData: scoreboardData
+        }
+    )
 
-    useWebSocket({
+    useResolutionWebSocket({
         onMessage: handleMessage,
         url: config.BASE_URL_WS
     })

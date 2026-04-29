@@ -6,4 +6,8 @@
 
 !/resolver
 
+!/resolver-control
+
 !/resolver/**
+
+!/resolver-control/**

@@ -1,12 +1,12 @@
 import {useEffect, useRef} from "react";
 import {UiEvent} from "./models";
 
-interface UseWebSocketParams {
+interface UseResolutionWebSocketParams {
     url: string,
     onMessage: (data: any) => void
 }
 
-export function useWebSocket(params: UseWebSocketParams) {
+export function useResolutionWebSocket(params: UseResolutionWebSocketParams) {
     const {url, onMessage} = params
     const wsRef = useRef<WebSocket | null>(null)
     const onMessageRef = useRef(onMessage)

@@ -1,10 +1,10 @@
 import {ResolverConfig} from "./config.interface";
 
-type EvaluatableTo<T> = {
+export type EvaluatableTo<T> = {
     [K in keyof T]: T[K] | ((T) => T[K]);
 };
 
-function evaluateConfig(evaluatable: EvaluatableTo<ResolverConfig>) {
+export function evaluateConfig(evaluatable: EvaluatableTo<ResolverConfig>) {
     const evaluated = {}
     for (const key in evaluatable) {
         const value = evaluatable[key as keyof typeof evaluatable]
@@ -13,7 +13,7 @@ function evaluateConfig(evaluatable: EvaluatableTo<ResolverConfig>) {
     return evaluated as ResolverConfig
 }
 
-const config = evaluateConfig(getDefaultConfig())
+export const config = evaluateConfig(getDefaultConfig())
 
 function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
     return {
@@ -38,7 +38,7 @@ function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
             cfg.GLOBAL_DEFAULT_FONT_SIZE + " " + cfg.GLOBAL_DEFAULT_FONT_FAMILY,
         GLOBAL_BACKGROUND_COLOR: "#242425",
         GLOBAL_TEXT_COLOR: "#FFF",
-        GLOBAL_BORDER_RADIUS: "16px",
+        GLOBAL_BORDER_RADIUS: "0px",
 
         VERDICT_OK: "#3bba6b",
         VERDICT_NOK: "#CB2E28",

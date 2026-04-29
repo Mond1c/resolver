@@ -1,19 +1,28 @@
 import {useCallback} from "react";
 import {UiEvent} from "./models";
-import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
-import {OptimismLevel} from "@shared/api";
+import {handleScoreboardDiff, ScoreboardData} from "@/redux/contest/scoreboard";
+import {ContestInfo, OptimismLevel} from "@shared/api";
 import {setInfo} from "@/redux/contest/contestInfo";
-import {store} from "../redux/store";
+import {AppDispatch} from "../redux/store";
 import {hideWidget, ScoreboardScrollDirection, showWidget, Widget} from "../widgets";
 import {handleRow} from "../redux/row";
 import {handleProblem} from "../redux/problem";
-import {useAppDispatch, useAppSelector} from "../redux/hooks";
 
-export function useHandleMessage() {
-    const dispatch = useAppDispatch()
-    const scoreboardData = useAppSelector(state => state.scoreboard[OptimismLevel.normal])
-    const contestInfo = useAppSelector(state => state.contestInfo.info)
+interface UseHandleMessageParams {
+    dispatch: AppDispatch
+    scoreboardData: ScoreboardData
+    contestInfo: ContestInfo
+    getScoreboardData: () => ScoreboardData
+}
 
+export function useHandleMessage(
+    {
+        dispatch,
+        scoreboardData,
+        contestInfo,
+        getScoreboardData
+    }: UseHandleMessageParams
+) {
     return useCallback((data: UiEvent) => {
             switch (data.type) {
                 case UiEvent.Type.NoOp:
@@ -31,7 +40,7 @@ export function useHandleMessage() {
                         }
                     ))
                     dispatch(setInfo(data.contestInfo))
-                    const actualScoreboardData = store.getState().scoreboard[OptimismLevel.normal]
+                    const actualScoreboardData = getScoreboardData()
                     dispatch(showWidget(
                         {
                             settings: {
@@ -96,7 +105,7 @@ export function useHandleMessage() {
                     break;
                 }
                 case UiEvent.Type.ChooseRow: {
-                    const actual = store.getState().scoreboard[OptimismLevel.normal]
+                    const actual = getScoreboardData()
                     dispatch(showWidget(
                         {
                             settings: {
@@ -244,6 +253,6 @@ export function useHandleMessage() {
                 }
             }
         },
-        [dispatch, scoreboardData, contestInfo]
+        [dispatch, scoreboardData, contestInfo, getScoreboardData]
     )
 }
