@@ -78,6 +78,9 @@ class ScoreboardManagerImpl(
     }
 
     override fun applySpeedFactor(speedFactor: Double) {
+        if (speedFactor <= 0) {
+            return
+        }
         timeBetween.update {
             (scoreboardManagerOptions.baseTimeBetweenMs / speedFactor).toLong()
         }
