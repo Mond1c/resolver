@@ -31,7 +31,11 @@ internal class ResolutionControlRoom(
                             when (parts[0]) {
                                 SIG_APPLY_FACTOR -> parts[1].toDoubleOrNull()?.let(onApplyFactor)
                                 SIG_GET_VARIANTS_TO_GOTO -> {
-                                    send(json.encodeToString(onGetVariantsToGoto(parts[1].toTeamId())))
+                                    send(
+                                        json.encodeToString<ServerToControllerMessage>(
+                                            onGetVariantsToGoto(parts[1].toTeamId())
+                                        )
+                                    )
                                 }
                             }
                         } else if (parts.size == 3) {
