@@ -1,0 +1,1 @@
+# Universal competitive programming resolver
