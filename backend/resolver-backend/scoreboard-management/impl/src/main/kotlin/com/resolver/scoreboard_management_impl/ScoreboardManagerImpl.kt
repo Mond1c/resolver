@@ -134,9 +134,9 @@ class ScoreboardManagerImpl(
         }
     }
 
-    override fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto {
+    override fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto? {
         val variants = mutableListOf<VariantToGoto>()
-        val fullName = currentState.value.infoAfterEvent!!.teams[teamId]!!.fullName
+        val fullName = currentState.value.infoAfterEvent?.teams[teamId]?.fullName ?: return null
         var stateIndex = -1
         for (i in 0..<uiEvents.size) {
             val uiEvent = uiEvents[i]
@@ -187,9 +187,32 @@ class ScoreboardManagerImpl(
                         emit(UiEvent.NoOp)
                     }
                     if (currentUnusedUiEventsIndex > 0 &&
-                        uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.ChooseProblem
+                        (uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.ChooseProblem ||
+                                uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.ShowTeamAwards ||
+                                uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.ShowGroupAwards)
                     ) {
                         emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex - 1])
+                    }
+                    if (currentUnusedUiEventsIndex > 0 &&
+                        (uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.UnchooseProblem ||
+                                uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.HideTeamAwards ||
+                                uiEvents[currentUnusedUiEventsIndex - 1] is UiEvent.HideGroupAwards)
+                    ) {
+                        emit(uiEvents[currentUnusedUiEventsIndex - 1])
+                    }
+                    if (currentUnusedUiEventsIndex > 1 &&
+                        (uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.ChooseProblem ||
+                                uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.ShowTeamAwards ||
+                                uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.ShowGroupAwards)
+                    ) {
+                        emit(uiMapper reverse uiEvents[currentUnusedUiEventsIndex - 2])
+                    }
+                    if (currentUnusedUiEventsIndex > 1 &&
+                        (uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.UnchooseProblem ||
+                                uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.HideTeamAwards ||
+                                uiEvents[currentUnusedUiEventsIndex - 2] is UiEvent.HideGroupAwards)
+                    ) {
+                        emit(uiEvents[currentUnusedUiEventsIndex - 2])
                     }
                     if (stateIndex == -1) {
                         handleLastChosenRow(uiEvents[0])

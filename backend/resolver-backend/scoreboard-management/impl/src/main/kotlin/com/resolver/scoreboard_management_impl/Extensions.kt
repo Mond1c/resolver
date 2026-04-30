@@ -41,21 +41,19 @@ internal fun List<ResolutionStep>.getPrevWithTeamIdOrNull(end: Int): ResolutionS
 }
 
 internal fun List<UiEvent>.findFirstChooseRow(stateIndex: Int, teamId: TeamId): Int? {
-    var resultIndex: Int? = null
     var index = 0
-    loop@ for (i in 0..<size) {
+    for (i in 0..<size) {
         if (get(i).isImportant()) {
             index++
         }
         if (index == stateIndex) {
-            for (j in i..<size) {
+            for (j in (i + 1)..<size) {
                 val uiEvent = get(j)
                 if (uiEvent is UiEvent.ChooseRow && uiEvent.teamId == teamId) {
-                    resultIndex = j
-                    break@loop
+                    return j
                 }
             }
         }
     }
-    return resultIndex
+    return null
 }

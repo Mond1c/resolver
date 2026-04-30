@@ -26,5 +26,5 @@ abstract class ScoreboardManager(
 
     abstract fun goto(stateIndex: Int, teamId: TeamId)
 
-    abstract fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto
+    abstract fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto?
 }
