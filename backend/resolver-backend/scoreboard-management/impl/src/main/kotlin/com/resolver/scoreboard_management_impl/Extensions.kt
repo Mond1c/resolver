@@ -14,11 +14,7 @@ internal fun UiEvent.isImportant() = when (this) {
 }
 
 internal fun List<ResolutionStep>.withTeamIdOrNull(i: Int): ResolutionStep.WithTeamId? {
-    val got = get(i)
-    if (got is ResolutionStep.WithTeamId) {
-        return got
-    }
-    return null
+    return get(i) as? ResolutionStep.WithTeamId
 }
 
 internal fun List<ResolutionStep>.getNextWithTeamIdOrNull(start: Int): ResolutionStep.WithTeamId? {
