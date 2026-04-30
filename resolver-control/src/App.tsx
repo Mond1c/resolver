@@ -1,14 +1,15 @@
 import {useResolutionControlWebSocket} from "./useResolutionControlWebSocket";
-import {ServerToControllerMessage, useAppDispatch, useAppSelector} from "./models";
+import {ServerToControllerMessage} from "./models";
 import {useState} from "react";
-import {useHandleMessage} from 'resolver/src/contract/useHandleMessage'
-import {store} from 'resolver/src/redux/store';
+import {useHandleMessage} from '@resolver/src/contract/useHandleMessage'
+import {store} from '@resolver/src/redux/store';
 import {OptimismLevel} from "@shared/api";
 import {useResolutionWebSocket} from "@resolver/src/contract/useResolutionWebSocket";
 import {widgetComponents} from "@resolver/src/widgets";
 import {WidgetWrap} from "@resolver/src/scoreboard/ScoreboardContainer";
 import config from "@resolver/src/config/config";
 import VariantsToGoto = ServerToControllerMessage.VariantsToGoto;
+import {useAppDispatch, useAppSelector} from "@resolver/src/redux/hooks";
 
 export function App() {
     const dispatch = useAppDispatch()
@@ -31,19 +32,19 @@ export function App() {
     })
 
     const [variantsToGoto, setVariantsToGoto] = useState<VariantsToGoto | null>(null)
+    const [speedFactor, setSpeedFactor] = useState("")
+    const [teamId, setTeamId] = useState("")
+    const [stateIndex, setStateIndex] = useState<string>("")
 
     const controlWs = useResolutionControlWebSocket({
         onMessage: (data: ServerToControllerMessage) => {
             if (data.type === ServerToControllerMessage.Type.VariantsToGoto) {
                 setVariantsToGoto(data)
+                setStateIndex("")
             }
         },
         url: "ws://localhost:8080/control"
     })
-
-    const [speedFactor, setSpeedFactor] = useState("")
-    const [teamId, setTeamId] = useState("")
-    const [stateIndex, setStateIndex] = useState<string>("")
 
     const handleApplySpeed = () => {
         controlWs.ws?.send("4 " + speedFactor)
@@ -81,6 +82,7 @@ export function App() {
                 display: 'flex',
                 gap: '56px',
                 paddingLeft: '15px',
+                paddingRight: '15px',
                 paddingTop: '15px',
                 alignItems: 'flex-start'
             }}
@@ -203,6 +205,7 @@ export function App() {
                                 setStateIndex(ce.target.value)
                             }}
                         >
+                            <option value="" disabled>Choose variant</option>
                             {variantsToGoto.variants.map((v) => (
                                 <option key={v.stateIndex} value={v.stateIndex}>
                                     {v.stateIndex + ": " + v.problemsToResolveDisplayNames.join(", ")}

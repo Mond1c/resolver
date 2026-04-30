@@ -3,13 +3,7 @@ import {createRoot} from 'react-dom/client'
 import {App} from './App'
 import {Provider} from "react-redux";
 import {createGlobalStyle} from "styled-components";
-import {configureStore} from "@reduxjs/toolkit";
-import {widgetsReducer} from "@resolver/src/widgets";
-import scoreboardReducer from "@overlay/src/redux/contest/scoreboard";
-import {contestInfoReducer} from "@overlay/src/redux/contest/contestInfo";
-import rowReducer from "@resolver/src/redux/row";
-import problemReducer from "@resolver/src/redux/problem";
-import {store} from "./models";
+import { store } from "@resolver/src/redux/store";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
