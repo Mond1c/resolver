@@ -18,7 +18,7 @@ internal class ResolutionControlRoom(
         onDown: () -> Unit,
         onChangeDirection: () -> Unit,
         onApplyFactor: (Double) -> Unit,
-        onGetVariantsToGoto: (TeamId) -> ServerToControllerMessage.VariantsToGoto,
+        onGetVariantsToGoto: (TeamId) -> ServerToControllerMessage.VariantsToGoto?,
         onGoto: (Int, TeamId) -> Unit
     ) {
         with(session) {
@@ -32,7 +32,7 @@ internal class ResolutionControlRoom(
                                 SIG_APPLY_FACTOR -> parts[1].toDoubleOrNull()?.let(onApplyFactor)
                                 SIG_GET_VARIANTS_TO_GOTO -> {
                                     send(
-                                        json.encodeToString<ServerToControllerMessage>(
+                                        json.encodeToString<ServerToControllerMessage?>(
                                             onGetVariantsToGoto(parts[1].toTeamId())
                                         )
                                     )
