@@ -9,6 +9,7 @@ import com.resolver.resolver_server_api.StartResult
 import com.resolver.scoreboard_management_api.ScoreboardManager
 import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
 import com.resolver.util_api.App
+import com.resolver.util_api.Passwords
 import com.resolver.util_api.ScoreboardCalculator
 import com.resolver.util_api.YesNoConsoleHandler
 import kotlinx.coroutines.runBlocking
@@ -24,14 +25,16 @@ class AppImpl(
     private val createScoreboardManager: (
         ContestState, List<ContestState>, List<ResolutionStep>, ScoreboardManagerOptions
     ) -> ScoreboardManager,
-    private val createServer: (ScoreboardManager, Json, ServerOptions) -> Server,
+    private val createServer: (ScoreboardManager, Json, Passwords, ServerOptions) -> Server,
     private val chooseResolver: (ContestState) -> Resolver
 ) : App() {
     private val resolverOptions by ResolverCommandLineOptionsImpl()
     private val awardsBehaviourPath: Path
-        get() = resolverOptions.configDirectory.resolve("awards_behaviour.json")
+        get() = resolverOptions.configDirectory.resolve(Constants.AWARDS_BEHAVIOUR_FILE_NAME)
     private val resolverOptionsPath: Path
-        get() = resolverOptions.configDirectory.resolve("resolver.json")
+        get() = resolverOptions.configDirectory.resolve(Constants.RESOLVER_OPTIONS_FILE_NAME)
+    private val resolverPasswordsPath: Path
+        get() = resolverOptions.configDirectory.resolve(Constants.RESOLVER_PASSWORDS_FILE_NAME)
 
     override fun run() {
         val contestStatesLoader = ContestStatesLoaderImpl(resolverOptions)
@@ -57,6 +60,8 @@ class AppImpl(
                 isGenResolverOptionsOptionEnabled = resolverOptions.genResolverOptions,
                 resolverOptionsPath = resolverOptionsPath
             )
+
+            val passwords = PasswordsLoaderImpl(json).loadPasswords(resolverPasswordsPath)
 
             val frozen = mutableListOf<ContestState>()
             val notFrozen = mutableListOf<ContestState>()
@@ -102,6 +107,7 @@ class AppImpl(
             val server = createServer(
                 manager,
                 json,
+                passwords,
                 merged.extractServerOptions()
             )
             when (val startResult = server.start(merged.extractStartServerOptions())) {

@@ -47,9 +47,14 @@ class ScoreboardManagerImpl(
         uiEvents.addAll(uiMapper mapToUiEvents steps)
     }
 
+    private val settings =
+        MutableStateFlow(ScoreboardManagerSettingsImpl.provideDefault(scoreboardManagerOptions.isGotoEnabled))
+    private val MutableStateFlow<ScoreboardManagerSettingsImpl>.isUp
+        get() = value.direction == Direction.UP
+    private val MutableStateFlow<ScoreboardManagerSettingsImpl>.isStopped
+        get() = value.state == State.STOP
+
     private val timeBetween = MutableStateFlow(scoreboardManagerOptions.baseTimeBetweenMs)
-    private val isUp = MutableStateFlow(true)
-    private val isStopped = MutableStateFlow(true)
     private val upSignal = MutableSharedFlow<Unit>()
     private val downSignal = MutableSharedFlow<Unit>()
     private val gotoSignal = MutableSharedFlow<GotoQuery>()
@@ -60,20 +65,20 @@ class ScoreboardManagerImpl(
     private val lastChosenRowInfo = MutableStateFlow(LastChosenRowInfo.DEFAULT)
 
     override fun start() {
-        isStopped.update {
-            false
+        settings.update {
+            it.copy(state = State.PROCESS)
         }
     }
 
     override fun stop() {
-        isStopped.update {
-            true
+        settings.update {
+            it.copy(state = State.STOP)
         }
     }
 
     override fun changeDirection() {
-        isUp.update { currentIsUp ->
-            !currentIsUp
+        settings.update {
+            it.copy(direction = if (it.direction == Direction.DOWN) Direction.UP else Direction.DOWN)
         }
     }
 
@@ -83,6 +88,9 @@ class ScoreboardManagerImpl(
         }
         timeBetween.update {
             (scoreboardManagerOptions.baseTimeBetweenMs / speedFactor).toLong()
+        }
+        settings.update {
+            it.copy(speedFactor = speedFactor)
         }
     }
 
@@ -135,6 +143,9 @@ class ScoreboardManagerImpl(
     }
 
     override fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto? {
+        if (!settings.value.isGotoEnabled) {
+            return null
+        }
         val variants = mutableListOf<VariantToGoto>()
         val fullName = currentState.value.infoAfterEvent?.teams[teamId]?.fullName ?: return null
         var stateIndex = -1
@@ -174,9 +185,16 @@ class ScoreboardManagerImpl(
         return ServerToControllerMessage.VariantsToGoto(teamId, fullName, variants)
     }
 
+    override fun getSettingsFlow(): StateFlow<ScoreboardManagerSettings> {
+        return settings.asStateFlow()
+    }
+
     private fun getGotoFlow(): Flow<UiEvent> {
         return flow {
             gotoSignal.collect { (stateIndex, teamId) ->
+                if (!settings.value.isGotoEnabled) {
+                    return@collect
+                }
                 mtx.withLock {
                     if (uiEvents.isEmpty()) {
                         return@withLock
@@ -259,7 +277,7 @@ class ScoreboardManagerImpl(
         return flow {
             upSignal.collect {
                 mtx.withLock {
-                    if (isStopped.value && currentUnusedUiEventsIndex < uiEvents.size) {
+                    if (settings.value.state == State.STOP && currentUnusedUiEventsIndex < uiEvents.size) {
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
                             currentState.update {
                                 snapshots[currentUnusedSnapshotsIndex]
@@ -279,7 +297,7 @@ class ScoreboardManagerImpl(
         return flow {
             downSignal.collect {
                 mtx.withLock {
-                    if (isStopped.value && currentUnusedUiEventsIndex > 0) {
+                    if (settings.isStopped && currentUnusedUiEventsIndex > 0) {
                         currentUnusedUiEventsIndex--
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
                             currentUnusedSnapshotsIndex--
@@ -299,12 +317,12 @@ class ScoreboardManagerImpl(
     private fun getAutoUpFlow(): Flow<UiEvent> {
         return flow {
             while (true) {
-                if (isStopped.value || !isUp.value) {
+                if (settings.isStopped || !settings.isUp) {
                     delay(timeBetween.value)
                     continue
                 }
                 mtx.withLock {
-                    if (!isStopped.value && isUp.value && currentUnusedUiEventsIndex < uiEvents.size) {
+                    if (!settings.isStopped && settings.isUp && currentUnusedUiEventsIndex < uiEvents.size) {
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
                             currentState.update {
                                 snapshots[currentUnusedSnapshotsIndex]
@@ -324,12 +342,12 @@ class ScoreboardManagerImpl(
     private fun getAutoDownFlow(): Flow<UiEvent> {
         return flow {
             while (true) {
-                if (isStopped.value || isUp.value) {
+                if (settings.isStopped || settings.isUp) {
                     delay(timeBetween.value)
                     continue
                 }
                 mtx.withLock {
-                    if (!isStopped.value && !isUp.value && currentUnusedUiEventsIndex > 0) {
+                    if (!settings.isStopped && !settings.isUp && currentUnusedUiEventsIndex > 0) {
                         currentUnusedUiEventsIndex--
                         if (uiEvents[currentUnusedUiEventsIndex].isImportant()) {
                             currentUnusedSnapshotsIndex--

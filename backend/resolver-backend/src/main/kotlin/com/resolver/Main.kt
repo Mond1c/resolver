@@ -16,8 +16,8 @@ fun main(args: Array<String>) = ResolverUtilComponent.provideApp(
             scoreboardManagerOptions = scoreboardManagerOptions
         )
     },
-    createServer = { scoreboardManager, json, serverOptions ->
-        ResolverServerComponent.provideServer1(scoreboardManager, json, serverOptions)
+    createServer = { scoreboardManager, json, passwords, serverOptions ->
+        ResolverServerComponent.provideServer1(scoreboardManager, json, serverOptions, passwords)
     },
     chooseResolver = { contestState ->
         ResolutionLogicComponent.provideResolver(contestState)

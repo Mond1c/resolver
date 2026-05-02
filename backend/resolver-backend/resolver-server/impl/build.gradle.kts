@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.websockets)
 
+    implementation(project(":util:api"))
     implementation(project(":resolver-server:api"))
     implementation(project(":scoreboard-management:api"))
 

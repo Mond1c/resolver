@@ -2,6 +2,7 @@ package com.resolver.resolver_server_impl
 
 import com.resolver.resolver_server_api.*
 import com.resolver.scoreboard_management_api.ScoreboardManager
+import com.resolver.util_api.Passwords
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -20,13 +21,17 @@ class ServerImpl(
     private val json: Json,
     serverOptions: ServerOptions,
     scoreboardManager: ScoreboardManager,
+    passwords: Passwords,
     serverDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : Server(scoreboardManager, serverOptions) {
+) : Server(scoreboardManager, serverOptions, passwords) {
     private lateinit var server: EmbeddedServer<*, *>
     private val isStarted = AtomicBoolean(false)
     private val mtx = Mutex()
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
-    private val controlRoom = ResolutionControlRoom(json = json)
+    private val controlRoom = ResolutionControlRoom(
+        json = json,
+        scoreboardManagerSettingsFlow = scoreboardManager.getSettingsFlow()
+    )
     private val resolutionRoom = ResolutionRoom(
         scoreboardManager = scoreboardManager,
         json = json
@@ -98,6 +103,7 @@ class ServerImpl(
             with(scoreboardManager) {
                 controlRoom.setBehaviour(
                     session = this@webSocket,
+                    onValidatePassword = passwords::contains,
                     onStart = ::start,
                     onStop = ::stop,
                     onUp = ::up,

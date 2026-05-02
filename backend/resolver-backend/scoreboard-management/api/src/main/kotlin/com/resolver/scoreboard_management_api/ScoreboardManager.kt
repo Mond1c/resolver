@@ -1,6 +1,7 @@
 package com.resolver.scoreboard_management_api
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import org.icpclive.cds.api.TeamId
 
 abstract class ScoreboardManager(
@@ -27,4 +28,6 @@ abstract class ScoreboardManager(
     abstract fun goto(stateIndex: Int, teamId: TeamId)
 
     abstract fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto?
+
+    abstract fun getSettingsFlow(): StateFlow<ScoreboardManagerSettings>
 }

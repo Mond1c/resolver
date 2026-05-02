@@ -6,6 +6,7 @@ group = "com.resolver_server"
 version = "1.0-resolver-SNAPSHOT"
 
 dependencies {
+    implementation(project(":util:api"))
     implementation(project(":scoreboard-management:api"))
 
     implementation(libs.full)

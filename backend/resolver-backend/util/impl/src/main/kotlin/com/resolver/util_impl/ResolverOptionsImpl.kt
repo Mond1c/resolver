@@ -10,7 +10,8 @@ data class ResolverOptionsImpl(
     override val resolutionControlWsEndpoint: String,
     override val resolutionWsEndpoint: String,
     override val host: String,
-    override val port: Int
+    override val port: Int,
+    override val isGotoEnabled: Boolean
 ) : ResolverOptions {
     override fun mergeWithCommandLineOptions(commandLineOptions: ResolverCommandLineOptions): ResolverOptions {
         return ResolverOptionsImpl(
@@ -18,7 +19,8 @@ data class ResolverOptionsImpl(
             resolutionControlWsEndpoint = resolutionControlWsEndpoint,
             resolutionWsEndpoint = resolutionWsEndpoint,
             host = commandLineOptions.host ?: host,
-            port = commandLineOptions.port ?: port
+            port = commandLineOptions.port ?: port,
+            isGotoEnabled = isGotoEnabled
         )
     }
 
@@ -28,7 +30,8 @@ data class ResolverOptionsImpl(
             resolutionControlWsEndpoint = "/control",
             resolutionWsEndpoint = "/resolution",
             host = "0.0.0.0",
-            port = 8080
+            port = 8080,
+            isGotoEnabled = false
         )
     }
 }

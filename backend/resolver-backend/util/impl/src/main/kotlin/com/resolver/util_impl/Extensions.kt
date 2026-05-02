@@ -11,7 +11,8 @@ internal fun ResolverOptions.extractServerOptions(): ServerOptions = ServerOptio
 )
 
 internal fun ResolverOptions.extractScoreboardManagerOptions(): ScoreboardManagerOptions = ScoreboardManagerOptions(
-    baseTimeBetweenMs = baseTimeBetweenMs
+    baseTimeBetweenMs = baseTimeBetweenMs,
+    isGotoEnabled = isGotoEnabled
 )
 
 internal fun ResolverOptions.extractStartServerOptions(): StartServerOptions = StartServerOptions(

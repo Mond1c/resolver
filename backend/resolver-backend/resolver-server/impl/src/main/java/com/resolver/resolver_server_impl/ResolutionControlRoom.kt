@@ -1,17 +1,23 @@
 package com.resolver.resolver_server_impl
 
+import com.resolver.scoreboard_management_api.ScoreboardManagerSettings
 import com.resolver.scoreboard_management_api.ServerToControllerMessage
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import org.icpclive.cds.api.TeamId
 import org.icpclive.cds.api.toTeamId
 
 internal class ResolutionControlRoom(
-    private val json: Json
+    private val json: Json,
+    private val scoreboardManagerSettingsFlow: StateFlow<ScoreboardManagerSettings>,
 ) {
     suspend fun setBehaviour(
         session: DefaultWebSocketSession,
+        onValidatePassword: (String?) -> Boolean,
         onStart: () -> Unit,
         onStop: () -> Unit,
         onUp: () -> Unit,
@@ -23,6 +29,17 @@ internal class ResolutionControlRoom(
     ) {
         with(session) {
             runCatching {
+                val password = withTimeout(AUTH_TIMEOUT_MS) {
+                    incoming.receive() as? Frame.Text
+                }
+                if (!onValidatePassword(password?.readText())) {
+                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, AUTH_FAILED_MSG))
+                }
+                launch {
+                    scoreboardManagerSettingsFlow.collect {
+                        send(Frame.Text(json.encodeToString(it)))
+                    }
+                }
                 incoming.consumeEach { frame ->
                     if (frame is Frame.Text) {
                         val receivedText = frame.readText()
@@ -51,8 +68,6 @@ internal class ResolutionControlRoom(
                             SIG_UP -> onUp()
                             SIG_DOWN -> onDown()
                             SIG_CHANGE_DIRECTION -> onChangeDirection()
-
-                            else -> {}
                         }
                     }
                 }
@@ -61,6 +76,8 @@ internal class ResolutionControlRoom(
     }
 
     companion object {
+        private const val AUTH_FAILED_MSG = "Authentication failed"
+        private const val AUTH_TIMEOUT_MS = 60_000L
         private const val SIG_STOP = "0"
         private const val SIG_START = "1"
         private const val SIG_UP = "2"

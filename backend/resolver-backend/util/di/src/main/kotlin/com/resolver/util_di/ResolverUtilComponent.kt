@@ -47,12 +47,16 @@ object ResolverUtilComponent {
         )
     }
 
+    fun providePasswordsLoader(json: Json): PasswordsLoader {
+        return PasswordsLoaderImpl(json)
+    }
+
     fun provideApp(
         json: Json,
         createScoreboardManager: (
             ContestState, List<ContestState>, List<ResolutionStep>, ScoreboardManagerOptions
         ) -> ScoreboardManager,
-        createServer: (ScoreboardManager, Json, ServerOptions) -> Server,
+        createServer: (ScoreboardManager, Json, Passwords, ServerOptions) -> Server,
         chooseResolver: (ContestState) -> Resolver
     ): App {
         return AppImpl(
