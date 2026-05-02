@@ -48,10 +48,10 @@ class ScoreboardManagerImpl(
     }
 
     private val settings =
-        MutableStateFlow(ScoreboardManagerSettingsImpl.provideDefault(scoreboardManagerOptions.isGotoEnabled))
-    private val MutableStateFlow<ScoreboardManagerSettingsImpl>.isUp
+        MutableStateFlow(ServerToControllerMessage.ScoreboardManagerSettings.provideDefault(scoreboardManagerOptions.isGotoEnabled))
+    private val MutableStateFlow<ServerToControllerMessage.ScoreboardManagerSettings>.isUp
         get() = value.direction == Direction.UP
-    private val MutableStateFlow<ScoreboardManagerSettingsImpl>.isStopped
+    private val MutableStateFlow<ServerToControllerMessage.ScoreboardManagerSettings>.isStopped
         get() = value.state == State.STOP
 
     private val timeBetween = MutableStateFlow(scoreboardManagerOptions.baseTimeBetweenMs)
@@ -185,7 +185,7 @@ class ScoreboardManagerImpl(
         return ServerToControllerMessage.VariantsToGoto(teamId, fullName, variants)
     }
 
-    override fun getSettingsFlow(): StateFlow<ScoreboardManagerSettings> {
+    override fun getSettingsFlow(): StateFlow<ServerToControllerMessage.ScoreboardManagerSettings> {
         return settings.asStateFlow()
     }
 

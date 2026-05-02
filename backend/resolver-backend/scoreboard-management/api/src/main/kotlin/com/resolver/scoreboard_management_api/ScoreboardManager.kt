@@ -29,5 +29,5 @@ abstract class ScoreboardManager(
 
     abstract fun getVariantsToGoto(teamId: TeamId): ServerToControllerMessage.VariantsToGoto?
 
-    abstract fun getSettingsFlow(): StateFlow<ScoreboardManagerSettings>
+    abstract fun getSettingsFlow(): StateFlow<ServerToControllerMessage.ScoreboardManagerSettings>
 }

@@ -1,6 +1,5 @@
 package com.resolver.resolver_server_impl
 
-import com.resolver.scoreboard_management_api.ScoreboardManagerSettings
 import com.resolver.scoreboard_management_api.ServerToControllerMessage
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
@@ -13,7 +12,7 @@ import org.icpclive.cds.api.toTeamId
 
 internal class ResolutionControlRoom(
     private val json: Json,
-    private val scoreboardManagerSettingsFlow: StateFlow<ScoreboardManagerSettings>,
+    private val scoreboardManagerSettingsFlow: StateFlow<ServerToControllerMessage.ScoreboardManagerSettings>,
 ) {
     suspend fun setBehaviour(
         session: DefaultWebSocketSession,
