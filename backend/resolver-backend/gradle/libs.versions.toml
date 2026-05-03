@@ -19,6 +19,8 @@ ktor-server-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-serve
 ktor-server-routing = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-routing" }
 ktor-server-host-common = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-host-common" }
 ktor-server-websockets = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-websockets" }
+ktor-client-cio = { version.ref = "ktor", group = "io.ktor", name = "ktor-client-cio" }
+ktor-client-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-client-core" }
 
 full = { version.ref = "live-v3", group = "com.github.icpc.live-v3", name = "org.icpclive.cds.full" }
 

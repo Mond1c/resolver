@@ -12,14 +12,15 @@ import kotlinx.serialization.json.Json
 internal class ResolutionRoom(
     private val scoreboardManager: ScoreboardManager,
     private val json: Json,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    replay: Int,
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 ) {
     private val eventsFlow = scoreboardManager.getUiEventsFlow()
         .map { json.encodeToString(it) }
-        .shareIn(scope, SharingStarted.Eagerly, 10)
+        .shareIn(scope, SharingStarted.Eagerly, replay)
 
     fun addClient(session: DefaultWebSocketSession): Job {
-        return scope.launch {
+        return session.launch {
             try {
                 session.send(json.encodeToString<UiEvent>(scoreboardManager.getScoreboard()))
                 eventsFlow.collect { serializedEvent ->

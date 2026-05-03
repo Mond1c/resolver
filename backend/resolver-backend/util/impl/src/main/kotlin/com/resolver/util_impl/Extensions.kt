@@ -7,12 +7,14 @@ import com.resolver.util_api.ResolverOptions
 
 internal fun ResolverOptions.extractServerOptions(): ServerOptions = ServerOptions(
     resolutionControlWsEndpoint = resolutionControlWsEndpoint,
-    resolutionWsEndpoint = resolutionWsEndpoint
+    resolutionWsEndpoint = resolutionWsEndpoint,
+    replay = replay
 )
 
 internal fun ResolverOptions.extractScoreboardManagerOptions(): ScoreboardManagerOptions = ScoreboardManagerOptions(
     baseTimeBetweenMs = baseTimeBetweenMs,
-    isGotoEnabled = isGotoEnabled
+    isGotoEnabled = isGotoEnabled,
+    replay = replay
 )
 
 internal fun ResolverOptions.extractStartServerOptions(): StartServerOptions = StartServerOptions(

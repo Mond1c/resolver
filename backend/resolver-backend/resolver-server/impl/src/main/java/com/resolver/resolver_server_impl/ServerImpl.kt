@@ -34,7 +34,8 @@ class ServerImpl(
     )
     private val resolutionRoom = ResolutionRoom(
         scoreboardManager = scoreboardManager,
-        json = json
+        json = json,
+        replay = serverOptions.replay
     )
 
     override suspend fun start(startServerOptions: StartServerOptions): StartResult {

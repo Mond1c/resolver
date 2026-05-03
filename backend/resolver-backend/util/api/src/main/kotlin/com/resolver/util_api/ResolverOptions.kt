@@ -7,6 +7,7 @@ interface ResolverOptions {
     val host: String
     val port: Int
     val isGotoEnabled: Boolean
+    val replay: Int
 
     fun mergeWithCommandLineOptions(commandLineOptions: ResolverCommandLineOptions): ResolverOptions
 }

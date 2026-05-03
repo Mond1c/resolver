@@ -201,7 +201,7 @@ class ScoreboardManagerImpl(
                     }
                     stop()
                     val resultIndex = uiEvents.findFirstChooseRow(stateIndex, teamId)
-                    repeat(10) {
+                    repeat(scoreboardManagerOptions.replay) {
                         emit(UiEvent.NoOp)
                     }
                     if (currentUnusedUiEventsIndex > 0 &&
@@ -240,7 +240,7 @@ class ScoreboardManagerImpl(
                         currentUnusedSnapshotsIndex = 0
                         currentUnusedUiEventsIndex = 1
                         emit(getScoreboard())
-                        repeat(10) {
+                        repeat(scoreboardManagerOptions.replay) {
                             emit(UiEvent.NoOp)
                         }
                         emit(uiEvents[0])
@@ -252,7 +252,7 @@ class ScoreboardManagerImpl(
                         currentUnusedSnapshotsIndex = snapshots.size
                         currentUnusedUiEventsIndex = uiEvents.size
                         emit(getScoreboard())
-                        repeat(10) {
+                        repeat(scoreboardManagerOptions.replay) {
                             emit(UiEvent.NoOp)
                         }
                     } else {
@@ -263,7 +263,7 @@ class ScoreboardManagerImpl(
                         currentUnusedSnapshotsIndex = stateIndex + 1
                         currentUnusedUiEventsIndex = resultIndex + 1
                         emit(getScoreboard())
-                        repeat(10) {
+                        repeat(scoreboardManagerOptions.replay) {
                             emit(UiEvent.NoOp)
                         }
                         emit(uiEvents[resultIndex])

@@ -18,6 +18,15 @@ dependencies {
     implementation(libs.full)
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":util:di"))
+    testImplementation(project(":scoreboard-management:di"))
+    testImplementation(project(":resolution-logic:di"))
+    testImplementation(project(":resolution-logic:api"))
+    testImplementation(project(":resolver-server:di"))
+    testImplementation(libs.ktor.client.core)
+    testImplementation(libs.ktor.client.cio)
+    testImplementation(libs.logger)
 }
 
 tasks.test {

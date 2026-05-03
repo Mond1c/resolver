@@ -2,7 +2,7 @@
     "baseTimeBetweenMs": 1000,
     "resolutionControlWsEndpoint": "/control",
     "resolutionWsEndpoint": "/resolution",
-    "host": "0.0.0.0",
+    "host": "127.0.0.1",
     "port": 8080,
     "isGotoEnabled": false,
     "replay": 10
