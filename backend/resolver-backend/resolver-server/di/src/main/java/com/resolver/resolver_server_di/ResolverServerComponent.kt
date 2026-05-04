@@ -4,7 +4,7 @@ import com.resolver.resolver_server_api.Server
 import com.resolver.resolver_server_api.ServerOptions
 import com.resolver.resolver_server_impl.ServerImpl
 import com.resolver.scoreboard_management_api.ScoreboardManager
-import com.resolver.util_api.Passwords
+import com.resolver.util_api.ResolverAccounts
 import kotlinx.serialization.json.Json
 
 object ResolverServerComponent {
@@ -12,13 +12,13 @@ object ResolverServerComponent {
         scoreboardManager: ScoreboardManager,
         json: Json,
         serverOptions: ServerOptions,
-        passwords: Passwords
+        resolverAccounts: ResolverAccounts
     ): Server {
         return ServerImpl(
             json = json,
             scoreboardManager = scoreboardManager,
             serverOptions = serverOptions,
-            passwords = passwords
+            resolverAccounts = resolverAccounts
         )
     }
 }

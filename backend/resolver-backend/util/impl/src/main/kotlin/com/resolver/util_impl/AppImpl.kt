@@ -7,7 +7,7 @@ import com.resolver.resolver_server_api.ServerOptions
 import com.resolver.resolver_server_api.StartResult
 import com.resolver.scoreboard_management_api.ScoreboardManager
 import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
-import com.resolver.util_api.Passwords
+import com.resolver.util_api.ResolverAccounts
 import com.resolver.util_api.ScoreboardCalculator
 import com.resolver.util_api.YesNoConsoleHandler
 import kotlinx.serialization.json.Json
@@ -20,7 +20,7 @@ class AppImpl(
     private val createScoreboardManager: (
         ContestState, List<ContestState>, List<ResolutionStep>, ScoreboardManagerOptions
     ) -> ScoreboardManager,
-    private val createServer: (ScoreboardManager, Json, Passwords, ServerOptions) -> Server,
+    private val createServer: (ScoreboardManager, Json, ResolverAccounts, ServerOptions) -> Server,
     private val chooseResolver: (ContestState) -> Resolver
 ) : AppBase(
     calculator,

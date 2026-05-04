@@ -5,16 +5,18 @@ import com.resolver.resolution_logic_api.AwardBehaviour
 import com.resolver.util_api.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.icpclive.cds.api.ContestState
 import java.nio.file.Path
 
+@OptIn(ExperimentalSerializationApi::class)
 open class AppBase(
     private val calculator: ScoreboardCalculator,
     private val yesNoConsoleHandler: YesNoConsoleHandler,
     private val json: Json,
     private val block: suspend (
-        Passwords,
+        ResolverAccounts,
         Map<String, AwardBehaviour>,
         ResolverOptions,
         frozen: List<ContestState>,
@@ -54,7 +56,8 @@ open class AppBase(
                 resolverOptionsPath = resolverOptionsPath
             )
 
-            val passwords = PasswordsLoaderImpl(json).loadPasswords(resolverPasswordsPath)
+            val accounts = ResolverAccountsLoaderImpl(json, resolverOptions.credentialFile)
+                .loadAccounts(resolverPasswordsPath)
 
             val frozen = mutableListOf<ContestState>()
             val notFrozen = mutableListOf<ContestState>()
@@ -89,7 +92,7 @@ open class AppBase(
             notFrozenJob.cancel()
 
             block(
-                passwords,
+                accounts,
                 awardIdToBehaviour,
                 merged,
                 frozen,

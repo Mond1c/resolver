@@ -13,8 +13,6 @@ object YesNoConsoleHandlerImpl : YesNoConsoleHandler {
                 "n", "no" -> {
                     return false
                 }
-
-                else -> {}
             }
         }
     }

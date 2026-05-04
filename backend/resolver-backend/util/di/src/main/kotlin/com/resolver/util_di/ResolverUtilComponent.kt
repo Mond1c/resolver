@@ -29,7 +29,7 @@ object ResolverUtilComponent {
         createScoreboardManager: (
             ContestState, List<ContestState>, List<ResolutionStep>, ScoreboardManagerOptions
         ) -> ScoreboardManager,
-        createServer: (ScoreboardManager, Json, Passwords, ServerOptions) -> Server,
+        createServer: (ScoreboardManager, Json, ResolverAccounts, ServerOptions) -> Server,
         chooseResolver: (ContestState) -> Resolver
     ): App {
         return AppImpl(
@@ -47,7 +47,7 @@ object ResolverUtilComponent {
         yesNoConsoleHandler: YesNoConsoleHandler,
         json: Json,
         block: suspend (
-            Passwords,
+            ResolverAccounts,
             Map<String, AwardBehaviour>,
             ResolverOptions,
             frozen: List<ContestState>,

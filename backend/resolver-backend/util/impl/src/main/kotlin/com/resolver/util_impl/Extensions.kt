@@ -21,3 +21,26 @@ internal fun ResolverOptions.extractStartServerOptions(): StartServerOptions = S
     host = host,
     port = port
 )
+
+internal fun String.resolveCredential(creds: Map<String, String>): String {
+    val prefix = $$"$creds."
+    if (startsWith(prefix)) {
+        val name = substring(prefix.length)
+        val cred = creds[name]
+        if (cred != null) {
+            return cred
+        }
+    }
+    return this
+}
+
+internal fun ResolverAccount.resolveCredentials(creds: Map<String, String>): ResolverAccount {
+    return ResolverAccount(
+        login = login.resolveCredential(creds),
+        password = password.resolveCredential(creds)
+    )
+}
+
+internal fun List<ResolverAccount>.resolveCredentials(creds: Map<String, String>): List<ResolverAccount> {
+    return map { it.resolveCredentials(creds) }
+}
