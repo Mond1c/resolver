@@ -21,7 +21,7 @@ data class ResolverOptionsImpl(
             resolutionWsEndpoint = resolutionWsEndpoint,
             host = commandLineOptions.host ?: host,
             port = commandLineOptions.port ?: port,
-            isGotoEnabled = isGotoEnabled,
+            isGotoEnabled = commandLineOptions.enableGoto || isGotoEnabled,
             replay = replay
         )
     }

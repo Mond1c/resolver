@@ -38,7 +38,7 @@ internal class ResolutionControlRoom(
                 try {
                     launch {
                         scoreboardManagerSettingsFlow.collect {
-                            send(json.encodeToString(it))
+                            send(json.encodeToString<ServerToControllerMessage>(it))
                         }
                     }
                     incoming.consumeEach { frame ->

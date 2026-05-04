@@ -31,4 +31,10 @@ open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
         help = "Write file in config directory where resolver option can be redetermined."
     )
         .flag(default = false)
+
+    override val enableGoto by option(
+        "--enable-goto",
+        help = "Enable goto"
+    )
+        .flag(default = false)
 }
