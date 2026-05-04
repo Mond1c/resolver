@@ -80,7 +80,7 @@ internal class ResolutionControlRoom(
     }
 
     private suspend fun DefaultWebSocketSession.validateCredentials(
-        onValidatePassword: (login: String?, password: String?) -> Boolean
+        onValidateCredentials: (login: String?, password: String?) -> Boolean
     ): String? {
         val creds = withTimeout(AUTH_TIMEOUT_MS) {
             incoming.receive() as? Frame.Text
@@ -91,7 +91,7 @@ internal class ResolutionControlRoom(
             return null
         }
         val (login, password) = parts
-        if (!onValidatePassword(login, password) || !clients.add(login)) {
+        if (!onValidateCredentials(login, password) || !clients.add(login)) {
             closeWithAuthFailure()
             return null
         }
