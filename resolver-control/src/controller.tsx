@@ -78,6 +78,7 @@ export type ControllerProps = {
     stateIndex: string
     setStateIndex: React.Dispatch<React.SetStateAction<string>>
     variantsToGoto: ServerToControllerMessage.VariantsToGoto | null
+    settings: ServerToControllerMessage.Settings | null
 }
 
 export const Controller = (
@@ -89,7 +90,8 @@ export const Controller = (
         setTeamId,
         stateIndex,
         setStateIndex,
-        variantsToGoto
+        variantsToGoto,
+        settings
     }: ControllerProps
 ) => {
     const handleApplySpeed = () => {
@@ -139,39 +141,40 @@ export const Controller = (
                 Apply speed factor
             </ControllerButtonWrap>
         </ControllerColumnWrap>
-        <ControllerColumnWrap>
-            <TeamIdInputWrap
-                value={teamId}
-                onChange={(ce) => {
-                    const value = ce.target.value
-                    setTeamId(value)
-                }}>
-            </TeamIdInputWrap>
-            <ControllerButtonWrap onClick={handleGetVariantsToGoto}>
-                Get variants to go to
-            </ControllerButtonWrap>
-            <ControllerButtonWrap onClick={handleGoto}>
-                Go to
-            </ControllerButtonWrap>
-        </ControllerColumnWrap>
-        <ControllerColumnWrap>
-            {variantsToGoto && <TeamFullNameWrap>
-                {variantsToGoto.fullName}
-            </TeamFullNameWrap>}
-            {variantsToGoto && <div>
-                <select
-                    value={stateIndex}
+        {settings?.isGotoEnabled && (
+            <><ControllerColumnWrap>
+                <TeamIdInputWrap
+                    value={teamId}
                     onChange={(ce) => {
-                        setStateIndex(ce.target.value)
+                        const value = ce.target.value;
+                        setTeamId(value);
                     }}>
-                    <option value='' disabled>Choose variant</option>
-                    {variantsToGoto.variants.map((v) => (
-                        <option key={v.stateIndex} value={v.stateIndex}>
-                            {v.stateIndex + ': ' + v.problemsToResolveDisplayNames.join(', ')}
-                        </option>
-                    ))}
-                </select>
-            </div>}
-        </ControllerColumnWrap>
+                </TeamIdInputWrap>
+                <ControllerButtonWrap onClick={handleGetVariantsToGoto}>
+                    Get variants to go to
+                </ControllerButtonWrap>
+                <ControllerButtonWrap onClick={handleGoto}>
+                    Go to
+                </ControllerButtonWrap>
+            </ControllerColumnWrap><ControllerColumnWrap>
+                {variantsToGoto && <TeamFullNameWrap>
+                    {variantsToGoto.fullName}
+                </TeamFullNameWrap>}
+                {variantsToGoto && <div>
+                    <select
+                        value={stateIndex}
+                        onChange={(ce) => {
+                            setStateIndex(ce.target.value);
+                        }}>
+                        <option value='' disabled>Choose variant</option>
+                        {variantsToGoto.variants.map((v) => (
+                            <option key={v.stateIndex} value={v.stateIndex}>
+                                {v.stateIndex + ': ' + v.problemsToResolveDisplayNames.join(', ')}
+                            </option>
+                        ))}
+                    </select>
+                </div>}
+            </ControllerColumnWrap></>
+        )}
     </ControllerWrap>
 }

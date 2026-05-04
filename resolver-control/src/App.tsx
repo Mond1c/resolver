@@ -42,10 +42,10 @@ export function App() {
     const [settings, setSettings] = useState<Settings | null>(null)
     const [login, setLogin] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+    const [isError, setIsError] = useState<boolean>(false)
 
     const controlWs = useResolutionControlWebSocket({
         onMessage: (data: ServerToControllerMessage) => {
-            console.log(data)
             if (data.type === ServerToControllerMessage.Type.VariantsToGoto) {
                 setVariantsToGoto(data)
                 setStateIndex('')
@@ -54,6 +54,11 @@ export function App() {
                     setIsAuthenticated(true)
                 }
                 setSettings(data)
+            }
+        },
+        onClose: (code: number) => {
+            if (code === 1008) {
+                setIsError(true)
             }
         },
         url: 'ws://localhost:8080/control'
@@ -77,10 +82,12 @@ export function App() {
                 setTeamId={setTeamId}
                 stateIndex={stateIndex}
                 setStateIndex={setStateIndex}
-                variantsToGoto={variantsToGoto}>
+                variantsToGoto={variantsToGoto}
+                settings={settings}>
             </Controller>)}
             {!isAuthenticated && (<Auth
                     ws={controlWs.ws}
+                    isError={isError}
                     login={login}
                     setLogin={setLogin}
                     password={password}

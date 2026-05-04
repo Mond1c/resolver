@@ -44,7 +44,7 @@ export class ReconnectingWebSocket {
         this.ws.onclose = (event) => {
             this.callbacks.onclose?.(event);
 
-            if (!event.wasClean && this.shouldReconnect()) {
+            if (this.shouldReconnect()) {
                 setTimeout(() => {
                     this.reconnectAttempts++;
                     this.reconnectDelay = Math.min(

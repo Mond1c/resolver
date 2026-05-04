@@ -18,8 +18,10 @@ export const LoginInputWrap = styled.input.attrs(
         type: 'text',
         placeholder: 'Login'
     }
-)`
+)<{ isError: boolean }>`
     font-size: 24px;
+    border: 2px solid ${props => props.isError ? 'red' : 'initial'}
+
 `
 
 export const PasswordInputWrap = styled.input.attrs(
@@ -27,8 +29,9 @@ export const PasswordInputWrap = styled.input.attrs(
         type: 'password',
         placeholder: 'Password'
     }
-)`
+)<{ isError: boolean }>`
     font-size: 24px;
+    border: 2px solid ${props => props.isError ? 'red' : 'initial'}
 `
 
 export type AuthProps = {
@@ -37,6 +40,7 @@ export type AuthProps = {
     setLogin: React.Dispatch<React.SetStateAction<string>>
     password: string
     setPassword: React.Dispatch<React.SetStateAction<string>>
+    isError: boolean
 }
 
 export const AuthButtonWrap = styled.button`
@@ -47,6 +51,7 @@ export const Auth = (
     {
         ws,
         login,
+        isError,
         setLogin,
         password,
         setPassword
@@ -55,6 +60,7 @@ export const Auth = (
     return <AuthWrap>
         <LoginInputWrap
             value={login}
+            isError={isError}
             onChange={(ce) => {
                 const value = ce.target.value
                 setLogin(value)
@@ -62,6 +68,7 @@ export const Auth = (
         </LoginInputWrap>
         <PasswordInputWrap
             value={password}
+            isError={isError}
             onChange={(ce) => {
                 const value = ce.target.value
                 setPassword(value)
