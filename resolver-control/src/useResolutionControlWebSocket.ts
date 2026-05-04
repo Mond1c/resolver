@@ -1,5 +1,6 @@
 import {useEffect, useRef} from "react";
 import {ServerToControllerMessage} from "./models";
+import {ReconnectingWebSocket} from "./ReconnectingWebSocket"
 
 interface UseResolutionControlWebSocketParams {
     url: string,
@@ -8,7 +9,7 @@ interface UseResolutionControlWebSocketParams {
 
 export function useResolutionControlWebSocket(params: UseResolutionControlWebSocketParams) {
     const {url, onMessage} = params
-    const wsRef = useRef<WebSocket | null>(null)
+    const wsRef = useRef<ReconnectingWebSocket | null>(null)
     const onMessageRef = useRef(onMessage)
 
     useEffect(() => {
@@ -16,16 +17,12 @@ export function useResolutionControlWebSocket(params: UseResolutionControlWebSoc
     }, [onMessage]);
 
     useEffect(() => {
-        const socket = new WebSocket(url)
+        const socket = new ReconnectingWebSocket(url, {
+            onmessage: (messageEvent) => {
+                onMessageRef.current?.(JSON.parse(messageEvent.data) as ServerToControllerMessage)
+            }
+        })
         wsRef.current = socket
-
-        socket.onmessage = (messageEvent) => {
-            onMessageRef.current?.(JSON.parse(messageEvent.data) as ServerToControllerMessage)
-        }
-
-        socket.onerror = () => {
-            console.log("Error in web socket occurred.")
-        }
 
         return () => {
             socket.close(1000)
