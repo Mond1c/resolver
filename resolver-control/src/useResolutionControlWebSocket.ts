@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import {ServerToControllerMessage} from "./models";
-import {ReconnectingWebSocket} from "./ReconnectingWebSocket"
+import {ReconnectingWebSocket} from "@resolver/src/websocket/ReconnectingWebSocket"
 
 interface UseResolutionControlWebSocketParams {
     url: string,

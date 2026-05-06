@@ -6,6 +6,7 @@ import {useHandleMessage} from "./contract/useHandleMessage";
 import {WidgetWrap} from "./scoreboard/ScoreboardContainer";
 import {OptimismLevel} from "@shared/api";
 import {store} from "./redux/store";
+import {handleScoreboardDiff} from "@/redux/contest/scoreboard";
 
 export function App() {
     const dispatch = useAppDispatch()
@@ -24,6 +25,19 @@ export function App() {
 
     useResolutionWebSocket({
         onMessage: handleMessage,
+        onClose: (code: number) => {
+            dispatch(handleScoreboardDiff(
+                {
+                    optimism: OptimismLevel.normal,
+                    diff: {
+                        rows: {},
+                        order: [],
+                        ranks: [],
+                        awards: []
+                    }
+                }
+            ))
+        },
         url: config.BASE_URL_WS
     })
 

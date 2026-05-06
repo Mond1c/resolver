@@ -51,7 +51,7 @@ function getDefaultConfig(): EvaluatableTo<ResolverConfig> {
 
         SCOREBOARD_ROW_TRANSITION_TIME: 1000,
         SCOREBOARD_SCROLL_INTERVAL: 20000,
-        SCOREBOARD_CHOSEN_ROW_COLOR: "green",
+        SCOREBOARD_CHOSEN_ROW_COLOR: "#0094ff",
         SCOREBOARD_BACKGROUND_COLOR: (cfg: ResolverConfig) =>
             cfg.GLOBAL_BACKGROUND_COLOR,
         SCOREBOARD_BORDER_RADIUS: (cfg: ResolverConfig) =>

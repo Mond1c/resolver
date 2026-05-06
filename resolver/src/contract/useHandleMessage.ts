@@ -131,6 +131,7 @@ export function useHandleMessage(
                     break;
                 }
                 case UiEvent.Type.HideGroupAwards:
+                    dispatch(hideWidget("awards"))
                     break;
                 case UiEvent.Type.HideTeamAwards:
                     dispatch(hideWidget("awards"))
@@ -214,6 +215,17 @@ export function useHandleMessage(
                     ));
                     break;
                 case UiEvent.Type.ShowGroupAwards:
+                    dispatch(showWidget(
+                        {
+                            settings: {
+                                awards: data.awards
+                            },
+                            statisticsId: "awards",
+                            widgetId: "awards",
+                            widgetLocationId: "awards",
+                            type: Widget.Type.AwardsWidget
+                        }
+                    ))
                     break;
                 case UiEvent.Type.ShowTeamAwards:
                     dispatch(showWidget(

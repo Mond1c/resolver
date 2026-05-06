@@ -17,7 +17,7 @@ export class ReconnectingWebSocket {
     constructor(url: string, callbacks: WebSocketCallbacks) {
         this.url = url;
         this.reconnectDelay = 1000;
-        this.maxReconnectDelay = 30000;
+        this.maxReconnectDelay = 5000;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = null;
         this.callbacks = callbacks

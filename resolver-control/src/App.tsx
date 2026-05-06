@@ -11,6 +11,7 @@ import config from "@resolver/src/config/config";
 import {useAppDispatch, useAppSelector} from "@resolver/src/redux/hooks";
 import {Controller, ScoreboardWithControllerWrap, ScoreboardWrap} from "./controller";
 import {Auth} from "./auth";
+import {handleScoreboardDiff} from "@overlay/src/redux/contest/scoreboard";
 import VariantsToGoto = ServerToControllerMessage.VariantsToGoto;
 import Settings = ServerToControllerMessage.Settings;
 
@@ -31,6 +32,19 @@ export function App() {
 
     useResolutionWebSocket({
         onMessage: handleMessage,
+        onClose: (code: number) => {
+            dispatch(handleScoreboardDiff(
+                {
+                    optimism: OptimismLevel.normal,
+                    diff: {
+                        rows: {},
+                        order: [],
+                        ranks: [],
+                        awards: []
+                    }
+                }
+            ))
+        },
         url: config.BASE_URL_WS
     })
 
@@ -50,6 +64,7 @@ export function App() {
                 setVariantsToGoto(data)
                 setStateIndex('')
             } else if (data.type === ServerToControllerMessage.Type.Settings) {
+                setIsError(false)
                 if (!isAuthenticated) {
                     setIsAuthenticated(true)
                 }
@@ -57,6 +72,11 @@ export function App() {
             }
         },
         onClose: (code: number) => {
+            if (code !== 1008) {
+                setLogin('')
+                setPassword('')
+            }
+            setIsAuthenticated(false)
             if (code === 1008) {
                 setIsError(true)
             }

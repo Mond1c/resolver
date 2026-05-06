@@ -2,6 +2,7 @@ import config from "@resolver/src/config/config";
 import styled from "styled-components";
 import React from "react";
 import {
+    Direction,
     ServerToControllerMessage,
     SIG_APPLY_FACTOR,
     SIG_CHANGE_DIRECTION,
@@ -10,9 +11,10 @@ import {
     SIG_GOTO,
     SIG_START,
     SIG_STOP,
-    SIG_UP
+    SIG_UP,
+    State
 } from "./models";
-import {ReconnectingWebSocket} from "./ReconnectingWebSocket";
+import {ReconnectingWebSocket} from "@resolver/src/websocket/ReconnectingWebSocket";
 
 export const ScoreboardWithControllerWrap = styled.div`
     height: 100vh;
@@ -42,6 +44,13 @@ export const ControllerColumnWrap = styled.div`
     gap: 15px;
 `
 
+export const SettingsWrap = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+`
+
 export const TeamFullNameWrap = styled.div`
     background: white;
     font-size: 18px;
@@ -49,6 +58,27 @@ export const TeamFullNameWrap = styled.div`
 `
 export const ControllerButtonWrap = styled.button`
     font-size: 24px;
+`
+
+export const SelectVariantsToGotoWrap = styled.select`
+    font-size: 24px;
+`
+
+export const CurrentSpeedFactorWrap = styled.div`
+    background: white;
+    font-size: 24px;
+    text-align: center;
+`
+
+export const StateWrap = styled.div<{ colour: string }>`
+    background: ${({colour}) => colour};
+    width: 28px;
+    height: 28px;
+`
+
+export const DirectionWrap = styled.div`
+    background: white;
+    font-size: 28px;
 `
 
 export const SpeedFactorInputWrap = styled.input.attrs(
@@ -126,6 +156,18 @@ export const Controller = (
             <ControllerButtonWrap onClick={() => ws?.send(SIG_DOWN)}>
                 Step down
             </ControllerButtonWrap>
+            <SettingsWrap>
+                {settings?.direction === Direction.Up && (
+                    <DirectionWrap>↑</DirectionWrap>
+                )}
+                {settings?.direction === Direction.Down && (
+                    <DirectionWrap>↓</DirectionWrap>
+                )}
+                {settings?.state === State.Process && (
+                    <StateWrap colour={'green'}/>)}
+                {settings?.state === State.Stop && (
+                    <StateWrap colour={'red'}/>)}
+            </SettingsWrap>
         </ControllerColumnWrap>
         <ControllerColumnWrap>
             <SpeedFactorInputWrap
@@ -140,6 +182,9 @@ export const Controller = (
             <ControllerButtonWrap onClick={handleApplySpeed}>
                 Apply speed factor
             </ControllerButtonWrap>
+            <CurrentSpeedFactorWrap>
+                Current speed factor: {settings.speedFactor}
+            </CurrentSpeedFactorWrap>
         </ControllerColumnWrap>
         {settings?.isGotoEnabled && (
             <><ControllerColumnWrap>
@@ -161,7 +206,7 @@ export const Controller = (
                     {variantsToGoto.fullName}
                 </TeamFullNameWrap>}
                 {variantsToGoto && <div>
-                    <select
+                    <SelectVariantsToGotoWrap
                         value={stateIndex}
                         onChange={(ce) => {
                             setStateIndex(ce.target.value);
@@ -172,7 +217,7 @@ export const Controller = (
                                 {v.stateIndex + ': ' + v.problemsToResolveDisplayNames.join(', ')}
                             </option>
                         ))}
-                    </select>
+                    </SelectVariantsToGotoWrap>
                 </div>}
             </ControllerColumnWrap></>
         )}

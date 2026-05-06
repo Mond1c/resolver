@@ -19,11 +19,13 @@ export interface VariantToGoto {
 }
 
 export enum Direction {
-    Up, Down
+    Up = 'Up',
+    Down = 'Down'
 }
 
 export enum State {
-    Process, Stop
+    Process = 'Process',
+    Stop = 'Stop'
 }
 
 export namespace ServerToControllerMessage {

@@ -64,15 +64,15 @@ const ScoreboardRankLabel = styled(RankLabel)`
 
 const pulse = keyframes`
     0% {
-        opacity: 1;
+        opacity: 0.7;
         transform: scale(1);
     }
     50% {
-        opacity: 0.6;
+        opacity: 1.0;
         transform: scale(1.05);
     }
     100% {
-        opacity: 1;
+        opacity: 0.7;
         transform: scale(1);
     }
 `
