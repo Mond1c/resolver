@@ -3,6 +3,8 @@ import config from "../config/config";
 import {ResolverWidgetC, Widget} from "../widgets";
 import {Award, ContestInfo, TeamId, TeamMediaType} from "@shared/api";
 import {useAppSelector} from "../redux/hooks";
+import {VerticalMarquee} from "./marquee";
+import {useMemo} from "react";
 
 const AwardsWrap = styled.div`
     overflow: hidden;
@@ -76,10 +78,37 @@ const TextInfoColumn = styled.div`
     flex: 1;
 `
 
-export type TeamAwardsProps = {
-    teamId: TeamId
-    awards: Array<Award>
-}
+const GroupAwardWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 80%;
+    align-items: center;
+`
+
+const CitationWrap = styled.div`
+    font-size: 24px;
+    text-align: center;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid white;
+`
+
+const VerticalMarqueeWrap = styled.div`
+    padding-top: 15px;
+`
+
+const AwardRowWrap = styled.div`
+    display: flex;
+    justify-content: center;
+    flex: 1;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    gap: 32px;
+    padding: 10px 0;
+    align-items: center;
+`
 
 export function getTeamAwardHeader(
     contestInfo: ContestInfo,
@@ -113,6 +142,11 @@ export function getOrganizationLogoUrl(
     return contestInfo.organizations.find(org => org.id === organizationId)?.logo[TeamMediaType.photo]?.url
 }
 
+export type TeamAwardsProps = {
+    teamId: TeamId
+    awards: Array<Award>
+}
+
 export const TeamAwards = (
     {
         teamId,
@@ -140,6 +174,36 @@ export const TeamAwards = (
     </ImageContainer>
 }
 
+export type GroupAwardsProps = {
+    awards: Array<Award>
+}
+
+export const GroupAwards = (
+    {
+        awards
+    }: GroupAwardsProps
+) => {
+    const contestInfo = useAppSelector(state => state.contestInfo.info)
+    const teamIdToTeamInfo = useMemo(() =>
+            new Map(contestInfo.teams.map(teamInfo => [teamInfo.id, teamInfo])),
+        [contestInfo.teams]
+    )
+    return <GroupAwardWrap>
+        <CitationWrap>{awards.at(0).citation}</CitationWrap>
+        <VerticalMarqueeWrap>
+            <VerticalMarquee speed={20}>
+                {awards.at(0).teams.map((teamId, index) => {
+                    return (
+                        <AwardRowWrap key={index}>
+                            {teamIdToTeamInfo.get(teamId).shortName}
+                        </AwardRowWrap>
+                    )
+                })}
+            </VerticalMarquee>
+        </VerticalMarqueeWrap>
+    </GroupAwardWrap>
+}
+
 export const Awards: ResolverWidgetC<Widget.AwardsWidget> = (
     {
         widgetData: {settings},
@@ -150,8 +214,10 @@ export const Awards: ResolverWidgetC<Widget.AwardsWidget> = (
             {settings.teamId && (
                 <TeamAwards
                     teamId={settings.teamId}
-                    awards={settings.awards}
-                />
+                    awards={settings.awards}/>
+            )}
+            {!settings.teamId && (
+                <GroupAwards awards={settings.awards}/>
             )}
         </AwardsWrap>
     );

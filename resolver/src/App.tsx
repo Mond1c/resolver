@@ -1,5 +1,5 @@
 import {useAppDispatch, useAppSelector} from "./redux/hooks";
-import {widgetComponents} from "./widgets";
+import {hideWidget, widgetComponents} from "./widgets";
 import {useResolutionWebSocket} from "./contract/useResolutionWebSocket";
 import config from "./config/config";
 import {useHandleMessage} from "./contract/useHandleMessage";
@@ -26,6 +26,7 @@ export function App() {
     useResolutionWebSocket({
         onMessage: handleMessage,
         onClose: (code: number) => {
+            dispatch(hideWidget("awards"))
             dispatch(handleScoreboardDiff(
                 {
                     optimism: OptimismLevel.normal,
