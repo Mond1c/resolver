@@ -15,6 +15,7 @@ const MarqueeInner = styled.div<{
     flex-direction: column;
     animation: marquee-vertical ${props => props.duration}s linear 1 forwards;
     animation-play-state: running;
+    animation-fill-mode: forwards;
     @keyframes marquee-vertical {
         0% {
             transform: translateY(0%);
@@ -40,7 +41,6 @@ export const VerticalMarquee = ({
 }: VerticalMarqueeProps) => {
     const contentRef = useRef<HTMLDivElement>(null)
     const [contentHeight, setContentHeight] = useState(0)
-    const [isFinished, setIsFinished] = useState(false)
 
     useEffect(() => {
         if (contentRef.current) {
@@ -49,20 +49,11 @@ export const VerticalMarquee = ({
         }
     }, [children])
 
-    const duration = contentHeight > 0 ? contentHeight / speed : 0
-
-    if (isFinished) {
-        return null
-    }
-
     return <MarqueeContainer
         className={className}
-        style={style}
-    >
+        style={style}>
         <MarqueeInner
-            duration={duration}
-            onAnimationEnd={() => setIsFinished(true)}
-        >
+            duration={contentHeight / speed}>
             <div ref={contentRef}>{children}</div>
         </MarqueeInner>
     </MarqueeContainer>

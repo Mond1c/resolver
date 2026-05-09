@@ -101,11 +101,9 @@ const VerticalMarqueeWrap = styled.div`
 const AwardRowWrap = styled.div`
     display: flex;
     justify-content: center;
-    flex: 1;
     font-size: 20px;
     font-weight: bold;
     text-align: center;
-    gap: 32px;
     padding: 10px 0;
     align-items: center;
 `
