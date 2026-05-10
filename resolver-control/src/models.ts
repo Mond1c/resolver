@@ -4,15 +4,6 @@ export type ServerToControllerMessage =
     ServerToControllerMessage.VariantsToGoto |
     ServerToControllerMessage.Settings
 
-export const SIG_STOP = '0'
-export const SIG_START = '1'
-export const SIG_UP = '2'
-export const SIG_DOWN = '3'
-export const SIG_APPLY_FACTOR = '4'
-export const SIG_CHANGE_DIRECTION = '5'
-export const SIG_GET_VARIANTS_TO_GOTO = '6'
-export const SIG_GOTO = '7'
-
 export interface VariantToGoto {
     stateIndex: number,
     problemsToResolveDisplayNames: string[]

@@ -7,6 +7,7 @@ import {AppDispatch} from "../redux/store";
 import {hideWidget, ScoreboardScrollDirection, showWidget, Widget} from "../widgets";
 import {handleRow} from "../redux/row";
 import {handleProblem} from "../redux/problem";
+import {AWARDS, SCOREBOARD} from "../constants";
 
 interface UseHandleMessageParams {
     dispatch: AppDispatch
@@ -50,9 +51,9 @@ export function useHandleMessage(
                                 group: "all",
                                 optimismLevel: OptimismLevel.normal
                             },
-                            statisticsId: "scoreboard",
-                            widgetId: "scoreboard",
-                            widgetLocationId: "scoreboard",
+                            statisticsId: SCOREBOARD,
+                            widgetId: SCOREBOARD,
+                            widgetLocationId: SCOREBOARD,
                             type: Widget.Type.ScoreboardWidget
                         }
                     ))
@@ -114,9 +115,9 @@ export function useHandleMessage(
                                 group: "all",
                                 optimismLevel: OptimismLevel.normal
                             },
-                            statisticsId: "scoreboard",
-                            widgetId: "scoreboard",
-                            widgetLocationId: "scoreboard",
+                            statisticsId: SCOREBOARD,
+                            widgetId: SCOREBOARD,
+                            widgetLocationId: SCOREBOARD,
                             type: Widget.Type.ScoreboardWidget
                         }
                     ))
@@ -131,10 +132,10 @@ export function useHandleMessage(
                     break;
                 }
                 case UiEvent.Type.HideGroupAwards:
-                    dispatch(hideWidget("awards"))
+                    dispatch(hideWidget(AWARDS))
                     break;
                 case UiEvent.Type.HideTeamAwards:
-                    dispatch(hideWidget("awards"))
+                    dispatch(hideWidget(AWARDS))
                     break;
                 case UiEvent.Type.RejectICPC:
                     dispatch(handleScoreboardDiff(
@@ -220,9 +221,9 @@ export function useHandleMessage(
                             settings: {
                                 awards: data.awards
                             },
-                            statisticsId: "awards",
-                            widgetId: "awards",
-                            widgetLocationId: "awards",
+                            statisticsId: AWARDS,
+                            widgetId: AWARDS,
+                            widgetLocationId: AWARDS,
                             type: Widget.Type.AwardsWidget
                         }
                     ))
@@ -234,9 +235,9 @@ export function useHandleMessage(
                                 teamId: data.teamId,
                                 awards: data.awards
                             },
-                            statisticsId: "awards",
-                            widgetId: "awards",
-                            widgetLocationId: "awards",
+                            statisticsId: AWARDS,
+                            widgetId: AWARDS,
+                            widgetLocationId: AWARDS,
                             type: Widget.Type.AwardsWidget
                         }
                     ))

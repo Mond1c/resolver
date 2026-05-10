@@ -4,13 +4,13 @@ export type EvaluatableTo<T> = {
     [K in keyof T]: T[K] | ((T) => T[K]);
 };
 
-export function evaluateConfig(evaluatable: EvaluatableTo<ResolverConfig>) {
-    const evaluated = {}
+export function evaluateConfig<T>(evaluatable: EvaluatableTo<T>) {
+    const evaluated: Record<keyof T, any> = {} as any
     for (const key in evaluatable) {
         const value = evaluatable[key as keyof typeof evaluatable]
-        evaluated[key] = typeof value === 'function' ? value(evaluated as ResolverConfig) : value
+        evaluated[key] = typeof value === 'function' ? value(evaluated as T) : value
     }
-    return evaluated as ResolverConfig
+    return evaluated as T
 }
 
 export const config = evaluateConfig(getDefaultConfig())

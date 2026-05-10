@@ -12,6 +12,9 @@ import {useAppDispatch, useAppSelector} from "@resolver/src/redux/hooks";
 import {Controller, ScoreboardWithControllerWrap, ScoreboardWrap} from "./controller";
 import {Auth} from "./auth";
 import {handleScoreboardDiff} from "@overlay/src/redux/contest/scoreboard";
+import controllerConfig from "./config/config";
+import {AWARDS} from "@resolver/src/constants";
+import {POLICY_VIOLATION_CODE} from "./constants";
 import VariantsToGoto = ServerToControllerMessage.VariantsToGoto;
 import Settings = ServerToControllerMessage.Settings;
 
@@ -33,7 +36,7 @@ export function App() {
     useResolutionWebSocket({
         onMessage: handleMessage,
         onClose: (code: number) => {
-            dispatch(hideWidget("awards"))
+            dispatch(hideWidget(AWARDS))
             dispatch(handleScoreboardDiff(
                 {
                     optimism: OptimismLevel.normal,
@@ -73,16 +76,16 @@ export function App() {
             }
         },
         onClose: (code: number) => {
-            if (code !== 1008) {
+            if (code !== POLICY_VIOLATION_CODE) {
                 setLogin('')
                 setPassword('')
             }
             setIsAuthenticated(false)
-            if (code === 1008) {
+            if (code === POLICY_VIOLATION_CODE) {
                 setIsError(true)
             }
         },
-        url: 'ws://localhost:8080/control'
+        url: controllerConfig.CONTROLLER_URL_WS
     })
 
     return (

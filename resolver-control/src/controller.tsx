@@ -4,6 +4,10 @@ import React from "react";
 import {
     Direction,
     ServerToControllerMessage,
+    State
+} from "./models";
+import {ReconnectingWebSocket} from "@resolver/src/websocket/ReconnectingWebSocket";
+import {
     SIG_APPLY_FACTOR,
     SIG_CHANGE_DIRECTION,
     SIG_DOWN,
@@ -11,10 +15,8 @@ import {
     SIG_GOTO,
     SIG_START,
     SIG_STOP,
-    SIG_UP,
-    State
-} from "./models";
-import {ReconnectingWebSocket} from "@resolver/src/websocket/ReconnectingWebSocket";
+    SIG_UP
+} from "./constants";
 
 export const ScoreboardWithControllerWrap = styled.div`
     height: 100vh;
@@ -156,18 +158,6 @@ export const Controller = (
             <ControllerButtonWrap onClick={() => ws?.send(SIG_DOWN)}>
                 Step down
             </ControllerButtonWrap>
-            <SettingsWrap>
-                {settings?.direction === Direction.Up && (
-                    <DirectionWrap>↑</DirectionWrap>
-                )}
-                {settings?.direction === Direction.Down && (
-                    <DirectionWrap>↓</DirectionWrap>
-                )}
-                {settings?.state === State.Process && (
-                    <StateWrap colour={'green'}/>)}
-                {settings?.state === State.Stop && (
-                    <StateWrap colour={'red'}/>)}
-            </SettingsWrap>
         </ControllerColumnWrap>
         <ControllerColumnWrap>
             <SpeedFactorInputWrap
@@ -219,6 +209,18 @@ export const Controller = (
                         ))}
                     </SelectVariantsToGotoWrap>
                 </div>}
+                <SettingsWrap>
+                    {settings?.direction === Direction.Up && (
+                        <DirectionWrap>↑</DirectionWrap>
+                    )}
+                    {settings?.direction === Direction.Down && (
+                        <DirectionWrap>↓</DirectionWrap>
+                    )}
+                    {settings?.state === State.Process && (
+                        <StateWrap colour={'green'}/>)}
+                    {settings?.state === State.Stop && (
+                        <StateWrap colour={'red'}/>)}
+                </SettingsWrap>
             </ControllerColumnWrap></>
         )}
     </ControllerWrap>
