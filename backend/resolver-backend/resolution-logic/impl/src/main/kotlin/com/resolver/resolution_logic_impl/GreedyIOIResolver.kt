@@ -5,6 +5,7 @@ import com.resolver.util_api.ScoreboardCalculator
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.api.*
 import kotlin.time.Duration
+import com.resolver.util_api.exception.Exception as CoreException
 
 @Suppress("DuplicatedCode")
 class GreedyIOIResolver(
@@ -30,9 +31,12 @@ class GreedyIOIResolver(
         states: List<ContestState>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>
     ): ResolutionResult {
-        val awardIdToTeamIds = scoreboardCalculator.getAwardIdToTeamIds(states) ?: TODO("Unexpected null")
-        val teamsCount =
-            states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
+        if (states.isEmpty()) {
+            throw CoreException.contestStatesIsEmptyException
+        }
+        val awardIdToTeamIds =
+            scoreboardCalculator.getAwardIdToTeamIds(states) ?: throw CoreException.contestInfoIsNullException
+        val teamsCount = states.getTeamsCount()
         val runs = states.getRunUpdates()
         val teamIdToProblemIdToFrozenContestStates = runs.getProblemIdToTeamIdToFrozenContestStates()
         var currentContestState = frozenState
@@ -42,7 +46,7 @@ class GreedyIOIResolver(
         val teamsWhoHaveAtLeastOneResolvedProblem = hashSetOf<TeamId>()
         while (currentUnresolvedIndex >= 0) {
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestState)
-                ?: TODO("Unexpected null")
+                ?: throw CoreException.contestInfoIsNullException
             val teamId = ranking.order[currentUnresolvedIndex]
             val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
             if (problemIdToFrozenContestStates == null) {
@@ -67,7 +71,8 @@ class GreedyIOIResolver(
             }
             teamsWhoHaveAtLeastOneResolvedProblem.add(teamId)
             var contestStatesToApply: List<ContestState>? = null
-            val scoreboardRowBeforeResolution = rows[ranking.order[currentUnresolvedIndex]] ?: TODO("Unexpected null")
+            val scoreboardRowBeforeResolution =
+                rows[ranking.order[currentUnresolvedIndex]] ?: throw CoreException.teamNotFoundException
             val oldIndex = currentUnresolvedIndex
             val oldPenalty = scoreboardRowBeforeResolution.penalty
             var currentPenaltyDelta = Duration.INFINITE
@@ -105,7 +110,7 @@ class GreedyIOIResolver(
                 snapshots.add(currentContestState)
                 problemIdToResolve?.let { problemId ->
                     (teamIdToProblemIdToFrozenContestStates[teamId]
-                        ?: TODO("Unexpected null")).remove(problemId)
+                        ?: throw CoreException.teamNotFoundException).remove(problemId)
                     if (teamIdToProblemIdToFrozenContestStates[teamId]?.isEmpty() == true) {
                         teamIdToProblemIdToFrozenContestStates.remove(teamId)
                     }
@@ -131,13 +136,14 @@ class GreedyIOIResolver(
         oldPenalty: Duration,
         currentIsBetterFound: Boolean
     ): CellAnalyzeResult {
-        val newRuns = frozenContestStates + currentContestState
+        val newRuns = currentContestState + frozenContestStates
         val (rows, ranking) = scoreboardCalculator.calculateScoreboard(
             currentContestState.infoAfterEvent,
             newRuns
-        ) ?: TODO("Unexpected null")
+        ) ?: throw CoreException.contestInfoIsNullException
         val newIndex = ranking.order.indexOf(teamId)
-        val scoreboardRowAfterTestResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
+        val scoreboardRowAfterTestResolution =
+            rows[ranking.order[newIndex]] ?: throw CoreException.teamNotFoundException
         val testPenalty = scoreboardRowAfterTestResolution.penalty
         val testTotalScore = scoreboardRowAfterTestResolution.totalScore
         var contestStatesToApply: List<ContestState>? = null
@@ -173,19 +179,17 @@ class GreedyIOIResolver(
         currentUnresolvedIndex: Int,
     ): DecisionPreparationResult {
         var currentContestStateResult = currentContestState
-        var currentUnresolvedIndexResult = currentUnresolvedIndex
         var resolutionStep: ResolutionStep? = null
         val problemIdToResolve = if (contestStatesToApply != null) {
-            ((contestStatesToApply.lastOrNull() ?: TODO("Unexpected null")).lastEvent as RunUpdate).newInfo.problemId
+            ((contestStatesToApply.lastOrNull()
+                ?: throw Exception.contestStatesToApplyIsEmptyException).lastEvent as RunUpdate).newInfo.problemId
         } else {
             null
         }
-        if (contestStatesToApply == null) {
-            currentUnresolvedIndexResult--
-        } else {
+        if (contestStatesToApply != null) {
             currentContestStateResult = currentContestStateResult.applyEvents(contestStatesToApply)
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestStateResult)
-                ?: TODO("Unexpected null")
+                ?: throw CoreException.contestInfoIsNullException
             val newIndex = ranking.order.indexOf(teamId)
             val runInfo = (currentContestStateResult.lastEvent as RunUpdate).newInfo
             val ioiResult = runInfo.result as RunResult.IOI
@@ -195,7 +199,7 @@ class GreedyIOIResolver(
                     problemId = runInfo.problemId,
                     index = newIndex,
                     oldRow = scoreboardRowBeforeResolution,
-                    row = rows[teamId]!!,
+                    row = rows[teamId] ?: throw CoreException.teamNotFoundException,
                 )
             } else {
                 ResolutionStep.WithTeamId.IOIAcceptResolutionStep(
@@ -203,7 +207,7 @@ class GreedyIOIResolver(
                     problemId = runInfo.problemId,
                     oldIndex = oldIndex,
                     newIndex = newIndex,
-                    row = rows[teamId]!!,
+                    row = rows[teamId] ?: throw CoreException.teamNotFoundException,
                     ranks = ranking.ranks,
                     order = ranking.order,
                     oldRow = scoreboardRowBeforeResolution,
@@ -216,7 +220,7 @@ class GreedyIOIResolver(
             step = resolutionStep,
             currentContestStateResult = currentContestStateResult,
             problemIdToResolve = problemIdToResolve,
-            currentUnresolvedIndexResult = currentUnresolvedIndexResult
+            currentUnresolvedIndexResult = currentUnresolvedIndex
         )
     }
 }

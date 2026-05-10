@@ -3,6 +3,8 @@ package com.resolver.scoreboard_management_impl
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.*
 import com.resolver.util_api.ScoreboardCalculator
+import com.resolver.util_api.exception.Exception
+import com.resolver.util_api.exception.UnexpectedStateException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -120,12 +122,13 @@ class ScoreboardManagerImpl(
 
     override fun getScoreboard(): UiEvent.Scoreboard {
         val (indexOfLastChosenRow, teamOfLastChosenRow, isLastChosenRowChosenNow) = lastChosenRowInfo.value
-        val (rows, ranking) = calculator.calculateScoreboard(currentState.value) ?: TODO("Unexpected null")
+        val (rows, ranking) = calculator.calculateScoreboard(currentState.value)
+            ?: throw Exception.contestInfoIsNullException
         return UiEvent.Scoreboard(
             teamIdToScoreboardRow = rows,
             order = ranking.order,
             ranks = ranking.ranks,
-            contestInfo = currentState.value.infoAfterEvent!!,
+            contestInfo = currentState.value.infoAfterEvent ?: throw Exception.contestInfoIsNullException,
             indexOfLastChosenRow = indexOfLastChosenRow,
             teamOfLastChosenRow = teamOfLastChosenRow,
             isLastChosenRowChosenNow = isLastChosenRowChosenNow
@@ -158,15 +161,13 @@ class ScoreboardManagerImpl(
                 val problemsToResolveDisplayNames = mutableListOf<String>()
                 when (val next = uiEvents[i + 1]) {
                     is UiEvent.ChooseProblem -> {
-                        problemsToResolveDisplayNames.add(
-                            currentState.value.infoAfterEvent!!.problems[next.problemId]!!.displayName
-                        )
+                        problemsToResolveDisplayNames.add(currentState.value.getProblemDisplayName(next.problemId))
                         var j = i + 2
                         while (j < uiEvents.size && uiEvents[j] !is UiEvent.UnchooseRow) {
                             val nextNext = uiEvents[j]
                             if (nextNext is UiEvent.ChooseProblem) {
                                 problemsToResolveDisplayNames.add(
-                                    currentState.value.infoAfterEvent!!.problems[nextNext.problemId]!!.displayName
+                                    currentState.value.getProblemDisplayName(nextNext.problemId)
                                 )
                             }
                             j++
@@ -178,7 +179,7 @@ class ScoreboardManagerImpl(
                         variants.add(VariantToGoto(stateIndex, problemsToResolveDisplayNames))
                     }
 
-                    else -> TODO("Unexpected case")
+                    else -> throw Exception.badUiEventsSequenceException
                 }
             }
         }
@@ -245,7 +246,8 @@ class ScoreboardManagerImpl(
                         }
                         emit(uiEvents[0])
                     } else if (resultIndex == null) {
-                        handleLastChosenRow(uiEvents.findLast { it is UiEvent.UnchooseRow } ?: TODO("Is it reachable?"))
+                        handleLastChosenRow(uiEvents.findLast { it is UiEvent.UnchooseRow }
+                            ?: throw UnexpectedStateException())
                         currentState.update {
                             snapshots.lastOrNull() ?: frozenState
                         }
@@ -382,6 +384,11 @@ class ScoreboardManagerImpl(
                         teamOfLastChosenRow = uiEvent.teamId,
                         isLastChosenRowChosenNow = false
                     )
+                }
+
+                is UiEvent.ShowGroupAwards -> {
+                    stop()
+                    it
                 }
 
                 else -> {

@@ -10,6 +10,7 @@ import com.resolver.scoreboard_management_api.ScoreboardManagerOptions
 import com.resolver.util_api.ResolverAccounts
 import com.resolver.util_api.ScoreboardCalculator
 import com.resolver.util_api.YesNoConsoleHandler
+import com.resolver.util_api.exception.Exception
 import kotlinx.serialization.json.Json
 import org.icpclive.cds.api.ContestState
 
@@ -27,7 +28,7 @@ class AppImpl(
     yesNoConsoleHandler,
     json,
     { passwords, awardIdToBehaviour, resolverOptions, frozen, notFrozen ->
-        val frozenState = frozen.lastOrNull() ?: TODO("Handle this case gracefully")
+        val frozenState = frozen.lastOrNull() ?: throw Exception.contestStatesIsEmptyException
         val resolver = chooseResolver(frozenState)
         val result = resolver.resolve(frozenState, notFrozen, awardIdToBehaviour)
         val manager = createScoreboardManager(

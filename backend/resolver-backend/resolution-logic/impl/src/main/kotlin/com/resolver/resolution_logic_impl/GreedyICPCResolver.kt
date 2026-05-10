@@ -5,6 +5,7 @@ import com.resolver.util_api.ScoreboardCalculator
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.api.*
 import kotlin.time.Duration
+import com.resolver.util_api.exception.Exception as CoreException
 
 @Suppress("DuplicatedCode")
 class GreedyICPCResolver(
@@ -30,9 +31,12 @@ class GreedyICPCResolver(
         states: List<ContestState>,
         awardIdToAwardBehaviour: Map<String, AwardBehaviour>
     ): ResolutionResult {
-        val awardIdToTeamIds = scoreboardCalculator.getAwardIdToTeamIds(states) ?: TODO("Unexpected null")
-        val teamsCount =
-            states.lastOrNull()?.infoAfterEvent?.teams?.size ?: TODO("states is empty or infoAfterEvent is null")
+        if (states.isEmpty()) {
+            throw CoreException.contestStatesIsEmptyException
+        }
+        val awardIdToTeamIds =
+            scoreboardCalculator.getAwardIdToTeamIds(states) ?: throw CoreException.contestInfoIsNullException
+        val teamsCount = states.getTeamsCount()
         val runs = states.getRunUpdates()
         val teamIdToProblemIdToFrozenContestStates = runs.getProblemIdToTeamIdToFrozenContestStates()
         var currentContestState = frozenState
@@ -42,7 +46,7 @@ class GreedyICPCResolver(
         val teamsWhoHaveAtLeastOneResolvedProblem = hashSetOf<TeamId>()
         while (currentUnresolvedIndex >= 0) {
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestState)
-                ?: TODO("Unexpected null")
+                ?: throw CoreException.contestInfoIsNullException
             val teamId = ranking.order[currentUnresolvedIndex]
             val problemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates[teamId]
             if (problemIdToFrozenContestStates == null) {
@@ -67,16 +71,20 @@ class GreedyICPCResolver(
             }
             teamsWhoHaveAtLeastOneResolvedProblem.add(teamId)
             var contestStatesToApply: List<ContestState>? = null
-            val scoreboardRowBeforeResolution = rows[ranking.order[currentUnresolvedIndex]] ?: TODO("Unexpected null")
+            val scoreboardRowBeforeResolution =
+                rows[ranking.order[currentUnresolvedIndex]] ?: throw CoreException.teamNotFoundException
             val oldIndex = currentUnresolvedIndex
             val oldPenalty = scoreboardRowBeforeResolution.penalty
             var currentPenaltyDelta = Duration.INFINITE
             var currentMaxSolved = scoreboardRowBeforeResolution.totalScore
             var isSolvedFound = false
-            for (entry in problemIdToFrozenContestStates) {
+            for (entry in problemIdToFrozenContestStates.entries.toList()) {
                 analyzePendingCell(
                     currentContestState = currentContestState,
                     frozenContestStates = entry.value,
+                    scoreboardRowBeforeResolution = scoreboardRowBeforeResolution,
+                    teamIdToProblemIdToFrozenContestStates = teamIdToProblemIdToFrozenContestStates,
+                    problemId = entry.key,
                     teamId = teamId,
                     currentMaxSolved = currentMaxSolved,
                     isSolvedFound = isSolvedFound,
@@ -101,17 +109,13 @@ class GreedyICPCResolver(
                 oldIndex = oldIndex,
                 currentUnresolvedIndex = currentUnresolvedIndex
             ).apply {
-                currentContestState = currentContestStateResult
-                snapshots.add(currentContestState)
                 problemIdToResolve?.let { problemId ->
-                    (teamIdToProblemIdToFrozenContestStates[teamId]
-                        ?: TODO("Unexpected null")).remove(problemId)
-                    if (teamIdToProblemIdToFrozenContestStates[teamId]?.isEmpty() == true) {
-                        teamIdToProblemIdToFrozenContestStates.remove(teamId)
+                    currentContestState = currentContestStateResult
+                    snapshots.add(currentContestState)
+                    teamIdToProblemIdToFrozenContestStates.clear(teamId, problemId)
+                    step?.let { step ->
+                        steps.add(step)
                     }
-                }
-                step?.let { step ->
-                    steps.add(step)
                 }
                 currentUnresolvedIndex = currentUnresolvedIndexResult
             }
@@ -125,19 +129,23 @@ class GreedyICPCResolver(
     private fun analyzePendingCell(
         currentContestState: ContestState,
         frozenContestStates: List<ContestState>,
+        scoreboardRowBeforeResolution: ScoreboardRow,
+        teamIdToProblemIdToFrozenContestStates: HashMap<TeamId, HashMap<ProblemId, List<ContestState>>>,
+        problemId: ProblemId,
         teamId: TeamId,
         currentMaxSolved: Double,
         isSolvedFound: Boolean,
         currentPenaltyDelta: Duration,
         oldPenalty: Duration
     ): CellAnalyzeResult {
-        val newRuns = frozenContestStates + currentContestState
+        val newRuns = currentContestState + frozenContestStates
         val (rows, ranking) = scoreboardCalculator.calculateScoreboard(
             currentContestState.infoAfterEvent,
             newRuns
-        ) ?: TODO("Unexpected null")
+        ) ?: throw CoreException.contestInfoIsNullException
         val newIndex = ranking.order.indexOf(teamId)
-        val scoreboardRowAfterTestResolution = rows[ranking.order[newIndex]] ?: TODO("Unexpected null")
+        val scoreboardRowAfterTestResolution =
+            rows[ranking.order[newIndex]] ?: throw CoreException.teamNotFoundException
         val testPenalty = scoreboardRowAfterTestResolution.penalty
         val testSolved = scoreboardRowAfterTestResolution.totalScore
         var contestStatesToApply: List<ContestState>? = null
@@ -152,8 +160,13 @@ class GreedyICPCResolver(
             currentPenaltyDeltaResult = testPenalty - oldPenalty
             contestStatesToApply = frozenContestStates
         } else if (!isSolvedFound) {
-            // TODO: problem was solved before freeze, but there are submissions after freeze
-            contestStatesToApply = frozenContestStates
+            val resultBefore = scoreboardRowBeforeResolution
+                .problemResults[currentContestState.getProblemOrdinal(problemId)] as ICPCProblemResult
+            if (!resultBefore.isSolved) {
+                contestStatesToApply = frozenContestStates
+            } else {
+                teamIdToProblemIdToFrozenContestStates.clear(teamId, problemId)
+            }
         }
         return CellAnalyzeResult(
             contestStatesToApply = contestStatesToApply,
@@ -174,25 +187,23 @@ class GreedyICPCResolver(
         currentUnresolvedIndex: Int,
     ): DecisionPreparationResult {
         var currentContestStateResult = currentContestState
-        var currentUnresolvedIndexResult = currentUnresolvedIndex
         var resolutionStep: ResolutionStep? = null
         val problemIdToResolve = if (contestStatesToApply != null) {
-            ((contestStatesToApply.lastOrNull() ?: TODO("Unexpected null")).lastEvent as RunUpdate).newInfo.problemId
+            ((contestStatesToApply.lastOrNull()
+                ?: throw Exception.contestStatesToApplyIsEmptyException).lastEvent as RunUpdate).newInfo.problemId
         } else {
             null
         }
-        if (contestStatesToApply == null) {
-            currentUnresolvedIndexResult--
-        } else {
+        if (contestStatesToApply != null) {
             currentContestStateResult = currentContestStateResult.applyEvents(contestStatesToApply)
             val (rows, ranking) = scoreboardCalculator.calculateScoreboard(currentContestStateResult)
-                ?: TODO("Unexpected null")
+                ?: throw CoreException.contestInfoIsNullException
             val newIndex = ranking.order.indexOf(teamId)
             val runInfo = (currentContestStateResult.lastEvent as RunUpdate).newInfo
             val icpcResult = runInfo.result as RunResult.ICPC
             resolutionStep = if (!icpcResult.verdict.isAccepted) {
                 ResolutionStep.WithTeamId.ICPCRejectResolutionStep(
-                    rows[teamId]!!,
+                    rows[teamId] ?: throw CoreException.teamNotFoundException,
                     runInfo.teamId,
                     oldIndex,
                     runInfo.problemId,
@@ -202,7 +213,7 @@ class GreedyICPCResolver(
                 ResolutionStep.WithTeamId.ICPCAcceptResolutionStep(
                     teamId = runInfo.teamId,
                     problemId = runInfo.problemId,
-                    row = rows[teamId]!!,
+                    row = rows[teamId] ?: throw CoreException.teamNotFoundException,
                     ranks = ranking.ranks,
                     order = ranking.order,
                     oldRow = scoreboardRowBeforeResolution,
@@ -217,7 +228,7 @@ class GreedyICPCResolver(
             step = resolutionStep,
             currentContestStateResult = currentContestStateResult,
             problemIdToResolve = problemIdToResolve,
-            currentUnresolvedIndexResult = currentUnresolvedIndexResult
+            currentUnresolvedIndexResult = currentUnresolvedIndex
         )
     }
 }

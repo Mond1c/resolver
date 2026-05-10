@@ -2,6 +2,9 @@ package com.resolver.scoreboard_management_impl
 
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.UiEvent
+import com.resolver.util_api.exception.Exception
+import org.icpclive.cds.api.ContestState
+import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
 
 internal fun UiEvent.isImportant() = when (this) {
@@ -56,4 +59,10 @@ internal fun List<UiEvent>.findFirstChooseRow(stateIndex: Int, teamId: TeamId): 
         }
     }
     return null
+}
+
+internal fun ContestState.getProblemDisplayName(problemId: ProblemId): String {
+    val infoAfterEvent = infoAfterEvent ?: throw Exception.contestInfoIsNullException
+    val problem = infoAfterEvent.problems[problemId] ?: throw Exception.problemNotFoundException
+    return problem.displayName
 }

@@ -3,6 +3,7 @@ package com.resolver.resolution_logic_impl
 import com.resolver.resolution_logic_api.AwardBehaviour
 import com.resolver.resolution_logic_api.AwardsHandler
 import com.resolver.resolution_logic_api.ResolutionStep
+import com.resolver.util_api.exception.Exception
 import org.icpclive.cds.api.Award
 import org.icpclive.cds.api.TeamId
 
@@ -21,14 +22,15 @@ object AwardsHandlerImpl : AwardsHandler {
             if (!award.teams.contains(teamId) || awardIdToAwardBehaviour[award.id] == AwardBehaviour.IGNORE) {
                 continue
             }
-            (awardIdToTeamIds[award.id] ?: TODO("Unexpected null")).remove(teamId)
+            val teamIds = awardIdToTeamIds[award.id] ?: throw Exception.awardNotFoundException
+            teamIds.remove(teamId)
             if (
                 award.teams.size == 1 ||
                 awardIdToAwardBehaviour[award.id] == AwardBehaviour.AFTER_EACH ||
                 awardIdToAwardBehaviour[award.id] == null
             ) {
                 teamAwardsToShow.add(award)
-            } else if (awardIdToTeamIds[award.id]?.isEmpty() ?: TODO("Unexpected null")) {
+            } else if (teamIds.isEmpty()) {
                 groupAwardsToShow.add(award)
             }
         }
@@ -40,6 +42,14 @@ object AwardsHandlerImpl : AwardsHandler {
                     teamIndex = teamIndex
                 )
             )
+        } else {
+            val prevTeamId = when (val step = steps.lastOrNull()) {
+                is ResolutionStep.WithTeamId -> step.teamId
+                else -> null
+            }
+            if (prevTeamId != teamId) {
+                steps.add(ResolutionStep.WithTeamId.NoResolvedProblemsForTeam(teamId, teamIndex))
+            }
         }
         if (groupAwardsToShow.isNotEmpty()) {
             steps.add(

@@ -14,6 +14,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.system.exitProcess
+import com.resolver.util_api.exception.Exception as CoreException
 
 class AwardsOptionHandlerImpl(
     private val calculator: ScoreboardCalculator,
@@ -46,8 +47,10 @@ class AwardsOptionHandlerImpl(
                 awardsSemaphore.acquire()
                 awardsJob.cancel()
                 val calculations =
-                    calculator.calculateScoreboard(dst.lastOrNull() ?: TODO("Handle this case gracefully"))
-                val awards = calculations?.ranks?.awards ?: TODO("Unexpected null")
+                    calculator.calculateScoreboard(
+                        dst.lastOrNull() ?: throw CoreException.contestStatesIsEmptyException
+                    )
+                val awards = calculations?.ranks?.awards ?: throw CoreException.contestInfoIsNullException
                 awardsBehaviourPath.writeText(
                     json.encodeToString<List<AwardInfo>>(awards.map {
                         AwardInfo(
@@ -66,8 +69,8 @@ class AwardsOptionHandlerImpl(
         awardsBehaviourPath
             .readText()
             .let { json.decodeFromString<List<AwardInfo>>(it) }
-            .groupBy { it.awardId }
-            .mapValues { it.value.firstOrNull()?.behaviour ?: TODO("Unexpected null") }
+            .associateBy { it.awardId }
+            .mapValues { it.value.behaviour }
     } catch (_: Exception) {
         hashMapOf()
     }
