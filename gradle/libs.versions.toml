@@ -1,0 +1,25 @@
+[versions]
+kotlin = "2.3.0"
+ktor = "3.4.1"
+logger = "1.5.32"
+coroutines = "1.10.2"
+node = "7.1.0"
+shadow = "9.4.1"
+clikt = "5.1.0"
+
+[libraries]
+coroutines = { version.ref = "coroutines", group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core" }
+
+logger = { version.ref = "logger", group = "ch.qos.logback", name = "logback-classic" }
+
+ktor-server-netty = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-netty" }
+ktor-server-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-core" }
+ktor-server-routing = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-routing" }
+ktor-server-host-common = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-host-common" }
+
+cli = { version.ref = "clikt", group = "com.github.ajalt.clikt", name = "clikt" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+gradle-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+node = { id = "com.github.node-gradle.node", version.ref = "node" }

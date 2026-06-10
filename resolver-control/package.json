@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "resolver": "1.0.0",
-    "icpc-live-v3-overlay": "^3.1.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "resolver": "workspace:^",
+    "usehooks-ts": "^3.1.1",
+    "icpc-live-v3-overlay": "workspace:^",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "styled-components": "^5.3.3",
+    "lodash": "^4.17.21",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
@@ -28,6 +31,7 @@
     "globals": "^17.5.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

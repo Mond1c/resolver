@@ -1,9 +1,11 @@
 #!/bin/bash
 
-git clone $1
+git clone --depth 1 $1
 
-mv ./live-v3/src/frontend/* .
+for item in ./live-v3/src/frontend/*; do
+  if [ "$(basename "$item")" != "build.gradle.kts" ]; then
+    mv "$item" .
+  fi
+done
 
 rm -rf ./live-v3
-
-rm -f ./build.gradle.kts
