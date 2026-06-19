@@ -5,7 +5,7 @@ import kotlinx.collections.immutable.PersistentMap
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.adapters.applyEvent
 import org.icpclive.cds.api.*
-import com.resolver.util_api.exception.Exception as CoreException
+import com.resolver.util_api.exception.CoreExceptions as CoreException
 
 internal fun ContestState.applyEvents(contestStatesToApply: List<ContestState>): ContestState {
     return contestStatesToApply.fold(this) { acc, contestState ->
@@ -19,8 +19,8 @@ internal fun ScoreboardCalculator.getAwardIdToTeamIds(contestStates: List<Contes
     return HashMap(
         awards
             .associateBy { it.id }
-            .mapValues { entries ->
-                entries.value.teams.toHashSet()
+            .mapValues { (_, award) ->
+                award.teams.toHashSet()
             }
     )
 }
@@ -48,7 +48,7 @@ internal fun List<ContestState>.getProblemIdToTeamIdToFrozenContestStates(): Has
                 })
             })
 
-internal operator fun ContestState.plus(contestStates: List<ContestState>): PersistentMap<RunId, RunInfo> {
+internal fun ContestState.withRunsFrom(contestStates: List<ContestState>): PersistentMap<RunId, RunInfo> {
     return contestStates.fold(runsAfterEvent) { runs, state ->
         val runInfo = (state.lastEvent as RunUpdate).newInfo
         runs.put(runInfo.id, runInfo)
@@ -62,10 +62,13 @@ internal fun ContestState.getProblemOrdinal(problemId: ProblemId) =
     ((infoAfterEvent ?: throw CoreException.contestInfoIsNullException).problems[problemId]
         ?: throw CoreException.problemNotFoundException).ordinal
 
-internal fun HashMap<TeamId, HashMap<ProblemId, List<ContestState>>>.clear(teamId: TeamId, problemId: ProblemId) {
-    (get(teamId)
-        ?: throw CoreException.teamNotFoundException).remove(problemId)
-    if (get(teamId)?.isEmpty() == true) {
+internal fun HashMap<TeamId, HashMap<ProblemId, List<ContestState>>>.removeProblem(
+    teamId: TeamId,
+    problemId: ProblemId
+) {
+    val problems = get(teamId) ?: throw CoreException.teamNotFoundException
+    problems.remove(problemId)
+    if (problems.isEmpty()) {
         remove(teamId)
     }
 }

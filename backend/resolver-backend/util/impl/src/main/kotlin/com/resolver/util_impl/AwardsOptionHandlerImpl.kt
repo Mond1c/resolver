@@ -14,7 +14,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.system.exitProcess
-import com.resolver.util_api.exception.Exception as CoreException
+import com.resolver.util_api.exception.CoreExceptions as CoreException
 
 class AwardsOptionHandlerImpl(
     private val calculator: ScoreboardCalculator,

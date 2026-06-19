@@ -2,7 +2,7 @@ package com.resolver.scoreboard_management_impl
 
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.UiEvent
-import com.resolver.util_api.exception.Exception
+import com.resolver.util_api.exception.CoreExceptions
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ProblemId
 import org.icpclive.cds.api.TeamId
@@ -62,7 +62,7 @@ internal fun List<UiEvent>.findFirstChooseRow(stateIndex: Int, teamId: TeamId): 
 }
 
 internal fun ContestState.getProblemDisplayName(problemId: ProblemId): String {
-    val infoAfterEvent = infoAfterEvent ?: throw Exception.contestInfoIsNullException
-    val problem = infoAfterEvent.problems[problemId] ?: throw Exception.problemNotFoundException
+    val infoAfterEvent = infoAfterEvent ?: throw CoreExceptions.contestInfoIsNullException
+    val problem = infoAfterEvent.problems[problemId] ?: throw CoreExceptions.problemNotFoundException
     return problem.displayName
 }

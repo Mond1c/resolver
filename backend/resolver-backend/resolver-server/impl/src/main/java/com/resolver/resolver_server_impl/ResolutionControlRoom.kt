@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import org.icpclive.cds.api.TeamId
 import org.icpclive.cds.api.toTeamId
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.seconds
 
 internal class ResolutionControlRoom(
     private val json: Json,
@@ -45,30 +46,39 @@ internal class ResolutionControlRoom(
                         if (frame is Frame.Text) {
                             val receivedText = frame.readText()
                             val parts = receivedText.split(SPACE)
-                            if (parts.size == 2) {
+                            if (parts.isNotEmpty()) {
                                 when (parts[0]) {
-                                    SIG_APPLY_FACTOR -> parts[1].toDoubleOrNull()?.let(onApplyFactor)
+                                    SIG_STOP -> onStop()
+                                    SIG_START -> onStart()
+                                    SIG_UP -> onUp()
+                                    SIG_DOWN -> onDown()
+                                    SIG_CHANGE_DIRECTION -> onChangeDirection()
+
+                                    SIG_APPLY_FACTOR -> {
+                                        if (parts.size == 2) {
+                                            parts[1].toDoubleOrNull()
+                                                ?.let(onApplyFactor)
+                                        }
+                                    }
+
                                     SIG_GET_VARIANTS_TO_GOTO -> {
-                                        send(
-                                            json.encodeToString<ServerToControllerMessage?>(
-                                                onGetVariantsToGoto(parts[1].toTeamId())
+                                        if (parts.size == 2) {
+                                            send(
+                                                json.encodeToString<ServerToControllerMessage?>(
+                                                    onGetVariantsToGoto(parts[1].toTeamId())
+                                                )
                                             )
-                                        )
+                                        }
+                                    }
+
+                                    SIG_GOTO -> {
+                                        if (parts.size == 3) {
+                                            parts[1].toIntOrNull()?.let { stateIndex ->
+                                                onGoto(stateIndex, parts[2].toTeamId())
+                                            }
+                                        }
                                     }
                                 }
-                            } else if (parts.size == 3) {
-                                when (parts[0]) {
-                                    SIG_GOTO -> parts[1].toIntOrNull()?.let { stateIndex ->
-                                        onGoto(stateIndex, parts[2].toTeamId())
-                                    }
-                                }
-                            }
-                            when (receivedText) {
-                                SIG_STOP -> onStop()
-                                SIG_START -> onStart()
-                                SIG_UP -> onUp()
-                                SIG_DOWN -> onDown()
-                                SIG_CHANGE_DIRECTION -> onChangeDirection()
                             }
                         }
                     }
@@ -82,7 +92,7 @@ internal class ResolutionControlRoom(
     private suspend fun DefaultWebSocketSession.validateCredentials(
         onValidateCredentials: (login: String?, password: String?) -> Boolean
     ): String? {
-        val creds = withTimeout(AUTH_TIMEOUT_MS) {
+        val creds = withTimeout(AUTH_TIMEOUT) {
             incoming.receive() as? Frame.Text
         }
         val parts = creds?.readText()?.split(SPACE)
@@ -100,7 +110,7 @@ internal class ResolutionControlRoom(
 
     companion object {
         private const val AUTH_FAILED_MSG = "Authentication failed"
-        private const val AUTH_TIMEOUT_MS = 60_000L
+        private val AUTH_TIMEOUT = 60.seconds
         private const val SIG_STOP = "0"
         private const val SIG_START = "1"
         private const val SIG_UP = "2"

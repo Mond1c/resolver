@@ -8,11 +8,11 @@ import com.resolver.util_api.ResolverAccounts
 import kotlinx.serialization.json.Json
 
 object ResolverServerComponent {
-    fun provideServer1(
+    fun provideServer(
         scoreboardManager: ScoreboardManager,
         json: Json,
-        serverOptions: ServerOptions,
-        resolverAccounts: ResolverAccounts
+        resolverAccounts: ResolverAccounts,
+        serverOptions: ServerOptions
     ): Server {
         return ServerImpl(
             json = json,

@@ -24,7 +24,7 @@ object ScoreboardManagementComponent {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun provideScoreboardManager1(
+    fun provideScoreboardManager(
         frozenState: ContestState,
         snapshots: List<ContestState>,
         steps: List<ResolutionStep>,
@@ -33,7 +33,7 @@ object ScoreboardManagementComponent {
         return ScoreboardManagerImpl(
             frozenState = frozenState,
             snapshots = snapshots,
-            calculator = ResolverUtilComponent.scoreboardCalculator1,
+            calculator = ResolverUtilComponent.scoreboardCalculator,
             steps = steps,
             uiMapper = uiMapper,
             scoreboardManagerOptions = scoreboardManagerOptions

@@ -1,6 +1,6 @@
 package com.resolver.util_api.exception
 
-object Exception {
+object CoreExceptions {
     val awardNotFoundException by lazy {
         InvariantViolationException("Map must contain all awards")
     }

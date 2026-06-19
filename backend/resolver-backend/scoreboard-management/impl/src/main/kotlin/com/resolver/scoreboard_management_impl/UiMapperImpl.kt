@@ -9,7 +9,7 @@ object UiMapperImpl : UiMapper {
     override fun mapToUiEvents(steps: List<ResolutionStep>): List<UiEvent> {
         var isPrevTheSame = false
         return buildList {
-            for (i in 0..<steps.size) {
+            for (i in steps.indices) {
                 isPrevTheSame = when (val step = steps[i]) {
                     is ResolutionStep.WithTeamId.ICPCAcceptResolutionStep -> {
                         handleICPCAcceptResolutionStep(

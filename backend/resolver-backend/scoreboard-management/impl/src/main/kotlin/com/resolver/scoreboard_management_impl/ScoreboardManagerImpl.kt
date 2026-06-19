@@ -3,7 +3,7 @@ package com.resolver.scoreboard_management_impl
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.scoreboard_management_api.*
 import com.resolver.util_api.ScoreboardCalculator
-import com.resolver.util_api.exception.Exception
+import com.resolver.util_api.exception.CoreExceptions
 import com.resolver.util_api.exception.UnexpectedStateException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -123,12 +123,12 @@ class ScoreboardManagerImpl(
     override fun getScoreboard(): UiEvent.Scoreboard {
         val (indexOfLastChosenRow, teamOfLastChosenRow, isLastChosenRowChosenNow) = lastChosenRowInfo.value
         val (rows, ranking) = calculator.calculateScoreboard(currentState.value)
-            ?: throw Exception.contestInfoIsNullException
+            ?: throw CoreExceptions.contestInfoIsNullException
         return UiEvent.Scoreboard(
             teamIdToScoreboardRow = rows,
             order = ranking.order,
             ranks = ranking.ranks,
-            contestInfo = currentState.value.infoAfterEvent ?: throw Exception.contestInfoIsNullException,
+            contestInfo = currentState.value.infoAfterEvent ?: throw CoreExceptions.contestInfoIsNullException,
             indexOfLastChosenRow = indexOfLastChosenRow,
             teamOfLastChosenRow = teamOfLastChosenRow,
             isLastChosenRowChosenNow = isLastChosenRowChosenNow
@@ -179,7 +179,7 @@ class ScoreboardManagerImpl(
                         variants.add(VariantToGoto(stateIndex, problemsToResolveDisplayNames))
                     }
 
-                    else -> throw Exception.badUiEventsSequenceException
+                    else -> throw CoreExceptions.badUiEventsSequenceException
                 }
             }
         }

@@ -16,13 +16,9 @@ import kotlinx.serialization.json.Json
 import org.icpclive.cds.api.ContestState
 
 object ResolverUtilComponent {
-    val scoreboardCalculator1: ScoreboardCalculator by lazy {
-        ScoreboardCalculatorImpl
-    }
+    val scoreboardCalculator: ScoreboardCalculator = ScoreboardCalculatorImpl
 
-    val yesNoConsoleHandler: YesNoConsoleHandler by lazy {
-        YesNoConsoleHandlerImpl
-    }
+    val yesNoConsoleHandler: YesNoConsoleHandler = YesNoConsoleHandlerImpl
 
     fun provideApp(
         json: Json,
@@ -33,7 +29,7 @@ object ResolverUtilComponent {
         chooseResolver: (ContestState) -> Resolver
     ): App {
         return AppImpl(
-            calculator = scoreboardCalculator1,
+            calculator = scoreboardCalculator,
             yesNoConsoleHandler = yesNoConsoleHandler,
             json = json,
             createScoreboardManager = createScoreboardManager,

@@ -3,7 +3,7 @@ package com.resolver.resolution_logic_impl
 import com.resolver.resolution_logic_api.AwardBehaviour
 import com.resolver.resolution_logic_api.AwardsHandler
 import com.resolver.resolution_logic_api.ResolutionStep
-import com.resolver.util_api.exception.Exception
+import com.resolver.util_api.exception.CoreExceptions
 import org.icpclive.cds.api.Award
 import org.icpclive.cds.api.TeamId
 
@@ -19,15 +19,16 @@ object AwardsHandlerImpl : AwardsHandler {
         val teamAwardsToShow = mutableListOf<Award>()
         val groupAwardsToShow = mutableListOf<Award>()
         for (award in awards) {
-            if (!award.teams.contains(teamId) || awardIdToAwardBehaviour[award.id] == AwardBehaviour.IGNORE) {
+            val behaviour = awardIdToAwardBehaviour[award.id]
+            if (!award.teams.contains(teamId) || behaviour == AwardBehaviour.IGNORE) {
                 continue
             }
-            val teamIds = awardIdToTeamIds[award.id] ?: throw Exception.awardNotFoundException
+            val teamIds = awardIdToTeamIds[award.id] ?: throw CoreExceptions.awardNotFoundException
             teamIds.remove(teamId)
             if (
                 award.teams.size == 1 ||
-                awardIdToAwardBehaviour[award.id] == AwardBehaviour.AFTER_EACH ||
-                awardIdToAwardBehaviour[award.id] == null
+                behaviour == AwardBehaviour.AFTER_EACH ||
+                behaviour == null
             ) {
                 teamAwardsToShow.add(award)
             } else if (teamIds.isEmpty()) {

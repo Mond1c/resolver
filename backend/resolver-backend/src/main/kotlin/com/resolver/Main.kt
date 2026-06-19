@@ -8,18 +8,7 @@ import com.resolver.util_di.ResolverUtilComponent
 
 fun main(args: Array<String>) = ResolverUtilComponent.provideApp(
     json = ScoreboardManagementComponent.json,
-    createScoreboardManager = { frozenState, snapshots, steps, scoreboardManagerOptions ->
-        ScoreboardManagementComponent.provideScoreboardManager1(
-            frozenState = frozenState,
-            snapshots = snapshots,
-            steps = steps,
-            scoreboardManagerOptions = scoreboardManagerOptions
-        )
-    },
-    createServer = { scoreboardManager, json, passwords, serverOptions ->
-        ResolverServerComponent.provideServer1(scoreboardManager, json, serverOptions, passwords)
-    },
-    chooseResolver = { contestState ->
-        ResolutionLogicComponent.provideResolver(contestState)
-    }
+    createScoreboardManager = ScoreboardManagementComponent::provideScoreboardManager,
+    createServer = ResolverServerComponent::provideServer,
+    chooseResolver = ResolutionLogicComponent::provideResolver
 ).main(args)

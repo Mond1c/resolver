@@ -28,14 +28,14 @@ class ServerImplTest {
     @Test
     fun `GIVEN resolution in process WHEN client joins THEN no one of important ui events is lost`() = runBlocking {
         ResolverUtilComponent.provideAppBase(
-            ResolverUtilComponent.scoreboardCalculator1,
+            ResolverUtilComponent.scoreboardCalculator,
             ResolverUtilComponent.yesNoConsoleHandler,
             ScoreboardManagementComponent.json
         ) { passwords, map, options, frozen, notFrozen ->
             val frozenState = frozen.last()
             val resolver = ResolutionLogicComponent.provideResolver(frozenState)
             val result = resolver.resolve(frozenState, notFrozen, map)
-            val manager = ScoreboardManagementComponent.provideScoreboardManager1(
+            val manager = ScoreboardManagementComponent.provideScoreboardManager(
                 frozenState,
                 result.snapshots,
                 result.steps,
@@ -48,15 +48,15 @@ class ServerImplTest {
             val json = Json {
                 ignoreUnknownKeys = true
             }
-            val server = ResolverServerComponent.provideServer1(
+            val server = ResolverServerComponent.provideServer(
                 manager,
                 json,
+                passwords,
                 ServerOptions(
                     resolutionControlWsEndpoint = options.resolutionControlWsEndpoint,
                     resolutionWsEndpoint = options.resolutionWsEndpoint,
                     replay = options.replay
-                ),
-                passwords
+                )
             )
             server.start(
                 StartServerOptions(

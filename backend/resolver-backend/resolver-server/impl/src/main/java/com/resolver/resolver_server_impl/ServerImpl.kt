@@ -57,7 +57,6 @@ class ServerImpl(
                         throw e
                     }
                 }
-                isStarted.store(true)
                 StartResult.MaybeSuccess(startJob)
             }
         } catch (_: Exception) {
@@ -81,6 +80,10 @@ class ServerImpl(
     }
 
     private fun Application.module() {
+        monitor.subscribe(ApplicationStarted) {
+            isStarted.store(true)
+        }
+
         install(WebSockets) {
             pingPeriod = 15.seconds
             timeout = 15.seconds

@@ -12,7 +12,7 @@ class UiMapperImplTest {
     @Test
     fun `GIVEN resolution steps WHEN map it to ui events THEN result sequence is valid`() {
         ResolverUtilComponent.provideAppBase(
-            ResolverUtilComponent.scoreboardCalculator1,
+            ResolverUtilComponent.scoreboardCalculator,
             ResolverUtilComponent.yesNoConsoleHandler,
             ScoreboardManagementComponent.json
         ) { _, map, _, frozen, notFrozen ->
