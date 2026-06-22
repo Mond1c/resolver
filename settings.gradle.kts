@@ -33,10 +33,10 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":app:desktopApp")
-include(":app:shared")
-include(":app:resolverControlWasm")
-include(":app:resolverWasm")
+include(":frontend-compose:desktopApp")
+include(":frontend-compose:shared")
+include(":frontend-compose:resolverControlWasm")
+include(":frontend-compose:resolverWasm")
 
 include(":core")
 

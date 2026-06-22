@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./gradlew :app:resolverControlWasm:shadowJar
-./gradlew :app:resolverWasm:shadowJar
+./gradlew :frontend-compose:resolverControlWasm:shadowJar
+./gradlew :frontend-compose:resolverWasm:shadowJar

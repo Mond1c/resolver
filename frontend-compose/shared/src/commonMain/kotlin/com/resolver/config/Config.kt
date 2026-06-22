@@ -1,6 +1,6 @@
 package com.resolver.config
 
-import Resolver.app.shared.BuildConfig
+import Resolver.frontend_compose.shared.BuildConfig
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import resolver.app.shared.generated.resources.Res
+import resolver.frontend_compose.shared.generated.resources.Res
 
 @Serializable
 internal data class Config(
