@@ -77,3 +77,7 @@ internal fun HashMap<TeamId, HashMap<ProblemId, List<ContestState>>>.removeProbl
         remove(teamId)
     }
 }
+
+internal fun ContestState.extractProblemInfo(problemId: ProblemId) = (infoAfterEvent
+    ?: throw CoreExceptions.contestInfoIsNullException).problems[problemId]
+    ?: throw CoreExceptions.problemNotFoundException

@@ -6,6 +6,7 @@ import com.resolver.resolution_logic_api.ResolutionResult
 import com.resolver.resolution_logic_api.ResolutionStep
 import com.resolver.resolution_logic_api.Resolver
 import com.resolver.util_api.ScoreboardCalculator
+import com.resolver.util_api.exception.CoreExceptions
 import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ProblemId
@@ -13,7 +14,6 @@ import org.icpclive.cds.api.RunResult
 import org.icpclive.cds.api.ScoreboardRow
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
-import com.resolver.util_api.exception.CoreExceptions
 
 @Suppress("DuplicatedCode")
 class GreedyIOIResolver(
@@ -200,13 +200,14 @@ class GreedyIOIResolver(
             val newIndex = ranking.order.indexOf(teamId)
             val runInfo = (currentContestStateResult.lastEvent as RunUpdate).newInfo
             val ioiResult = runInfo.result as RunResult.IOI
+            val row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException
             resolutionStep = if (ioiResult.wrongVerdict != null) {
                 ResolutionStep.WithTeamId.RejectResolutionStep(
                     teamId = runInfo.teamId,
                     problemId = runInfo.problemId,
                     index = newIndex,
                     oldRow = scoreboardRowBeforeResolution,
-                    row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException,
+                    row = row,
                 )
             } else {
                 ResolutionStep.WithTeamId.AcceptResolutionStep(
@@ -214,7 +215,7 @@ class GreedyIOIResolver(
                     problemId = runInfo.problemId,
                     oldIndex = oldIndex,
                     newIndex = newIndex,
-                    row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException,
+                    row = row,
                     ranks = ranking.ranks,
                     order = ranking.order,
                     oldRow = scoreboardRowBeforeResolution,

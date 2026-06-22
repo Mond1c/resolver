@@ -11,7 +11,6 @@ import org.icpclive.cds.RunUpdate
 import org.icpclive.cds.api.ContestState
 import org.icpclive.cds.api.ICPCProblemResult
 import org.icpclive.cds.api.ProblemId
-import org.icpclive.cds.api.RunResult
 import org.icpclive.cds.api.ScoreboardRow
 import org.icpclive.cds.api.TeamId
 import kotlin.time.Duration
@@ -212,11 +211,13 @@ class GreedyICPCResolver(
                 ?: throw CoreExceptions.contestInfoIsNullException
             val newIndex = ranking.order.indexOf(teamId)
             val runInfo = (currentContestStateResult.lastEvent as RunUpdate).newInfo
-            val icpcResult = runInfo.result as RunResult.ICPC
-            resolutionStep = if (!icpcResult.verdict.isAccepted) {
+            val problemOrdinal = currentContestState.extractProblemInfo(runInfo.problemId).ordinal
+            val row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException
+            val isAccepted = (row.problemResults[problemOrdinal] as ICPCProblemResult).isSolved
+            resolutionStep = if (!isAccepted) {
                 ResolutionStep.WithTeamId.RejectResolutionStep(
                     teamId = runInfo.teamId,
-                    row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException,
+                    row = row,
                     index = oldIndex,
                     problemId = runInfo.problemId,
                     oldRow = scoreboardRowBeforeResolution
@@ -225,7 +226,7 @@ class GreedyICPCResolver(
                 ResolutionStep.WithTeamId.AcceptResolutionStep(
                     teamId = runInfo.teamId,
                     problemId = runInfo.problemId,
-                    row = rows[teamId] ?: throw CoreExceptions.teamNotFoundException,
+                    row = row,
                     ranks = ranking.ranks,
                     order = ranking.order,
                     oldRow = scoreboardRowBeforeResolution,

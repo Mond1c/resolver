@@ -13,6 +13,6 @@ interface ControllerRepository {
     suspend fun authenticate(login: String, password: String)
     suspend fun sendGetVariantsToGotoSignal(teamId: String)
     fun getConnectionFailureFlow(): Flow<Unit>
-    fun getVariantsToGotoFlow(): Flow<ServerToControllerMessage.VariantsToGoto>
+    fun getVariantsToGotoFlow(): Flow<ServerToControllerMessage.VariantsToGoto?>
     fun getSettingsFlow(): Flow<ServerToControllerMessage.ScoreboardManagerSettings?>
 }

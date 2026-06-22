@@ -24,7 +24,7 @@ internal class ControllerRepositoryImpl(
         SupervisorJob() + Dispatchers.Default +
                 CoroutineExceptionHandler { _, _ -> })
 ) : ControllerRepository {
-    private val variantsToGotoFlow = MutableSharedFlow<ServerToControllerMessage.VariantsToGoto>()
+    private val variantsToGotoFlow = MutableSharedFlow<ServerToControllerMessage.VariantsToGoto?>()
     private val settingsFlow: MutableSharedFlow<ServerToControllerMessage.ScoreboardManagerSettings?> =
         MutableSharedFlow()
 
@@ -45,6 +45,7 @@ internal class ControllerRepositoryImpl(
         }
         scope.launch {
             connectionFailureFlow.collect {
+                variantsToGotoFlow.emit(null)
                 settingsFlow.emit(null)
             }
         }
@@ -88,7 +89,7 @@ internal class ControllerRepositoryImpl(
 
     override fun getConnectionFailureFlow(): Flow<Unit> = connectionFailureFlow
 
-    override fun getVariantsToGotoFlow(): Flow<ServerToControllerMessage.VariantsToGoto> =
+    override fun getVariantsToGotoFlow(): Flow<ServerToControllerMessage.VariantsToGoto?> =
         variantsToGotoFlow
 
     override fun getSettingsFlow(): Flow<ServerToControllerMessage.ScoreboardManagerSettings?> =
