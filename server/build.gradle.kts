@@ -7,11 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.resolver"
-version = "1.0-SNAPSHOT"
-
 application {
-    mainClass.set("com.resolver.MainKt")
+    mainClass.set("org.icpclive.resolver.MainKt")
 }
 
 tasks.shadowJar {

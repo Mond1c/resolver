@@ -2,9 +2,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver_management"
-version = "1.0-management-SNAPSHOT"
-
 dependencies {
     implementation(project(":server:resolution-logic:api"))
     implementation(project(":server:scoreboard-management:api"))

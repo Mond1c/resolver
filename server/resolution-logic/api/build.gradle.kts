@@ -3,9 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.resolver"
-version = "1.0-logic-SNAPSHOT"
-
 dependencies {
     implementation(libs.full)
 

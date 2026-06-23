@@ -40,6 +40,6 @@ tasks.named<ShadowJar>("shadowJar") {
     }
     archiveFileName.set("resolver-control-wasm.jar")
     manifest {
-        attributes["Main-Class"] = "com.resolver.server.ServerKt"
+        attributes["Main-Class"] = "org.icpclive.resolver.server.ServerKt"
     }
 }

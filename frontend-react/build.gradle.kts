@@ -70,9 +70,10 @@ tasks {
         }
     }
 
-    val buildResolver = pnpmBuild("pnpm_run_buildResolver", layout.projectDirectory.dir("resolver"), "/resolver") {
-        dependsOn(cleanResolverDist)
-    }
+    val buildResolver =
+        pnpmBuild("pnpm_run_buildResolver", layout.projectDirectory.dir("resolver"), "/resolver") {
+            dependsOn(cleanResolverDist)
+        }
 
     val buildResolverControl = pnpmBuild(
         "pnpm_run_buildResolverControl",
@@ -87,7 +88,8 @@ tasks {
         archiveBaseName.set("resolver-frontend")
         destinationDirectory.set(layout.buildDirectory.dir("jars"))
         manifest {
-            attributes["Main-Class"] = "com.resolver.main.resolver.ResolverFrontendServerKt"
+            attributes["Main-Class"] =
+                "org.icpclive.resolver.main.resolver.ResolverFrontendServerKt"
         }
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(project.configurations.runtimeClasspath.get())
@@ -102,7 +104,8 @@ tasks {
         archiveBaseName.set("resolver-control-frontend")
         destinationDirectory.set(layout.buildDirectory.dir("jars"))
         manifest {
-            attributes["Main-Class"] = "com.resolver.main.control.ResolverControlFrontendServerKt"
+            attributes["Main-Class"] =
+                "org.icpclive.resolver.main.control.ResolverControlFrontendServerKt"
         }
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(project.configurations.runtimeClasspath.get())

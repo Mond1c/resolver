@@ -3,9 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.resolver_util"
-version = "1.0-util-SNAPSHOT"
-
 dependencies {
     implementation(project(":server:util:api"))
     implementation(project(":server:resolver-server:api"))

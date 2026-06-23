@@ -2,9 +2,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "com.resolver_server"
-version = "1.0-resolver-SNAPSHOT"
-
 dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.host.common)

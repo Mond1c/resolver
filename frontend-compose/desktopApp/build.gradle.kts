@@ -17,11 +17,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.resolver.MainKt"
+        mainClass = "org.icpclive.resolver.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.resolver"
+            packageName = "org.icpclive.resolver"
             packageVersion = "1.0.0"
         }
     }

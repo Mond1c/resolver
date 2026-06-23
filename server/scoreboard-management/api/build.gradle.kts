@@ -3,9 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.resolver_management"
-version = "1.0-management-SNAPSHOT"
-
 dependencies {
     implementation(projects.core)
 
