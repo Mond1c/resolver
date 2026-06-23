@@ -70,11 +70,7 @@ data class IOIProblemResult(
 @Serializable
 data class ScoreboardRow(
     val totalScore: Double,
-    @Serializable(
-        with =
-
-            DurationInSecondsSerializer::class
-    )
+    @Serializable(with = DurationInSecondsSerializer::class)
     val penalty: Duration,
     @Serializable(with = DurationInMillisecondsSerializer::class)
     @SerialName("lastAcceptedMs")
