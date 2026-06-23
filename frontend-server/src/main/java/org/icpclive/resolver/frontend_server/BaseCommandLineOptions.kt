@@ -17,7 +17,7 @@ internal abstract class BaseCommandLineOptions : OptionGroup() {
         "-h", "--host",
         help = "Host to connect to"
     )
-        .default("localhost")
+        .default("0.0.0.0")
 
     abstract val endpoint: String
 }

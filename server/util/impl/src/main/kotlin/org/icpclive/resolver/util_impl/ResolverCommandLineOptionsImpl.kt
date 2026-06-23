@@ -37,4 +37,10 @@ open class ResolverCommandLineOptionsImpl : ResolverCommandLineOptions() {
         help = "Enable goto"
     )
         .flag(default = false)
+
+    override val disableAuth by option(
+        "--disable-auth",
+        help = "Disable auth"
+    )
+        .flag(default = false)
 }

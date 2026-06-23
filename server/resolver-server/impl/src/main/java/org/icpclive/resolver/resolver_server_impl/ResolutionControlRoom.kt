@@ -28,6 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 internal class ResolutionControlRoom(
     private val json: Json,
     private val scoreboardManagerSettingsFlow: StateFlow<ServerToControllerMessage.ScoreboardManagerSettings>,
+    private val isAuthDisabled: Boolean
 ) {
     private val clients = ConcurrentHashMap.newKeySet<String>()
 
@@ -48,7 +49,11 @@ internal class ResolutionControlRoom(
     ) {
         with(session) {
             runCatching {
-                val login = validateCredentials(onValidateCredentials) ?: return@runCatching
+                val login = if (!isAuthDisabled) {
+                    validateCredentials(onValidateCredentials) ?: return@runCatching
+                } else {
+                    ""
+                }
                 try {
                     launch {
                         scoreboardManagerSettingsFlow.collect {

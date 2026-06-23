@@ -12,7 +12,8 @@ data class ResolverOptionsImpl(
     override val host: String,
     override val port: Int,
     override val isGotoEnabled: Boolean,
-    override val replay: Int
+    override val replay: Int,
+    override val isAuthDisabled: Boolean
 ) : ResolverOptions {
     override fun mergeWithCommandLineOptions(commandLineOptions: ResolverCommandLineOptions): ResolverOptions {
         return ResolverOptionsImpl(
@@ -22,7 +23,8 @@ data class ResolverOptionsImpl(
             host = commandLineOptions.host ?: host,
             port = commandLineOptions.port ?: port,
             isGotoEnabled = commandLineOptions.enableGoto || isGotoEnabled,
-            replay = replay
+            replay = replay,
+            isAuthDisabled = commandLineOptions.disableAuth || isAuthDisabled
         )
     }
 
@@ -34,7 +36,8 @@ data class ResolverOptionsImpl(
             host = "0.0.0.0",
             port = 8080,
             isGotoEnabled = false,
-            replay = 10
+            replay = 10,
+            isAuthDisabled = false
         )
     }
 }

@@ -8,7 +8,8 @@ import org.icpclive.resolver.util_api.ResolverOptions
 internal fun ResolverOptions.extractServerOptions(): ServerOptions = ServerOptions(
     resolutionControlWsEndpoint = resolutionControlWsEndpoint,
     resolutionWsEndpoint = resolutionWsEndpoint,
-    replay = replay
+    replay = replay,
+    isAuthDisabled = isAuthDisabled
 )
 
 internal fun ResolverOptions.extractScoreboardManagerOptions(): ScoreboardManagerOptions =

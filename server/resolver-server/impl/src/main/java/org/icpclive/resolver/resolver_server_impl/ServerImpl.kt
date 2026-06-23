@@ -44,7 +44,8 @@ class ServerImpl(
     private val serverScope = CoroutineScope(SupervisorJob() + serverDispatcher)
     private val controlRoom = ResolutionControlRoom(
         json = json,
-        scoreboardManagerSettingsFlow = scoreboardManager.getSettingsFlow()
+        scoreboardManagerSettingsFlow = scoreboardManager.getSettingsFlow(),
+        isAuthDisabled = serverOptions.isAuthDisabled
     )
     private val resolutionRoom = ResolutionRoom(
         scoreboardManager = scoreboardManager,

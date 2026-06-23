@@ -8,4 +8,5 @@ abstract class ResolverCommandLineOptions : CdsCommandLineOptions() {
     abstract val genAwards: Boolean
     abstract val genResolverOptions: Boolean
     abstract val enableGoto: Boolean
+    abstract val disableAuth: Boolean
 }

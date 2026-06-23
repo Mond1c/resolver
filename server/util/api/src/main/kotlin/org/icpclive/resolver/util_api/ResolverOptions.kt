@@ -8,6 +8,7 @@ interface ResolverOptions {
     val port: Int
     val isGotoEnabled: Boolean
     val replay: Int
+    val isAuthDisabled: Boolean
 
     fun mergeWithCommandLineOptions(commandLineOptions: ResolverCommandLineOptions): ResolverOptions
 }
