@@ -1,0 +1,85 @@
+[
+  {
+    "type": "overrideContestSettings",
+    "freezeTimeSeconds": 14400
+  },
+  {
+    "type": "addMedals",
+    "gold": 4,
+    "silver": 4,
+    "bronze": 4
+  },
+  {
+    "type": "overrideAwards",
+    "championTitle": "Northern Eurasia Champions",
+    "rankAwardsMaxRank": 13,
+    "medalGroups": [
+      {
+        "medals": [
+          {
+            "id": "first-diploma",
+            "citation": "First Award",
+            "minScore": 8.0,
+            "tiebreakMode": "NONE"
+          },
+          {
+            "id": "second-diploma",
+            "citation": "Second Award",
+            "minScore": 6.0,
+            "tiebreakMode": "NONE"
+          },
+          {
+            "id": "third-diploma",
+            "citation": "Third Award",
+            "minScore": 5.0,
+            "tiebreakMode": "NONE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "overrideProblems",
+    "rules": {
+      "A": {
+        "color": "#e6194B"
+      },
+      "B": {
+        "color": "#3cb44b"
+      },
+      "C": {
+        "color": "#ffe119"
+      },
+      "D": {
+        "color": "#4363d8"
+      },
+      "E": {
+        "color": "#f58231"
+      },
+      "F": {
+        "color": "#42d4f4"
+      },
+      "G": {
+        "color": "#f032e6"
+      },
+      "H": {
+        "color": "#fabed4"
+      },
+      "I": {
+        "color": "#469990"
+      },
+      "J": {
+        "color": "#dcbeff"
+      },
+      "K": {
+        "color": "#9A6324"
+      },
+      "L": {
+        "color": "#fffac8"
+      },
+      "M": {
+        "color": "#800000"
+      }
+    }
+  }
+]

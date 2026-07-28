@@ -1,0 +1,41 @@
+[
+  {
+    "type": "overrideContestSettings",
+    "freezeTimeSeconds": 14400
+  },
+  {
+    "type": "addMedals",
+    "gold": 4,
+    "silver": 4,
+    "bronze": 4
+  },
+  {
+    "type": "overrideAwards",
+    "championTitle": "Northern Eurasia Champions",
+    "rankAwardsMaxRank": 13,
+    "medalGroups": [
+      {
+        "medals": [
+          {
+            "id": "first-diploma",
+            "citation": "First Award",
+            "minScore": 8.0,
+            "tiebreakMode": "NONE"
+          },
+          {
+            "id": "second-diploma",
+            "citation": "Second Award",
+            "minScore": 6.0,
+            "tiebreakMode": "NONE"
+          },
+          {
+            "id": "third-diploma",
+            "citation": "Third Award",
+            "minScore": 5.0,
+            "tiebreakMode": "NONE"
+          }
+        ]
+      }
+    ]
+  }
+]
