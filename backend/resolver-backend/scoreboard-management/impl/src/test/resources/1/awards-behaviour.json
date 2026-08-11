@@ -1,0 +1,70 @@
+[
+    {
+        "awardId": "winner",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "first-diploma",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "second-diploma",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "third-diploma",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-1",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-2",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-3",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-4",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-5",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-6",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-7",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-8",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-9",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-10",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-11",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-12",
+        "behaviour": "after_each"
+    },
+    {
+        "awardId": "rank-13",
+        "behaviour": "after_each"
+    }
+]

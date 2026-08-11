@@ -1,0 +1,6 @@
+[
+  {
+    "type": "overrideContestSettings",
+    "freezeTimeSeconds": 7200
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "login": "$creds.login1",
+    "password": "$creds.password1"
+  },
+  {
+    "login": "$creds.login2",
+    "password": "$creds.password2"
+  }
+]

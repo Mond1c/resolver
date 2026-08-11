@@ -1,0 +1,33 @@
+[versions]
+kotlin = "2.3.0"
+live-v3 = "v3.5.0"
+ktor = "3.4.1"
+logger = "1.5.32"
+shadow = "9.4.1"
+coroutines = "1.10.2"
+serialization = "1.10.0"
+
+[libraries]
+serialization = { version.ref = "serialization", group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json" }
+
+coroutines = { version.ref = "coroutines", group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core" }
+
+logger = { version.ref = "logger", group = "ch.qos.logback", name = "logback-classic" }
+
+ktor-server-netty = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-netty" }
+ktor-server-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-core" }
+ktor-server-routing = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-routing" }
+ktor-server-host-common = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-host-common" }
+ktor-server-websockets = { version.ref = "ktor", group = "io.ktor", name = "ktor-server-websockets" }
+ktor-client-cio = { version.ref = "ktor", group = "io.ktor", name = "ktor-client-cio" }
+ktor-client-core = { version.ref = "ktor", group = "io.ktor", name = "ktor-client-core" }
+
+full = { version.ref = "live-v3", group = "com.github.icpc.live-v3", name = "org.icpclive.cds.full" }
+
+kotlin-junit = { version.ref = "kotlin", group = "org.jetbrains.kotlin", name = "kotlin-test-junit5" }
+kotlinx-coroutines-test = { version.ref = "coroutines", group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+gradle-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
